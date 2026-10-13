@@ -1,0 +1,1415 @@
+## Authoria - Requiem Reforged Version 2.9.9
+> Not Save Safe, Major Cleanup for a more consistent playthrough.
+> The Main Profile is removed, NSFW is the only profile now, keep in mind that it is made even less intrusive now, this will help a lot in tracking down bugs and issues in the future.
+> Only two modes now, easy and normal.
+> This is the last version with MCO, it will be removed with the next update, BFCO will not be added, bugs associated with these mods are too much to ignore, and we believe that a bugfree consistent experience is better than some fancy moves, this version will remain on nexus but is unsupported afetr the update.
+# Added
+- Dyn FNIS AA functions
+- Dynamic Inventory Icon Injector
+- LoTD Inventory Icons for DIII
+- Read or Take SKSE
+- Use or Take SKSE
+- Atlas Map Markers SE - Updated with MCM - Settings Loader
+- HDT-SMP PaladinMelus Armor for HIMBO
+- VIGILANT - CoMAP Addon
+- VIGILANT - Monster Ladies Refined
+- (DAR)More Ritho-ish Giant Animations SE
+- Vigilant - Nature of the Wildlands - Gildergreen True End Patch
+- Glenmoril - Firearm animations
+- Unslaad SE - TrueHUD Boss Bar
+- JK's Nightgate Inn
+- Siege at Icemoth - Skeleton Replacer HD
+- Fort Takeovers Framework Replacer - 10 days wait
+- MM Real Elks 
+- Husky HD
+- Bristleback Boars of Skyrim - HD replacer
+- Exist's Ebony High Hrothgar - CM
+- Open Animations Romance and Erotica for OStim Standalone
+- Pleasantrees - Simple Trees in Cities
+- Legacy of the Dragonborn config for Crafting Pulls Resources from Containers
+- Zodd's skyparkour steps
+- Enchanted Icon Overhaul
+- Immersive Spell Learning - DESTified Study Icon
+- KittyTail Master Spells Distribution Fix (removed our handmade fix)
+- Water Collision Crash Fix NG
+- SOFTBODY - More perfect physical collision of the body
+- Accurate Projectile Collision
+- Samples of Stools - A Barstool Replacer
+- Diverse Gravestones - Falkreath - Base Object Swapper or Model Swapper
+- Higher Poly Vanilla Dark Elf Urns
+- Immersive Dialogue Expansion - Dawnguard and Vigilants
+- Fancy Fishing - Minigame and Tweaks
+- Swimming Extensions - Swimming Overhaul (Svimex)
+- GC Bug Fix
+- Sweeping Organizes Stuff - Use Broom to Clean Mess
+- Simple Wheeler Menu - dMenu Port
+- Immersive Equipment Displays - Unequip When Nude - By Radish Cat
+
+# Removed
+- CC Content, kept only the free CC Content.
+- JS Dwarven Oil
+- Dwemer Tech Glowmapped.
+- Fists of Fury
+- VRamr - Use texture downscaler instead
+- xSHADOWMANx DLL Loader
+- Apostasy Framework
+- Actor Value Generator
+- aTweaks and Utilities
+- Simple Offence Suppression
+- Encounter Zone Informer
+- Sun Affects NPC Vampires
+- Faster Decompression
+- DynDOLOD - Settings Loader
+- Convenient Reading
+- MoreHUD
+- Photomod Overlays
+- Werewolf Transformation Timer - SkyUI Addon
+- Quickloot BETA (Downgrade)
+- Better Rkund Navmesh for Legacy of the Dragonborn
+- Legacy of the Dragonborn BadGremlins Collection
+- All the Anreme for VICN.
+- Glenmoril - TDM Boss Patch
+- Glenmoril - Meow-Meow NPC
+- Olenveld
+- Heljarchen Creek - A Nightgate Inn Overhaul
+- Ascend - Hidden Peaks of Skyrim
+- At your Own Pace - All Modules.
+- The Forgotten City.
+- A Lovely Letter Alternate Routes.
+- Thieves Guild Alternative Endings.
+- Blood on the Ice Redux SE
+- Astrid
+- M'rissi
+- All Worldspace Edits done by Witcher Horses.
+- Morskom.
+- Talos' Tease.
+- Skyland - High Hrothgar
+- Racial Body Morphs Redux SSE AE
+- City Trees
+- FPS Stabilizer
+- Shanoa Armor
+- Biggie Traits
+- Sweets and Such
+- Stress and Fear
+- Skyrim teas
+- Requiem - Food and Beverages Redone
+- Third Person First Person Aiming
+- Keyword Patch Collection - Rerun
+- BGSWaterCollision - CrashFix
+- Bleak falls barrow boss overhaul
+- Amorous Adventures
+- Stage Flow for OStim Standalone
+- OISeeYouMasturbating
+- Ill Met By Moolight - Dialogue Expansion
+- Skyfall's Sleeping Hist Tree Overhaul
+- Gonzeh Points of Interest - Pine Peak Cavern
+- Snazzy Braidwood Inn
+- Basic Wenches.
+- Subclasses of Skyrim 2.
+- Inn Soaps
+- dMenu
+- Note:
+  - Sacrilege
+  - Manbeast
+  > These might be added back in the Future, once i am certain werewolf and vampire related issues are completely fixed.
+
+# Updated
+- Quest Fixes
+- Dwemer Pipework Reworked
+- powerofthree's Papyrus Extender
+- powerofthree's Tweaks
+- Project Bro He's There - Fix followers not starting combat.
+- Stuck on Screen Auto Load Door Fix SKSE
+- Auto Follower Stuck Sneaking Fix SKSE
+- Base Object Swapper
+- SkyPatcher
+- SkyPrompt
+- Spell Perk Item Distributor (SPID)
+- FSMP - Faster HDT-SMP
+- Smooth Arrow Trails and Fixes
+- Pandora Behaviour Engine Plus
+- Dyndolod
+- No Grass In Objects
+- MCM Helper
+- Synthesis
+- Photomode
+- Security Overhaul SKSE - Lock Variations
+- Selling of Stacks or Singles
+- Legacy of The Dragonborn
+- Legacy of the Dragonborn Patches (Official) - rerun
+- Legacy of the Dragonborn - The Curator's Companion
+- Skyrim Extended Cut - Saints and Seducers
+- Dac0da
+- DAc0da - ElevenLabs Voiced
+- Vigilant
+- VIGILANT Summoner's Armor Replacer 4K CBBE
+- Vigilant SE - TrueHUD Boss Bar
+- VIGILANT - NPCs Refined
+- Seasons for Vigilant
+- Glenmoril
+- GLENMORIL - Fluffy Patch (Fluffworks)
+- Unslaad SE
+- Unslaad Voiced - English Addon SE
+- UNSLAAD - ElevenLabs Voiced
+- The Frozen Heart - Quest Mod
+- Quest - Baba Yaga and the Labyrinth
+- The Rot Below
+- The Forsworn Conspiracy - Quest Expansion
+- Kaidan Immersive Features.
+- Tumbajamba's Snow Elven Arsenal
+- SkyParkour v3
+- Follower Parkour Plus - Now All NPCs Parkour
+- Devotion
+- Simple Follower Framework
+- OStim Standalone - Advanced Adult Animation Framework
+- STB Widgets
+- Helmet Toggle 2
+- Serana Dialogue Add-On x Ashe - Crystal Heart - Full Banter Patch (Asherana)
+- Ashe
+
+# Fixed
+- Dwemer triggers not activating.
+- various empty mods due to missing downloads.
+- Retexture for Tools of Kagrenac.
+- Serana Hood related issues.
+- Vampire lord form race issues
+- Stuck Werewolf Transformation
+- Removed fix for DAK and switched to Read/Use or Take SKSE.
+- Sirenroot AI Packages on NPCs.
+- Baba Yaga quest not progressing after reading note.
+- Radiant quests sending player to conquered locations.
+- Disabled the outdated orcish helmet recipe.
+- Lucien's Leveling system.
+- Kaidan's Schlong.
+- Praedy's Aprocypha Missing textures.
+- Spiders and Wolves using the wrong skeleton.
+- kaidan pre thalmor having different preset than actual kaidan.
+- Experimental workaround for kaidan's hair and helmets.
+- Netch Leather recipe crash.
+- Hard freeze and crash related with imperial legate armor.
+- Actors render distance becoming extremely short.
+- Tools of Kagrenac Ruins landscape Isssue
+- Duplicate Braidwood Inns.
+- Fixed val serano "Rise in The East" Intimidate Dialogue Branch.
+- Apocalypse spells scaling infinitely.
+- Fixed some starts giving free gear.
+- Fixed lydia Neck Seam.
+- Removed CK requirement to make downgrading skyrim easier and ease of installation.
+- Fixed Babayaga quest not progressing.
+- Attempt to fix Kadian's hair when he wears a helmet.
+- Fixed Sneak Jump Height refresh issue.
+- added YASTM MCM.
+- Fixed missing ants meshes.
+- Missing textures on dunmeri tents.
+- Floating Chest at Halted Stream Camp.
+- Moved recipes that were on the tanning rack to the forge.
+- Water Shader Crash.
+- Fixed markarth in winter.
+- Fixed Whiterun Exterior Grass in Autumn.
+- Removed icicles in Autumn.
+- Fixed markarth Autumn trees.
+- Changed weather in starting room, this should solve all ENB issues in the starting room.
+- Fixed Crash caused by mammoth footprints.
+- Fixed guards posing with empty helmets (fr this time)
+- Fixed werewolf machine powerattack bug.
+- Disabled Grossmesser sword recipe (found on npc only now)
+- Fixed rare Belthor Store crash/freeze.
+- Fixed Ghost helm and Bottomless Pack.
+- Fixed serana's assigned adventurer outfit not applying.
+- Various issues of item description for LOTD (WIP).
+- Note on Vampire Feeding Tweaks and the Ring of Namira:
+  - pressing Shift+Q while quickloot is showing should result in feeding
+  - after equipping the ring of namira for the first time, some requiem globals related to it may be messed up, if it doesnt work immidietly, try waiting a day and then attempting to use it again, i might end up entirely reworking the ring if stays problematic.
+
+# Tweaks
+- Economy Tweaks
+  - Decreased Fast Travel Cost (Back to Default values)
+  - Decreased Home Prices, range 50k-80k.
+- Food Tweaks
+  - Removed all custom food related tweaks from the list, ported 3Tweaks' food system into authoria as standalone.
+    - For more info, visit [this link](https://sites.google.com/view/3bftweaksrequiem/character/food?authuser=0)
+  - Rebalanced all foods in the list based on this, Standalone fomod of this available on authoria's Nexus Page.
+  - Additions on top of the 3Tweaks System:
+    - Torn flesh is not guaranteed to drop, 50% chance
+    - Lorebox integration
+    - I4 Icons for all new foods
+    - Eating Animation and Sounds support for new foods.
+
+- UBE Related Changes:
+  - Most mesh issues are hoefully fixed, thanks to day.
+  - Races are unlocked, pick whichever race you want to play as.
+    - Note: there are no 3ba/ube-male  racemenu presets int he list for now, add your own.
+  - Schlong addons can be used through the T.N.G. Addon menu for UBE Males.
+  - Reverted the racemenu headparts filter, please ensure you are picking a UBE compatible addon before reporting an issue.
+
+- Ostim Related Changes:
+  - Fully redid PPA configuration, it's more accurate now
+  - Tweaked ostim solutions to block dialogue at the highest level of the branch, instead of a trailing dialogue.
+  - Disbaled some more ostim solutions dialogues.
+    - Suggestions here are welcome, please let us know if there are remaining "immersion breaking" dialogue branches added by this mod.
+  - The only path to sex now is either the follower/romance patches, or ostim solutions
+
+- Attempt to integrate become a bard song book learning and SGT better.
+  - You have to have >46 talent and a member of the college to craft song books
+  - All placed songbooks are disabled
+  - If you learn a songbook you can still choose to play based on your skill
+
+- Alternate Conversation Camera doesnt force First Person in dialogue anymore.
+- Dwemer Armor SE is now the Model used for Requiem's Aetherium Set.
+- Tweaked Obody Distribution.
+- Redid Sons of Skyrim and New Legion Patches from Scratch.
+  - Patched some LOTD Assets for Sons of Skyrim
+  - Extended coverage to some missed third party mods (excluding placed statics)
+- Disabled Honed Metal Enchanting services, its only for smithing now, increased costs for smithing through NPCs.
+- List now comes with Crafting Pulls resources from containers pre configured, it automatically registers Chests with the base editor ID "PlayerHouseChest", as well as LOTD chests.
+- Excluded Modded Followers and Miraak and Some modded NPCs from Wet and Cold, removed earmuffs.
+- Full rebalance of Unarmed Skill Tree (Nerf).
+- Slowed Down Leveling by ~50%
+- Any armor piece that doesnt take the traditional slots cant be enchanted anymore.
+- Vampires should be hurt by all sun spells and weapons now.
+- Fixed all existing Bestiary Configs, they should accurately reflect an NPCs data now.
+- the "Close Wounds" Restoration spell now closes wounds, the cure wounds and cure infection spell books are removed, infections are disabled by default.
+- Swmming fully clears dirt now
+- Vampires dont get drained by the sun while wearing a hood, or while standing in the shade
+  - Note: standing in the shade is not very accurate, especially when trying to stand in the shadow of a monuntain or tree, it works best when standing under roofs/etc.
+- Modified Wait Carriage in Inns prices to follow the same logic as carriages.
+- Lockbashing depends on requiem's original mechanics now, added lock bash meter.
+- Cabbage ENB (Tweaked)
+  - Decreased brightness in interiors.
+
+# Planned:
+- Cleanup for CC Content loose files.
+- Fixing new bugs if they arise
+- Full revision of seasons' Patches, and more seasonal tweaks
+- Porting some more 3tweaks mechanics into requiem
+- Requiem Musuem integration into LOTD.
+- Reworking LOTD Artifacts so they match requiem's artifact theme, editing cells edited by both mods so that artifacts are better distributed.
+- Locking free LOTD artifacts behind encounters
+- Adding devotion coverage to modded foods
+- Curate specific ostim sequences and scenes for every possible sex path in the list.
+- Add perk for crafting clothes.
+- revise balance for armors, increase higher tier options, and a full revision of the distribution and integrations.
+- Revice vicn mods balance.
+- Extend Bestiary support to cover more creatures and races.
+- Revision on NPC visuals, and adding coverage for generic npcs.
+</details>
+
+
+## Authoria - Requiem Reforged Version 2.5.2
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+> Forced for Perms, no fixes, if you are on 2.5.1, don't Update, this is not save safe.
+
+# Added
+- [The New Gentleman](https://www.nexusmods.com/skyrimspecialedition/mods/104215)
+- [Senua's Warpaint for Racemenu - UBE CotR](https://www.nexusmods.com/skyrimspecialedition/mods/169788)
+- [LDD - Detail Makeup - UBE](https://www.nexusmods.com/skyrimspecialedition/mods/149480)
+
+# Removed
+- Schlongs of Skyrim
+- Ultimate Body Enhancer - Senuas Warpaints
+- Ultimate Body Enhancer - HIMBO Hair Racemenu
+- Ultimate Body Enhancer - LDD Detail Makeup HPH
+- Ultimate Body Enhancer - Obis Warpaints
+- Ultimate Body Enhancer - Rutah's Warpaint
+- Ultimate Body Enhancer - Miggyluv Overlays
+- Ultimate Body Enhancer - Havoks Lipstick Overlays
+
+</details>
+
+## Authoria - Requiem Reforged Version 2.5.1
+
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+> Final ~kinda~Hotfix. This one is NOT save safe, but i can confidently say, all the newly introduced bugs are fully fiiiixed (except a handful of ube meshes), there will be no updates for a while, thanks to everyone for their reports, suggestions, and feedback, we tried to take everything into account.
+> Sorry for the hiccups, back to baseline now.
+
+# Added
+- [Simple Inn Bath for New Lands (SPID) - Bruma](https://www.nexusmods.com/skyrimspecialedition/mods/104314?tab=files)
+- [Missives - Worldspace Additions](https://www.nexusmods.com/skyrimspecialedition/mods/26788?tab=files)
+- [Phantasmal Chest from LOTD - Skyrim Souls RE - Compatibility Patch](https://www.nexusmods.com/skyrimspecialedition/mods/173523?tab=files)
+
+# Updated
+- [Legacy of the Dragonborn - Storage FormList Patches - rerun](https://www.nexusmods.com/skyrimspecialedition/mods/74810?tab=description)
+- [LOD Model Library for DynDOLOD](https://www.nexusmods.com/skyrimspecialedition/mods/87521)
+- [Racemenu Enhancer](https://www.nexusmods.com/skyrimspecialedition/mods/182536?tab=description)
+- [Racemenu Overlay Fixes](https://www.nexusmods.com/skyrimspecialedition/mods/138586?tab=files)
+- [Follower Parkour](https://www.nexusmods.com/skyrimspecialedition/mods/186033?tab=files)
+- [Devotion](https://www.nexusmods.com/skyrimspecialedition/mods/185531?tab=description)
+    - Endorse!
+- ENB Bianries
+- Reshade Binaries
+
+# Removed
+- [First Person Inertia](https://www.nexusmods.com/skyrimspecialedition/mods/167883?tab=description)
+- [Frostwalker - SKSE Plugin](https://www.nexusmods.com/skyrimspecialedition/mods/184628?tab=description)
+- [Shame of Skyrim](https://www.nexusmods.com/skyrimspecialedition/mods/96804)
+- [Modern Lighting Ovehraul v2](https://www.nexusmods.com/skyrimspecialedition/mods/160748)
+- [Skyrim Water Reflections Engine Fix (beta)](https://www.nexusmods.com/skyrimspecialedition/mods/185419)
+- [Manual Crossbow Reloading - SKSE](https://www.nexusmods.com/skyrimspecialedition/mods/185238)
+- A bunch of obody presets that came with the list.
+
+# Fixed
+- firstly, this hotfix is a HUGE performance improvement over the previous versions.
+- Dialogue topic order getting messed up because of xedit (Hireling bug and other)
+- Dylbilys Functions Crash
+- Seasonal Grass
+- Missing Textures on Children Clothes
+- CR04 (Hired Muscle) picking disabled carriage drivers as targets
+- Missives picking people in locked areas of talos' tease.
+- Increased object and actor load in slightly.
+- Excluded Danica from wet and cold's gear distribution (naked danica bug)
+- SPID Death item crash
+- FPS Drop during combat
+- Disabled movement in menus
+- Disabled Bruma's Iron Falchion (Textures not provided)
+- Fixed Floating Knapsacks in Dawnstar Exterior
+- Fixed Floating Equipment in Warmaidens (Except the belt, that one i cant even select it in ck)
+- Fixed Floating items at Talos Shrine
+- Fixed floating rocks in wolf skull cave
+- Fixed Hard mode MCM Recording
+- Fixed Auri's Outfit
+- Fixed animation looping when sheathing onehanded weapons with a shield.
+- Fixed various back directional power attack behavior.
+- Fixed FPS drop in first person (Drive dependant, caused by heavy logging)
+- Fixed Various issues and crashes with obody.
+- Disabled dodge in place to prevent crashing on horse, and crashing after immidietly opening a menu after dodging
+- Paraglider quest nor progressing and Excluded the paragilding NPC from quickloot
+- Fixed wigs getting removed from actors and player when bathing.
+- Fixed kaidan not having a schlong in NSFW profile.
+- Fixed Kaidan not reacting to Amren and Carlotta's quests.
+- Extremely negative skill value and debuffs
+- Fixed wench placement in Winterhold Inn
+- Racemenu overlays not applying without dressing and undressing.
+- Fixed Obi's hedge armor in 1st person (uses iron armor 1st person model now)
+- Converted all facepaints to UBE.
+  - They were batch converted in blender, some may not be perfect, the majority are good but the remaining ones will not be fixed, they'll just be removed.
+- Attmept to fix up khajiits schlong color, this is the best i could do with my limited blender skills, if a modeler wants to step up he is welcome to, please dont report this.
+
+* About the UBE conversions:
+  * The [tool running guide](https://github.com/Drheisen1/Authoria-Requiem-Reforged/blob/main/Authoria_Tool_Running_Guide.md) has been updated, check it for a full guide on how to run the tool, it ships with the list now
+  * Alot of armors should be fixed already, Some armors are not perfect, manual fixing on the armors will depend on how bad the issue is, priority is given to armors that crash the game or armors that are seriously messed up.
+    * for example: common clothes at the start of the game -> i see no reason to waste time converting it, as the player switches armors after he starts 99% of the time.
+    * please keep that in mind when reporting issues with armors.
+    * not all armors have morphs, Infantry armor, Sons of Skyrim armors, Velothi armors are not mesh converted, they can be used still ofcourse.
+  * running the tool now skips armors that are already generated and patches only things that you add
+  * if you crash because of equipping an armor, you can easily fix it on your side, go to tools\CBBE to UBE\races_only.json , and add the armor to the races_only list, then rerun the tool (see guide) it will not take long.
+  * do not report any clipping on UBE armors, we are aware of all the worst ones now and will manually convert them, for now, you can just live with it ;)
+
+
+# aTweaks
+- Argonians and Khajiit (Feline and Beast Stomach) really dont get negative from some raw food now (poisoning)
+- Decreased Inn bath to 35 gold instead of 100.
+- Added soaps to inn bath chest.
+- Extended duration of blackmarket (dragonborn DLC)
+- Wound potions are sure to appear in merchant and apothecary stores now.
+- Optimized Sekiro Combat and disabled it for unarmed
+- Tweaked Blue water cave to be more forgiving (Astrid)
+
+</details>
+
+
+## Authoria - Requiem Reforged Version 2.1.2
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+> 2nd Hotfix, Save Safe
+---
+# Fixed
+
+- Custom Skills menu failing to load, oops.
+---
+
+</details>
+
+
+## Authoria - Requiem Reforged Version 2.1.1
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+> Hotfix, Save Safe
+> For new birthsigns to take effect, you might need to manually remove your current birth sign, save, then update the list.
+---
+
+# Added
+- [Bruma Adventurer's Start Addon](https://www.nexusmods.com/skyrimspecialedition/mods/145599?tab=files)
+- [Skyrim Water Reflections Engine Fix (beta)](https://www.nexusmods.com/skyrimspecialedition/mods/185419?tab=files)
+- [Universal Serana Hood Patches](https://www.nexusmods.com/skyrimspecialedition/mods/152559?tab=files)
+- [A new Debt Alternate Routes](https://www.nexusmods.com/skyrimspecialedition/mods/148427)
+- [Pon's Riri UBE Preset](https://www.nexusmods.com/skyrimspecialedition/mods/186035)
+> subsribe to ponponmods or the modlist wil not work!!!!! https://www.youtube.com/watch?v=002G7ddNF78
+- [Follower Parkour](https://www.nexusmods.com/skyrimspecialedition/mods/186033?tab=files)
+---
+
+# Update
+- [Requiem - Birthsigns Redone](https://www.nexusmods.com/skyrimspecialedition/articles/6668)
+- [Wait Your Turn Redux - Enemy Circling Behavior](https://www.nexusmods.com/skyrimspecialedition/mods/185557)
+---
+
+# Removed
+- [SKSE Knockback](https://www.nexusmods.com/skyrimspecialedition/mods/171375?tab=description)
+- [Static Skill Leveling Rewritten](https://www.nexusmods.com/skyrimspecialedition/mods/89940)
+- [Auto Physics Reset](https://www.nexusmods.com/skyrimspecialedition/mods/174098?tab=posts)
+---
+# Fixed
+- Skysigns (Birthsigns)
+- No Grass in winter
+- Crash log tools error
+- No Music in Bruma
+- Glenmoril warning poster
+- Bards college clipping (NSFW Profile)
+- CC Alternative Armors quest (Should've been disabled to begin with)
+- Moved devotion into the init sequence
+- Removed support entirely for static skill leveling, sorry, it's too buggy.
+> if you want to rule 11 it anyways, make sure to rerun synthesis, and select to kill skill experience gain in the Experience patcher, or you can try more updated versions
+- Moved the Hand to Hand skill tree to vanilla skill tree system.
+- Fixed armor meshes for UBE, thank Day! All crashes related to equipping armors should be fixed
+- Water Reflection crash
+- Fixed HitEffectRaceCondition crash caused by scrambledbugs
+- Fixed otrthjolf switching genders (no shame in it! cut him some slack)
+- Fixed combat crash on creatures (SKSE Knockback)
+- Fixed Khajiit Schlongs (experimental, might still have color seam)
+- Fixed schlongs going through armors (for existing games/saves : MCM → SOS → Mod management → "Clean schlongified armors")
+- Fixed Bald Serana
+- Moved Campfire hotkey to \ to prevent it showing up too often when typing
+- Fixed initialization skipping steps after waiting too long
+> you dont need to exit the game after character creation no more
+- Physics reset Crash
+- Vampire Racial abilites applying incorrectly
+- Stances for Controller
+- Removed wet and Cold backpacks
+- Ostim MCM Recorder plays automatically now in the NSFW profile
+- Rebalanced Some Followers (kaidan, xelzaz)
+- Fixed Kaidan not wearing his armor when its given to him.
+
+---
+# aTweaks
+- You can pick the animation you want to play for dirt and blood in the mcm
+
+</details>
+
+## Authoria - Requiem Reforged Version 2.1.0
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+> not Save Safe
+> Mainly filling gaps that improve the list's vision.
+> Important : Vanilla leveling is default now, and is the intended way to play the list, Static Skill Leveling can be enabled in the optional mods section, it requires a new game to works.
+> Other than two big Surprises on the next update, The list has officially entered Maintenance mode, dont expect any big changes. QOL changes, bug reports, feedback, and fixes are welcome and planed, thanks to everyone for their support and feedback!
+> Huge thanks to day for his UBE converter tool <3
+---
+
+# Added
+- Third Person First Person Aiming (Optional, Enabled by Default, Can Be Disabled in MCM)
+- Bloodrush - Dark Folk Combat Music
+- Spider SE
+- Milfactory - Jenassa Visual Overhaul 
+- Locational Damage AE (SKSE Plugin)
+- Gunslicer x Gekou Female Locomotion CATA
+- Sacrilege (tweaked)
+- Manbeast (tweaked)
+* Stances NG
+  * Bear Stance : Mainly For Honor Animations
+  * Hawk Stance : Mainly Elden rim
+  * Wolf Stance : Multiple sources
+  * some first person coverage for variations that are avaialble on nexus
+- Werewolf Transformation Timer - SkyUI Addon
+- Fuzz's Legally Intelligible Core Kit
+- Racemenu Enhancer
+- ShowRaceMenu - NG
+- Selling of Stacks or Singles
+- Why i came to skyrim
+- Smooth Moveset (Tweaked)
+- Through the Woods - Alternate Perspective Addon
+- Requiem - Jail Duration Fix
+* Wounds - Simplified
+  * this now controls all wounds mechanics, no custom tweaks, note : wound healers have been removed.
+* Highly Improved Male Body Overhaul -HIMBO-
+  * Slight seam from dirt and blood around the wrist on men, this will be fixed later
+- HIMBO V3 Bodyhair Overlays for Racemenu
+- Milfactory - Aranea Ienith
+- Honed Metal -NPC Crafting and Enchanting Services-
+- Drunk or drugged animations OAR
+* Some love for the Beast Races
+  * HDT SMP Fluffy Beast Race Tail Replacer Tweaks
+  * Dynamic Fur Morph (Tweaked)
+  * Fluffy Khajiit 3
+    * we tried to cover as much armors covering the fur as possible, if there are issues with it, report it in the discord.
+    * The nevernude underwear clips with the fur, this will not be fixed.
+  * Fluffy Half-Khajiit 3
+  * Enhanced Khajiit CBBE
+    * footprints are not digi feet like, this will likely not be fixed.
+  * Fluffy Enhanced Khajiit
+  * Beast Race Body paints SE
+  * K.C.C.E Khajiit Character Creation Extended
+  * Argonian Creation Extended
+  * Argonian Crests
+  * Aquatic Elegance - Argonian Koi Whiskers HDT-SMP
+  * FK's Diverse Racial Skeletons - Fem Argonian Edit
+  * Fluffy M'Rissi!
+  * Serval Khajiit RaceMenu Overlays
+  * Katie's Enhanced Khajiit Preset Pack
+  * Better Khajiit Male Fluffy Khajiit 3 Texture
+  * Camp Khajiit Patterns
+  * Khajiit-yllux Overlays - CBBE 3BA
+  * A lot of beast themed armors
+  * ECE Sliders Addon for Racemenu
+    * this will only work for OhmesRaht
+  * Beasts HHBB
+  > please share your cool presets!
+
+* New Gear:
+  * Obi - Traveler's Romper Outfit 3BA
+  * Arcane Mage Armor 3BA (Standalone)
+  * DDV - Hal's casual outfit
+  * Gilded Doublet - Ported to SSE
+  * Moon Monk's Robes
+  * VickusDickus' Khajiiti Apex Armory Reforged
+  * Stormhold Warrior Armor SSE - Port Plus
+  * Ancient Argonian Armor
+  * Midnight Mistress Armor Mashup - SMP 3BA
+  * Shanoa Armor
+  * Obi's Cimmerian 3BA
+  * Obi's Abyss Armor 3BA BHUNP UBE 4K
+  * Asura's Guard
+  * Khajiit Armory Rebalance and Intergration
+  * Tumbajamba's Snow Elven Arsenal
+  * Gryphonknight Regalia - Breton Noble Armor (Unique, Non-Craftable, Endgame)
+  * Obi's Hedge Knight Armor SMP -> replaces starting iron armor.
+  * Blood Horker Pirate
+
+- Pick Up Radius SKSE
+- Skeiro Combat S
+- Knockback SKSE
+
+* OSTIM Profile (Completely optional)
+  * Schlongs of Skyrim NG (Custom, DLL Updated to AE with latest commonlib)
+  * Ostim Standalone
+  * Dylbills Papyrus Functions
+  * Petite to Plenty - A CBPC Config for Realistic Collisions and Physics
+  * Mu Skeleton Editor
+  * Bone Limit Extender
+  * Ostim Standalone Sound Overhaul
+  * Ostim SA-Sound Replacer -Blowjob
+  * Billyy's animations for Ostim Standalone
+  * Lovemaking Compendium for OStim Standalone
+  * Wall Bang - An Ostim Animation
+  * Sole Purpose for OStim Standalone
+  * Anub's animations for Ostim Standalone
+  * Nibbles' animations for Ostim Standalone
+  * Leito's animations for Ostim Standalone
+  * Stage Flow for OStim Standalone -> disabled by default (in mcm), i found it bugs out expression on the last stage.
+  * PPA - Procedural Penis Animations
+  * OCum Ascended - Cum and Orgasm Mechanics for OStim
+  * OISeeYouMasturbating
+  * OStim NPCs - NPC Sex Lives Improved
+  * Ostim Resolutions (Solutions 2.0) Standalone - Alot of dialogue and shortcuts has been disabled.
+  * Amorous Adventures - Some are Disabled by Default, you can re-enable/disable them in the mcm.
+  * OComfort - OStim Lovers Comfort
+  * OStim NPCs - NPC Sex Lives Improved
+  * Patches for followers.
+
+- Ultimate Body Enhancer
+- Serana Cured Eyes Removal NG
+- Serana Multiform NG
+- UBE Serana - NPC Replacer
+- Milfactory - Ladies of the Plots - Delphine - Rikke - Elenwen Replacer
+- UBE Lydia - NPC Replacer
+
+- Auto Follower Stuck Sneaking Fix SKSE
+- Nordic Stonewalls
+- TISC - True Individual Shout Cooldown
+- Lucien Creation Club Patches
+- Flying Crows SSE
+- Additional Traits for Biggie Traits and Requiem add on
+- Skyrim Realistic Conquering AIO
+- Frostwalker
+- Everybody Hates Nazeem
+- Extended Hireling Dialogue Berland
+- It came from akavir
+
+* New Followers
+  * Ashe - Crystal Heart
+  * Heart of Ice - Astrid. Custom Voiced Follower
+  * Val Serano is Back.
+
+* New starts
+  * Adventurer's Start - An Alternate Perspective Addon
+
+* New Lands and Quests:
+  * The Gray Cowl of Nocturnal - 10th anniversary (no seasons)
+  * The Tools of Kagrenac
+  * Beyond Skyrim: Bruma ( nur für dich, bruder ;) )
+  * Moonpath to Elsewyr (No Seasons)
+
+
+* *Devotion, authored by whispa <3*
+  * Documentation : https://www.nexusmods.com/skyrimspecialedition/mods/185531?tab=articles
+  * Nexus Page: https://www.nexusmods.com/skyrimspecialedition/mods/185531?tab=description
+  endoooooooooooooooooooooooooooooooooooooorse!!!!
+
+- Ash Nomad - A Dunmer Bedroll and Tent Replacer - BOS Distribution and Campfire Addon
+- Blood on the Ice Redux SE
+- Manual Crossbow Reloading
+- Modding My Business (M.M.B) - Ivy Random Patch Collection
+---
+
+# Removed
+- Papyrus Missing property and Missing script patches - Not Needed anymore.
+- GLAM Jenassa and Irileth
+- The Tinraa Body
+- Jellyfish FP Dagger animation
+- Racemenu Rotation
+- Elden Parry
+- Vanguard - Bash Behaviours Updated
+- CC Gray Cowl
+- CC Sunder and Wraithguard
+- Skybound
+- Snowpoint
+- Embershard
+- White Riber Watch
+---
+
+# Updated
+- [Modern Wait Menu](https://www.nexusmods.com/skyrimspecialedition/mods/117661?tab=description)
+- mfgfix NG
+- The Frozen Heart - Quest Mod
+- DD - Sigrin Silver Fox armor by Vergi CBBE 3BA SMP
+- Disable Turn Animation NG
+- Skypatcher
+- Keyword Item Distributor
+- Faster HDT-SMP
+- True Directional Movement.
+- Dyndolod
+- Paarthurnax - Quest Expansion
+- Legacy of the Dragonborn SSE
+- Legacy of the Dragonborn Patches (Official)
+- SIRENROOT - Deluge of Deceit
+- Lucien
+- Aetherium Forge Destroys Items
+- Show Player in Inventory
+- Serana Dialogue Addon
+---
+
+# Fixed
+- Skjor Hands
+- Frostfall widgets not disappearing in HUD.
+- Orcish armor having stormcloak model.
+- Experimental fix for show player in inventory switch POVs
+- Milk jug missing texture in drinking animation
+- Dirt and blood using regular anims instead of malignis
+- Tweaked subsurface scattering and Shadow Quality
+- Fix CID skipping distributions
+- Fixed crafting Categories.
+- Removed some over the top thicc Obody presets
+- Fixed SMP Hair going static when equipping helmets
+- Troll dropping horse meat
+- Fixed infinite (kinda) load screen after being jailed.
+- Bow bashing before unlocking Quickshot.
+---
+# aTweaks
+> Custom tweaks that modify vanilla and/or requiem behavior.
+
+- Wolf Targeting now focuses the Head instead of legs.
+- Sacrilege is deleveled and rebalanced to match requiem values
+- Manbeast is deleveled and rebalanced to match requiem values
+
+* Custom made form scratch (based on adamant) Hand to Hand skill tree.
+ * unarmed is leveled up through hitting enemies while unarmed (vanilla leveling), regardless if you have static skill enabled or not.
+
+* Reintegrated LOTD weapon rewards elsewhere, can be found by exploration.
+  * Thornblade -> found on Halldir
+  * Crimson Tide -> found on Movarth
+  * Gravedigger -> found on Lu'ah Al-Skaven
+  * Trident of the Cairn -> found on Arondil
+  * Eleidon's Ward -> found on Vahlok the Jailor
+  * Razak's Tuner -> found on Sulla Trebatius
+
+- Eating animation, Description fix, and an icon for torn flesh.
+- Tweaked some item weights and smleting/recipe yields.
+
+* Made falling over from drinking alcohol more forgiving.
+  * it takes 5 moderate drinks at least to count towards being drunk
+  * it takes 3 strong drinks at least to count towards being drunk
+  * it takes 2 Extreme drinks at least to count towards being drunk
+  * Added the grade of each drink next to it's name for easier identification
+  * on top of all this, current base health and a chance will be taken into account
+
+* Become a Bard + Bards Reborn + SgT Tweaks:
+  * You are now able to play an instrument by selecting it in the inventory (the generic power has been removed)
+  * Leveling up speech has been integrated into playing an instrument
+  * Some followers will react to you playing an instrument
+  * you can now move while playing an instrument
+  * You can select the song to play when you reach Skyrim Got Talent's max level
+  * SgT buffs and debuffs have been removed, use bard reborn's spellbooks
+  * Hotkey added to play an instrument without opening the inventory
+  * Gameplay loop should be as follows:
+    * you start as a low level bard
+    * you practice instruments by using them
+    * you can independantly learn spells using bard reborn's spellbooks, activating the instrument shows a menu of songs you learned (bypasses skill check)
+    * at max level -> you can pick what song to play through become a bard's menu
+  * you only need higher than 26 level in any instrument to pass the college performance tests.
+  * song book recipes are unlocked after reaching the skill level 50 on the corresponding instrument it teaches
+  * spell song recipes are unlock at skill level 86 of any instrument
+  * spyquest starts at mastery level 50 on any instrument
+
+* UBE Tweaks:
+  * Halfkhajiit Male, UBE Male, and Humanoid Female Vanilla races are disabled, meaning you cant pick them in racemenu.
+  * Tweaked OBODY preset selection to filter by race, so UBE races will only get UBE Bodies.
+  * Racemenu addons and headparts will only appear if the body is supported.
+* UBE lacks "realistic/grounded" presets, please share your presets on our Discord!
+
+* Sekiro Combat S tweaks:
+  * timed blocking is gated behind experienced blocking perk in the block perk tree.
+  * this will gain more modification in the future
+
+* wigs can be found in containers in the starting room, they will be distributed to certain/new merchants in the future (some are race specific).
+
+* Basic wenches have Basic sex dialogue in ostim profile.
+
+* Requiem Green Pact Tweaks:
+  * Eating plant based food does not grant benefits and clears current food benefits.
+  * the power to follow/reject the green pact does nothing and has been removed.
+
+* Honed Metal Tweaks:
+  * Increased Price, Locked Enchanting behind "Merchant" Speech Perk, Locked Rechrging behind "Haggling" Speech Perk.
+ 
+* Decrease drop of high tier potions and filled soul gems
+
+* I Highly recommend switching "bScrollingDoesntSwitchPOV" to true in EngineFixes.toml if you are playing with a bow and Using Third Person First Person Aiming.
+* Skyrim souls pauses menus during combat now, i highly recommend leaving it enabled!
+* UBE lacks "realistic/grounded" racemenu and bodyslide presets, please share your presets on our Discord!
+* NOTE: High poly head patcher is removed, make sure to pick the headpart you prefer in racemenu.
+* NOTE: UBE armors were converted using day's auto converter, it's a great tool that has it's limitations, armors will slowly be fixed manually.
+---
+
+</details>
+
+## Authoria - Requiem Reforged Version 1.5.1
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+> not Save Safe
+> this will be the last update in a while.
+---
+
+# Added
+- [BGSWaterCollision - CrashFix](https://www.nexusmods.com/skyrimspecialedition/mods/181562)
+- [Milfactory - College fo Winterhold](https://www.nexusmods.com/skyrimspecialedition/mods/181846?tab=description)
+- [Nihility Series - Serana Visual Overhaul](https://www.nexusmods.com/skyrimspecialedition/mods/136381)
+---
+
+# Removed
+- [True Blood Serana](https://www.nexusmods.com/skyrimspecialedition/mods/103713)
+- the Brelyna, Nirya, mirabelle and faralda replacers.
+---
+
+# Updated
+- [Modern Wait Menu](https://www.nexusmods.com/skyrimspecialedition/mods/117661?tab=description)
+- mfgfix NG
+---
+
+# Fixed
+- Starting choices initializaing twice before exiting helgen cave.
+- Some more script optimizations
+- Modern wait menu on Ultra Wide
+- Argonian and Orc faces
+- removed song loop in intro video
+- fixed kaidan home landscape
+
+---
+# aTweaks
+
+> Custom tweaks that modify vanilla and/or requiem behavior.
+
+---
+</details>
+
+
+## Authoria - Requiem Reforged Version 1.5
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+> MAJOR UPDATE
+---
+
+# Added
+
+- Meshes Optimization Project (Dawnstar and Solitude)
+- CFTO (carriages)
+- Sleep of the dead
+- COTN Winterhold
+- Legacy of the Dragonborn - NPC Overhaul by 1N (Auryen only)
+- Forsworn Consiperacy Quest Expansion
+- Vel'dun UI
+- Nature of the Wildlands
+- Metallurgy
+- Unslaad - Eleven labds voiced
+- Skyrim 3D Trees and Plants
+- Diverse Downed Logs for NOTWL3
+- JS Embalming Tools
+- Ancient Dwemer Metal
+- Faster HDT-SMP
+- a bunch of FYX mods.
+- White river Watch
+- Giant flame wall brightness Fix
+- Threads of the north
+- Heljarchen Creek
+- Snozz Bleakfalls barrow and tower
+- Robber's Gorge
+- Thieves guild requirements
+- Favor Quests Seperates
+- The Cursed Tribe - Quest Expansion
+- Thor Head and Beard (HDT)
+- Pandora Behavior Engine
+- Auto Skeleton Patcher
+- Vanaheimer - Norther Roads
+- Fair Rebalancing of Transit Tarriffs
+- At your own Pace - Main Quest
+- At your Own Pace - Misc
+- At your Own Pace - College of Winterhold
+- At your Own Pace - Thane
+- TB's - Better Chests
+- Rudification - Rudy Candles Expanded
+- tanningrack01 replacer
+- Mihail Meshes Optimization Project
+- Unique Jarl Throne Sitting Animation
+- ADXP MCO 1.6.0.6 Bug Fixes
+- ADXP Bug Fixes
+- New Creature Animation - Spider (No Spin)
+- Precision - Attack Collision Fixes
+- Smarter Conjuration Minions
+- Wheeler CTD Fix
+- Skyrim's Paraglider - ONE - Lorerim
+- Extended NPC Dialogues by JobiWanUK
+- Glorious Doors of Skyrim
+- Go to Bed
+- Whiterun Exterior Horse
+- Show Player In Inventory
+- YASTM
+- Crafting Pulls From COntainers
+- Auto Move NG
+- Windmill Replacer
+- Shaders of Solstheim
+---
+
+# Removed
+
+> Full audit of the load order, a lot of minor things made it out.
+
+- Volkihar Knight
+- The Alchemist's Vestment
+- Vestment of the Vigilant
+- Skyrim bandit epansion
+- Apaachii Sky Hair Male and Female
+- Fisherman Fish
+- JK's windhelm Outskirts
+- JK's Whiterun Outskirts
+- Blood and silver - Cidhna Mine Expanded
+- Medieval Markets
+- Racial Abilities - I4 Icons
+- Alternate Perspective Reborn - Sovngarde Edition
+- Requiem - Vigilant
+- Clefj's Winterhold
+- Winterhold Restored
+- Dragonborn reskin - Quickloot IE
+- Character menu - Untarnished UI
+- Love Potion
+- Cosplay pack gala
+- Ants Replacer (se-ae)
+- Ulvenwald and Patches.
+- HFs - Glazed Pottery
+- HFs - Whiterun Birdge Replacer
+- HFs - Chests
+- HDT-SMP Flex
+- Skyrim Souls
+- Ryn's Bleakfalls
+- Diverse Missive Boards
+- Skyrim Revoiced
+- Thieves guild for good guys
+- Nemesis Behavior Engine
+- Northern Roads Retexture
+- Dylbills Papyrus Functions
+- Dynamic Crafting Animations
+- Smooth Moveset
+- Beam Walking Assist
+- MCO - First Person Patch
+- MCO - ADXP Unarmed (Barehand) PowerAttack fix
+- Attack - MCO - ADXP 1st Person DW Attack Fix
+- Wheeler fixes and latin support.
+- Val Serano
+- Southfringe Crash Fix
+- Reqiuem Auto NPC patcher and Reqtificator Lite
+- Sweets and Such - Sunhelm
+- Vanity Mirror
+- Missives - Quest and Dialogue expansion
+- Sons of skyrim LOTD Patch by xtudo
+- Bishop Armor
+- Elle - Wayfarer Navi
+- Elle - Love Potion
+- Skyrim's Got Talent
+- Fire and Blood
+- Apocalypse - Requiem Magic Redone
+- modex
+- IWantWidgets
+- IWantStatusBars
+- IWant Frostfall Widgets
+- Phantom Horse
+---
+
+# Updated
+- SKY UI
+- Skypatcher
+- SPID
+- Unslaad
+- Mrf's Solitude - Interior
+- Followers sit on carriage
+
+---
+
+# Fixed
+- Fixed vigilant overly bright fire
+- Fixed vigilant messed up bridge in lamea worldspace.
+- Vigilants of stendarr in vigilant will wear requiem's vigilant of stendar armor now
+- fixed julianos shrine dubling magicka costs of spells.
+- Missives failing to spawn quests sometimes
+- Some minor dialogue issues and quest starters should be fixed
+- Fixed grand solitude FPS Drop.
+- Reduced spawns of some mihail seagulls to help with CPU usage
+- Fixed dragons disappearing in third person when camera gets close.
+- Fixed weapon getting stuck when unsheathing.
+- Fixed form-ids not working for worldspace placed references.
+- Animated Carriages clipping through bridges.
+- Fixed invisible campfire perk tree.
+- Fixed infinite map marker loop in ivarstead.
+- Merged some scripts that need merging, see "Authoria - Quest Fragment Patches"
+- Rebalanced all modded followers, and regisered them into requiem, they should be able to see locks now.
+- sunhelm cannabilsm now has the same drawbacks as requiem if it is enabled.
+- Updated requiem's apocalypse patch, this means some feature of magic redone might not work, another patch will be made in the future
+
+---
+# aTweaks
+
+> Custom tweaks that modify vanilla and/or requiem behavior.
+- CC Requiem patches were completely redone, NPCs were manually patched.
+- LOTD Patch was completely redone, there shouldn't be duplicate aartifacts now, remove integration of CC gear that is unobtainable, NPCs were manually patched.
+- VICN Quest Requiem patches were completely redone, NPCs are manually patched, bosses are not so easy anymore.
+- Tweaked S3D trees so it only replaces statics not covered by NOTWL3
+- Tweaked reqtificator to skip weapons, armor and actors that are already patched.
+- Modified navigator and removed conflicting cells
+- Modified wildlands renewal to touch dirtcliffs only.
+- Excluded some modded worldspaces from shadow of skyrim (currently vicn)
+- Excluded Oblivion worldspaces from frostfall
+- Added modded campfires to campfire heat sources.
+- Sven and Faendal are recruitable again.
+- Forwarded USMP Changes to drain spells, ghosts and undead are not affected by them now.
+- Vanilla Music now plays (last in order)
+- Need to steal 10 items total to start save the icerunner (AYOP Misc)
+- Lover's comfort buff, and the "Loved" buff from caught red handed - quest expansion grant stress immunity from stress and fear.
+- Patch sweet and such food for requiem - food and beverage redone, recipes locked behind gorumet perk in alchemy tree.
+- Crafting recipes are back, clothing pieces are exclusive to Ivy's crafting loom (Threads of the north), regular recipes are organized with COCKS thanks to Aaron
+- Thalmor investigator armor is made intentionally stronger, and is only available to craft after killing ancano
+- Ysmir armor has been made very strong, it is spread throughout the map and cant be crafted
+- custom SKSE plugin that changes weather during a dragon fight.
+- dragons and deadly dragons have been tweaked, they are more consistent now, flying is less often, encounter, resistance, and stats are all requiem based, the mcm for deadly dragons has been removed.
+- dragon weather changes moved to native SKSE plugin.
+- sun wont affect players now only if they are truly hooded, for players this means lowered hoods through Dynamic Lowered Hoods vamps will get burned from the sun.
+- Moved "Engaging Combat - Keep Combat Dynamic at Higher Levels" outside of hard mode, in case someone wants to enable it later in the game, or wants hardmode without it.
+- Moved frostfall widgets to native SKSE plugin (PrismaUI)
+- Added Widescreen support (21x9)
+- Chest armor distribution is gone and will make it back next update
+- Brawler gloves have a unique unarmed animation
+- Ammo Weight is now Toggleable through Requiem's MCM.
+- Septim weight is now Toggleable thorugh Requiem's MCM.
+- Markarth has no moss now in summer
+- Solitude winter assets has been replaced with optimized versions
+---
+</details>
+
+
+## Authoria - Requiem Reforged Version 1.1.1.1
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+> Wabbajack Release
+---
+
+# Added
+
+- Project Bro He's There - Fix followers not starting combat.
+- High Poly Head UV Stretch Fix (NECK SEAM FIXED)
+
+---
+
+# Removed
+- High Poly Head UV Stretch Fix
+
+---
+
+# Updated
+
+---
+
+# Fixed
+
+- reran all tools, fixed tundra grass distances and gaps
+
+---
+</details>
+
+
+## Authoria - Requiem Reforged Version 1.0.4
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+>Hotfixes and minor tweaks
+>Some fixes that were missed on initial Release.
+
+
+---
+
+# Added
+
+- Valkyr HDT-SMP Hairstyles - For Khajiit
+- Modex Lite - SKSE Menu Framework Addon
+- Use Those Blankets Campfire Patch
+- Contundris - Weelbones' Ria Overhaul
+- Fast Travel Cost
+
+---
+
+# Removed
+
+- UAPNG Potion Safety
+- Smart NPC Potions
+- Ultimate NPC Dodging
+
+---
+
+# Updated
+
+- Faster Decompression
+- Simple Follower Framework
+
+---
+
+# Fixed
+
+- organized and fixed incorrect placement of racemenu presets
+- Laundry Clipping outside bannered mare
+- stb widget equipment name overlapping sun icon
+- No Dialogue option to clean up Riverwood Trader
+- Aela Naked Bug
+- static skill leveling Caps at low level
+- book retexture and highpoly head links messed up
+- some trees clipping in whiterun exterior
+- removed description from nevernude seperator to avoid confusion
+- added dummy plugins for controller mods
+- fear/stress causing sunhelm food menu to pop up
+- Snowy mountain pile near BFB base in summer
+- duplicate fortify barter potions in starting gear selection with different costs
+- clipping on ass of female underwear
+
+---
+</details>
+
+
+## Authoria - Requiem Reforged Version 1.1.0
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+
+> Major Fixes.
+> Not savesafe.
+> Last major content addition before 2.0
+
+---
+
+# Added
+
+- Stuck Underwater Visuals and Sounds Fix SKSE
+- Simple Power Attack
+- Follower Dialogue Expansion - Marcurio (FDE)
+- GAB's Brynjolf Replacer
+- Bow Rapid Combo V3 - Archer Combat Overhaul
+- Bow Rapid Combo v3 - Complete Balance and Integration Patch
+- Hyper Realistic Sweetroll
+- Alternate game pause message
+- Requiem Magic Redone - Visual Tweaks
+- NPC Infinite Block Fix
+- NPC Infinite Block Fix - SkyPatched
+- Dual Wield Parrying - SKSE Menu Frameowrk Integration
+- SCAR Stamina Limitation Patch
+- Vanguard - Bash Behaviours Updated
+- Elden Parry
+- MCO-ADXP Rapier moveset
+- Gulan0-Walk-run-sprinting rework-CATA
+- Mace Animation MCO I SCAR
+- ADXP I MCO Nordic WarAxe Animation For Player
+- ADXP I MCO ER Spear Basic Animation (SCAR)
+- BFCO - MCO - ADXP - Elder Creed - Blade
+- Boiled Creme Treat 2K-8K by iimVampy
+- Dirt and Blood with Addons
+- OAR - Raysense
+- beam walking assist
+- RaySense - Cover Animation
+- RaySense - Edge Lookdown
+- RaySense - Jumping over obstacles
+- Player Equipment Manager on Wheels
+- Skyrim Outfit Equipment System NG
+- inn soaps and addons
+- Traveler's Armor Pack - Visually Upgradeable Outfit
+- Sweets and Such - Baking Expanded SE
+
+
+---
+
+# Removed
+
+- One Click Power Attack
+- Death Approaches - Quest Mod
+- BB's Brynjolf
+- Dynamic Sprint
+- One Quiver to Rule Them All
+- Bathing in Skyrim renewed
+
+---
+
+# Updated
+
+- Faster Decompression
+- Modex
+- SKSE Menu Framework
+- Ivy's Riverwood Overhaul
+- Shrubbery Symphony - Enhanced Greenery
+- Simple Power Attack SKSE
+- Requiem - Food and Beverage Redone
+
+---
+
+# Fixed
+
+- Half Khajiit sneak stats
+- Shor's stone Wall mesh bugged
+- SSSO3 not automaatically initiallizing
+- Farkas changing fit during companion quest
+
+---
+</details>
+
+
+## Authoria - Requiem Reforged Version 1.0.4
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+>Hotfixes and minor tweaks
+>Some fixes that were missed on initial Release.
+
+
+---
+
+# Added
+
+- Valkyr HDT-SMP Hairstyles - For Khajiit
+- Modex Lite - SKSE Menu Framework Addon
+- Use Those Blankets Campfire Patch
+- Contundris - Weelbones' Ria Overhaul
+- Fast Travel Cost
+
+---
+
+# Removed
+
+- UAPNG Potion Safety
+- Smart NPC Potions
+- Ultimate NPC Dodging
+
+---
+
+# Updated
+
+- Faster Decompression
+- Simple Follower Framework
+
+---
+
+# Fixed
+
+- organized and fixed incorrect placement of racemenu presets
+- Laundry Clipping outside bannered mare
+- stb widget equipment name overlapping sun icon
+- No Dialogue option to clean up Riverwood Trader
+- Aela Naked Bug
+- static skill leveling Caps at low level
+- book retexture and highpoly head links messed up
+- some trees clipping in whiterun exterior
+- removed description from nevernude seperator to avoid confusion
+- added dummy plugins for controller mods
+- fear/stress causing sunhelm food menu to pop up
+- Snowy mountain pile near BFB base in summer
+- duplicate fortify barter potions in starting gear selection with different costs
+- clipping on ass of female underwear
+
+---
+</details>
+
+
+
+# Authoria - Requiem Reforged Version 1.0.0
+
+<details>
+<summary><strong>Show / Hide full changelog</strong></summary>
+
+>Renamed files for rebrand
+>Merged Patches
+
+# Authoria Update
+
+## Summary
+
+This update focuses on **simplifying gameplay, improving stability, and cleaning up legacy systems**. A large number of redundant, script-heavy, or problematic mods were removed, Whiterun received adjustments, and many gameplay systems and patches were reworked.
+
+All **NSFW elements have been removed**.
+
+**UBE** has been removed to simplify development, with the intention of revisiting it in the future.
+
+---
+
+# Added
+
+- Imperial Thalmor Stormcloak Patrols Fixes
+- Fire and Blood - Story Mode
+- Fire and Blood - Deadly Dragons Patch
+- Skyground - Underwear (optional mod)
+- Combat Animation Overhaul - Draugr
+- Dismemberment framework patch for True Nordic Trolls
+- Skyrim Teas (madgbi edition) returns flagons
+- Relevant Meshes Optimization Project
+- Common Clothing Expansion
+- Archon
+- Race Compatibility SKSE
+- Auto Physics Reset
+- Nimhe - Unique Webmother
+- Character Menu SE
+- STB Widgets
+- Thogra
+- Ghostblade Unique
+- Fiery Souls Unique
+- Radiance Weapon
+- Viking Weaponry SE
+- Whiterun Has Walls Redone
+- Navigator - Navmesh Fixes
+- Dawnguard Arsenal
+- Stormfang - Truly Unique
+- Smithscript Greathammer
+- Gleamstrike
+- Dreadbinder
+- Helga Armor by Fuse
+- Abstract Whiterun - Vargr Entrance
+
+---
+
+# Removed
+
+- A Good Death - Old Orc Overhaul
+- Moonlight Tales Mini
+- Entire OStim separator
+- Schlongs of Skyrim
+- All XPMSE fixed scripts
+- Wet Function Redux
+- Petite to Plenty - CBPC Configuration
+- Conditional Expressions and Extended
+- Skyrim Reputation
+- Elden Handheld Lanterns
+- Legacy Handheld Lanterns
+- MoreHUD
+- Troll by Kajuan
+- Requiem - ST - Alduin Redone
+- Trad_AE_CC_Collection
+- Trad_SaintsExtendedCut_Compatibility_Requiem_Patch.esp
+- CC Staves
+- Requiem-general_NPC_Iweaks
+- UBE
+- Capital Whiterun Expansion
+- Fortified Whiterun
+- Clean Up the Physics Outfit - Collision Reset
+- Character Sheet
+- Maelstrom
+- Helrising
+- The Great City Of Dawnstar
+
+---
+
+# Updated
+
+- Ultimate Optimized Scripts Compilation
+- No Grass in Objects
+- VIGILANT - NPCs Refined
+- Assorted Mesh Fixes
+- Fire and Blood
+- Core Impact Framework
+
+---
+
+# Fixed
+
+- Wrong installation of **Ultimate Optimized Scripts Compilation - Simplicity of Seeding Patch**
+- Fire and Blood patched (dragon difficulty still needs testing in a normal playthrough)
+- Patched Sons of Skyrim properly
+- Patched Campfire backpacks for Archon
+- Attempt to remove blank skill tree from Campfire
+- Fixed arm clipping on LOTD NPC
+- Fixed Talos' Tease lighting (still limited by MLO2 due to lack of natural light sources)
+- Fixed Riften marker discovery
+- Fixed Riverwood log pile
+- Fixed perk tree choices (Alteration)
+- Fixed Tundra shrub replacer
+- Fixed Maj'had crash
+- Fixed seam in Whiterun exterior and Riften exterior
+- Fixed Dark Brotherhood floating
+- Fixed Windhelm bridge grass
+
+---
+
+# Replaced
+
+- **Nether's Follower Framework (NFF)** → **Simple Follower Framework**
+- **Blessings Redone** → **Archon**
+- **Steel Plate Armor** → **Nord Steel Heart Armor**
+
+---
+
+# Changed
+
+- Patched Fire and Blood; dragon difficulty still needs testing in a normal playthrough
+- Removed the custom outfit from Camilla and distributed it to wenches instead
+- Added front skirt to Danica outfit
+- Organized the starting message
+- Made Common Clothing Expansion replace vanilla regular clothing
+- Merged, reorganized, and reordered all custom patches
+- Renamed everything to **Authoria**
+- One Requiem Lite Synthesis Patcher
+- Made Immersive Hunting Animations disabled by default
+- Disabled some Mihail seagulls
+- Made Wounds COBJs enabled by default
+- Slowly and painfully rebalanced CC content
+- Moved dragon claws auto unlock from optional files to Gameplay - Misc
+- Tweaked Whiterun interior
+- Custom tweak to Whiterun's trees and flora
+
+
+---
+</details>

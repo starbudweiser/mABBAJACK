@@ -1,0 +1,29 @@
+.DS_Store
+Icon?
+.venv/
+node_modules/
+logs/
+.vite/
+.build-app/
+__pycache__/
+mABBAJACK.app/
+# macOS
+
+# Python
+*.py[cod]
+venv/
+*.egg-info/
+.pyinstaller_cache/
+# Node / Vite
+# Sorties de build (régénérées par les scripts)
+build/
+dist/
+.build_tmp*/
+*.app/
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Modlists de test (plusieurs Go)
+*.wabbajack
