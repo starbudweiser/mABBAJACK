@@ -2,7 +2,8 @@
 // Usage : node scripts/test-octodiff.mjs <fichier.wabbajack> <dossier du jeu>
 import fs from 'fs';
 import path from 'path';
-import JSZip from 'jszip';
+import { createRequire } from 'module';
+const JSZip = createRequire(new URL('../web/package.json', import.meta.url))('jszip');
 import { patchFile } from '../web/server/octodiff.js';
 
 const [wj, gameDir] = process.argv.slice(2);

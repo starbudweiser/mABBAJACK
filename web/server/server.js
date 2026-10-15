@@ -21,6 +21,7 @@ import { checkDiskSpace, fmtBytes } from './diskspace.js';
 import { inspectWabbajack as inspectWabbajackRaw } from './inspect.js';
 import { recordGameVersion, enrichCatalog } from './gameversions.js';
 import { openLazyZip } from './lazyzip.js';
+import { HashCache, verifyArchive, verifyInstalledFiles, archiveSourceUrl, listDownloadDir, modOf } from './archivecheck.js';
 import { initLogger, writeLog, startInstallLog, endInstallLog, getLogInfo, tailLog } from './logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -2194,34 +2195,79 @@ app.post('/api/install/start', async (req, res) => {
       };
       archiveStatuses = resolveGameFiles(archiveStatuses);
 
-      // For archives still missing a localPath, attempt a quick exact-name scan
-      const stillMissing = archiveStatuses.filter((a) => a.status !== 'ready');
-      if (stillMissing.length > 0) {
-        // Dossier de téléchargement du jeu, puis racine (organisation Vortex : racine/<jeu>/)
-        const scanDirs = [...new Set([cleanDownloads, downloadsRoot])].filter((d) => fs.existsSync(d));
-        const fileSet = new Map();
-        for (const dir of scanDirs) {
-          try {
-            for (const f of fs.readdirSync(dir)) {
-              const k = f.toLowerCase();
-              if (!fileSet.has(k)) fileSet.set(k, path.join(dir, f));
-            }
-          } catch { /* dossier illisible */ }
+      // Dossier dédié à la liste : celui du .wabbajack (ex. WABBAJACK LISTS/<LISTE>/), sinon
+      // DOWNLOADS/<LISTE>/. Prioritaire sur le cache commun, qu'on ne modifie jamais pour une
+      // archive de même nom : il sert peut-être à une autre modlist.
+      const listDir = listDownloadDir(modlist.localFilePath);
+      const dedicatedDir = listDir || path.join(cleanDownloads, modlistDirName);
+      if (listDir) broadcastLog('info', `📂 Dossier dédié à la liste (prioritaire) : ${listDir}`);
+      const hashCache = new HashCache();
+      const fmtSize = (n) => `${Number(n || 0).toLocaleString('fr-FR')} o`;
+      const describeWrongVersion = (a) => {
+        const w = a.wrongVersion;
+        return w.reason === 'size'
+          ? `"${w.path}" fait ${fmtSize(w.size)} au lieu de ${fmtSize(a.Size)}`
+          : `"${w.path}" a la bonne taille mais un autre contenu (hash ${w.hash} au lieu de ${a.Hash})`;
+      };
+      const verifyArchiveFiles = async (list) => {
+        const todo = list.filter((a) => !isGameFileArchive(a) && !a.ignored);
+        if (todo.length === 0) return list;
+        broadcastProgress({ stage: 'scanning_downloads', stageName: 'Vérification des archives', currentTask: `Vérification de ${todo.length} archive(s)…` });
+        broadcastLog('info', `🔎 Vérification de ${todo.length} archive(s) : taille puis hash Wabbajack (mis en cache après le premier calcul)…`);
+        const totalBytes = todo.reduce((s, a) => s + (Number(a.Size) || 0), 0);
+        let doneBytes = 0, hashed = 0, fromCache = 0, i = 0, lastSave = Date.now();
+        const out = [];
+        for (const a of list) {
+          if (isGameFileArchive(a) || a.ignored) { out.push(a); continue; }
+          i++;
+          await jobControl.waitIfPaused(signal);
+          const name = a.Name || '';
+          const candidates = [...new Set([
+            name && path.join(dedicatedDir, name),
+            a.localPath,
+            name && path.join(cleanDownloads, name),
+            name && path.join(downloadsRoot, name),
+          ].filter((p) => p && fs.existsSync(p)))];
+          let good = null, wrong = null;
+          for (const p of candidates) {
+            const r = await verifyArchive(a, p, {
+              cache: hashCache, signal, waitIfPaused: (s) => jobControl.waitIfPaused(s),
+              onBytes: (n) => {
+                doneBytes += n;
+                broadcastProgress({ currentTask: `🔎 ${i}/${todo.length} — ${name}`, stagePercent: totalBytes ? Math.min(100, Math.round((doneBytes / totalBytes) * 100)) : 0 });
+              },
+            });
+            if (r.hash) { if (r.cached) fromCache++; else hashed++; }
+            if (r.ok) { good = p; break; }
+            if (!wrong && r.reason !== 'unreadable') wrong = { path: p, reason: r.reason, size: r.size, hash: r.hash };
+          }
+          if (Date.now() - lastSave > 30000) { hashCache.save(); lastSave = Date.now(); }
+          const { wrongVersion: _old, ...rest } = a;
+          if (good) out.push({ ...rest, status: 'ready', localPath: good });
+          else out.push({ ...rest, status: 'missing', localPath: null, ...(wrong ? { wrongVersion: wrong } : {}) });
         }
-        archiveStatuses = archiveStatuses.map((a) => {
-          if (a.status === 'ready' || isGameFileArchive(a)) return a;
-          const exact = fileSet.get((a.Name || '').toLowerCase());
-          if (exact) return { ...a, status: 'ready', localPath: exact };
-          return a;
-        });
-      }
+        hashCache.save();
+        const ok = out.filter((a) => a.status === 'ready' && !isGameFileArchive(a) && !a.ignored).length;
+        const wrongN = out.filter((a) => a.wrongVersion).length;
+        broadcastLog(ok === todo.length ? 'success' : 'warn',
+          `✓ Archives vérifiées : ${ok} correcte(s), ${wrongN} de même nom mais d'une autre version, ${todo.length - ok - wrongN} absente(s) — ${hashed} hash calculé(s), ${fromCache} lu(s) en cache.`);
+        return out;
+      };
+
+      // ── Vérification des archives : taille puis hash Wabbajack (xxHash64) ──
+      // Une archive de même nom n'est JAMAIS acceptée sur son seul nom : les noms génériques
+      // (« DynDOLOD Output.7z », « Synthesis.zip »…) existent dans plusieurs modlists.
+      // Ordre de recherche : dossier dédié à la liste (prioritaire), chemin trouvé par le scan
+      // de l'interface, puis cache commun (dossier du jeu, puis racine).
+      archiveStatuses = await verifyArchiveFiles(archiveStatuses);
 
       const readyCount = archiveStatuses.filter((a) => a.status === 'ready').length;
       const missingCount = archives.length - readyCount;
-      broadcastLog('info', `Scan : ${readyCount}/${archives.length} archives présentes, ${missingCount} manquantes.`);
+      broadcastLog('info', `Scan : ${readyCount}/${archives.length} archives correctes, ${missingCount} absente(s) ou incorrecte(s).`);
       for (const a of archiveStatuses) {
         if (a.status === 'ready') continue;
         if (isGameFileArchive(a)) broadcastLog('warn', `  ✗ Manquant : ${path.basename(gameFileRel(a))} — fichier original du jeu (attendu : ${expectedGameFilePath(a, gamePath)})`);
+        else if (a.wrongVersion) broadcastLog('warn', `  ✗ Mauvaise version : ${a.Name} — ${describeWrongVersion(a)}`);
         else broadcastLog('warn', `  ✗ Manquant : ${a.Name} — archive de mod`);
       }
       broadcastProgress({ missingArchivesCount: missingCount, overallPercent: 10 });
@@ -2281,8 +2327,10 @@ app.post('/api/install/start', async (req, res) => {
 
           if (requiresManual) {
             skippedManual++;
-            if (manualUrl) { manualUrls.set(archiveName, manualUrl); broadcastLog('warn', `  → Manuel : ${manualUrl}`); broadcastLog('warn', `  → Copiez "${archiveName}" dans : ${cleanDownloads}`); }
-            else broadcastLog('warn', `  → Source inconnue — copiez manuellement dans DOWNLOADS`);
+            manualUrl ||= archiveSourceUrl(arc);
+            const copyDir = arc.wrongVersion ? dedicatedDir : cleanDownloads;
+            if (manualUrl) { manualUrls.set(archiveName, manualUrl); broadcastLog('warn', `  → Manuel : ${manualUrl}`); broadcastLog('warn', `  → Copiez "${archiveName}" dans : ${copyDir}`); }
+            else broadcastLog('warn', `  → Source inconnue — copiez manuellement "${archiveName}" dans : ${copyDir}`);
             continue;
           }
 
@@ -2293,18 +2341,26 @@ app.post('/api/install/start', async (req, res) => {
               const elap = (Date.now() - globalStart) / 1000;
               broadcastProgress({ currentTask: `⬇ ${archiveName} — ${(recv / 1048576).toFixed(1)} / ${total > 0 ? (total / 1048576).toFixed(1) : '?'} Mo`, speedBytesPerSec: Math.round(elap > 0 ? globalBytes / elap : speed), stagePercent: total > 0 ? Math.round((recv / total) * 100) : 0 });
             };
-            const destFile = path.join(cleanDownloads, archiveName);
+            // Une autre version porte déjà ce nom dans le cache commun : on ne l'écrase pas.
+            const destDir = arc.wrongVersion ? dedicatedDir : cleanDownloads;
+            if (arc.wrongVersion) { makeDirResilient(destDir); broadcastLog('info', `  → Enregistré dans le dossier dédié à la liste : ${destDir}`); }
+            const destFile = path.join(destDir, archiveName);
             if (cdnUrl) await downloadWabbajackCdn(cdnUrl, destFile, dlProgress, signal, arc.Size || 0);
             else if (driveId) await downloadGoogleDrive(driveId, destFile, dlProgress, signal, arc.Size || 0);
             else await downloadFile(url, destFile, dlProgress, signal);
-            arc.status = 'ready'; arc.localPath = path.join(cleanDownloads, archiveName);
+            const check = await verifyArchive(arc, destFile, { cache: hashCache, signal });
+            hashCache.save();
+            if (!check.ok) throw new Error(`fichier téléchargé incorrect (${check.reason === 'size' ? `taille ${check.size} au lieu de ${arc.Size}` : 'hash différent du manifeste'})`);
+            arc.status = 'ready'; arc.localPath = destFile; delete arc.wrongVersion;
             downloadedCount++;
-            broadcastLog('success', `  ✓ Téléchargé : ${archiveName}`);
+            broadcastLog('success', `  ✓ Téléchargé et vérifié : ${archiveName}`);
             broadcastProgress({ overallPercent: Math.min(35, 12 + Math.round(((downloadedCount + skippedManual) / missingCount) * 23)), processedItems: readyCount + downloadedCount });
           } catch (dlErr) {
             if (signal.aborted) throw new Error('Annulé');
             broadcastLog('error', `  ✗ Échec : ${dlErr.message}`);
-            broadcastLog('warn', `  → Copiez manuellement "${archiveName}" dans : ${cleanDownloads}`);
+            const src = archiveSourceUrl(arc);
+            if (src) { manualUrls.set(archiveName, src); broadcastLog('warn', `  → Manuel : ${src}`); }
+            broadcastLog('warn', `  → Copiez manuellement "${archiveName}" dans : ${arc.wrongVersion ? dedicatedDir : cleanDownloads}`);
             skippedManual++;
           }
         }
@@ -2643,17 +2699,9 @@ app.post('/api/install/start', async (req, res) => {
       // scanne dans DOWNLOADS pour savoir lesquelles sont présentes.
       if (modlist.archives && modlist.archives.length > 0 && archiveStatuses.length === 0) {
         broadcastLog('info', `🔄 Reconstruction de la liste des archives depuis le .wabbajack…`);
-        archiveStatuses = modlist.archives.filter(notSkipped).map((arc) => {
-          const name = arc.Name || arc.name || '';
-          const localPath = name ? path.join(cleanDownloads, name) : null;
-          const exists = localPath && fs.existsSync(localPath);
-          return {
-            ...arc,
-            status: exists ? 'ready' : 'missing',
-            localPath: exists ? localPath : null,
-          };
-        });
+        archiveStatuses = modlist.archives.filter(notSkipped).map((arc) => ({ ...arc, Name: arc.Name || arc.name || '', status: 'missing', localPath: null }));
         archiveStatuses = resolveGameFiles(archiveStatuses);
+        archiveStatuses = await verifyArchiveFiles(archiveStatuses);
         const ready2 = archiveStatuses.filter((a) => a.status === 'ready').length;
         const miss2  = archiveStatuses.filter((a) => a.status === 'missing').length;
         broadcastLog('info', `  → ${archiveStatuses.length} archives : ${ready2} présentes, ${miss2} manquantes.`);
@@ -2676,6 +2724,13 @@ app.post('/api/install/start', async (req, res) => {
           const mod = parts[0].toLowerCase() === 'mods' && parts[1] ? parts[1] : (parts.length > 1 ? parts[0] : '(racine)');
           m.mods.set(mod, (m.mods.get(mod) || 0) + 1);
         }
+        // Annoncé AVANT le déploiement : aucune directive n'est sautée en silence.
+        const lost = missingReport.reduce((s, m) => s + m.files, 0);
+        broadcastLog('warn', `⚠ Avant déploiement : ${missingReport.length} archive(s) absente(s) ou incorrecte(s) — ${lost} fichier(s) de la modlist ne pourront pas être installés :`);
+        for (const m of [...missingReport].sort((x, y) => y.files - x.files)) {
+          const label = isGameFileArchive(m.arc) ? `${path.basename(gameFileRel(m.arc))} (fichier du jeu)` : m.arc.Name;
+          broadcastLog('warn', `  • ${label} — ${m.arc.wrongVersion ? 'mauvaise version' : 'absente'} — ${m.files} directive(s)`);
+        }
       }
 
       // ── ÉTAPE 4 : TRAITEMENT DES DIRECTIVES ──────────────────────────
@@ -2687,6 +2742,7 @@ app.post('/api/install/start', async (req, res) => {
         if (dd.removed > 0) broadcastLog('info', `⚖ Priorités MO2 : ${dd.removed} fichier(s) en conflit résolus (le mod le plus prioritaire l'emporte).`);
       }
       let directivesProcessed = 0;
+      let installCheck = null;
 
       if (directives.length > 0) {
         broadcastProgress({
@@ -2733,6 +2789,31 @@ app.post('/api/install/start', async (req, res) => {
 
         broadcastLog('success', `✓ Directives : ${result.processed} traitée(s), ${result.skipped} ignorée(s), ${result.errors} erreur(s).`);
         directivesProcessed = result.processed;
+
+        // ── Contrôle post-installation : chaque fichier mods/<mod>/… doit exister avec la bonne taille ──
+        broadcastProgress({ stage: 'extracting_files', stageName: 'Contrôle de l\'installation', overallPercent: 86, currentTask: 'Contrôle des fichiers installés…' });
+        try {
+          const lostHashes = new Set(missingReport.map((m) => m.arc.Hash).filter(Boolean));
+          const toCheck = directives.filter((d) => modOf(d.To) && !/Remapped/i.test(d.$type || ''));
+          const chk = await verifyInstalledFiles(toCheck, (to) => resolveDirectivePath(to, cleanDest), {
+            signal,
+            onProgress: (done, total) => broadcastProgress({ currentTask: `Contrôle des fichiers installés : ${done}/${total}`, stagePercent: Math.round((done / Math.max(1, total)) * 100) }),
+          });
+          const archOf = new Map(toCheck.map((d) => [d.To, d.ArchiveHash]));
+          const explained = chk.missing.filter((m) => lostHashes.has(archOf.get(m.to)));
+          const unexplained = chk.missing.filter((m) => !lostHashes.has(archOf.get(m.to)));
+          installCheck = { checked: chk.checked, explained, unexplained, wrongSize: chk.wrongSize };
+          const bad = unexplained.length + chk.wrongSize.length;
+          broadcastLog(bad === 0 && explained.length === 0 ? 'success' : 'warn',
+            `🔍 Contrôle : ${chk.checked} fichier(s) vérifié(s) — ${explained.length} absent(s) à cause d'archives manquantes, ${unexplained.length} autre(s) absent(s), ${chk.wrongSize.length} de taille différente.`);
+          const byMod = new Map();
+          for (const m of [...unexplained, ...chk.wrongSize]) byMod.set(m.mod, (byMod.get(m.mod) || 0) + 1);
+          for (const [mod, n] of [...byMod.entries()].sort((x, y) => y[1] - x[1]).slice(0, 15)) broadcastLog('warn', `  • ${mod} : ${n} fichier(s) absent(s) ou différent(s)`);
+          if (byMod.size > 15) broadcastLog('warn', `  … et ${byMod.size - 15} autre(s) mod(s) — détail dans CONTROLE_INSTALLATION.txt`);
+        } catch (e) {
+          if (signal.aborted) throw e;
+          broadcastLog('warn', `⚠ Contrôle post-installation impossible : ${String(e.message || e).slice(0, 160)}`);
+        }
       } else {
         broadcastLog('warn', `⚠ Aucune directive — installation plugins.txt seulement.`);
       }
@@ -2802,11 +2883,23 @@ app.post('/api/install/start', async (req, res) => {
         `  Directives traitées   : ${directivesProcessed} / ${directives.length}`,
         `  Plugins actifs        : ${pluginCount}`,
         `  Fichiers sources manquants : ${missingReport.length} (${missingReport.reduce((s, m) => s + m.files, 0)} fichier(s) de la modlist non installés)`,
-        ...missingReport.map((m) => `    - ${isGameFileArchive(m.arc) ? `[JEU] ${expectedGameFilePath(m.arc, gamePath)}` : `[MOD] ${m.arc.Name}${manualUrls.get(m.arc.Name) ? ` — ${manualUrls.get(m.arc.Name)}` : ''}`} (${m.files} fichier(s))`),
+        ...missingReport.map((m) => `    - ${isGameFileArchive(m.arc) ? `[JEU] ${expectedGameFilePath(m.arc, gamePath)}` : `[MOD] ${m.arc.Name}${m.arc.wrongVersion ? ' [MAUVAISE VERSION]' : ''}${(manualUrls.get(m.arc.Name) || archiveSourceUrl(m.arc)) ? ` — ${manualUrls.get(m.arc.Name) || archiveSourceUrl(m.arc)}` : ''}`} (${m.files} fichier(s))`),
+        ...(installCheck ? [`  Contrôle des fichiers  : ${installCheck.checked} vérifiés, ${installCheck.explained.length + installCheck.unexplained.length} absents, ${installCheck.wrongSize.length} de taille différente (voir CONTROLE_INSTALLATION.txt)`] : []),
         `  Généré le             : ${new Date().toLocaleString('fr-FR')}`,
         `======================================================================`,
       ].join('\n');
       fs.writeFileSync(path.join(cleanDest, 'README_READY_TO_PLAY.txt'), readme, 'utf-8');
+      if (installCheck) {
+        const sect = (title, rows) => rows.length ? [``, `${title} (${rows.length}) :`, ...rows] : [];
+        fs.writeFileSync(path.join(cleanDest, 'CONTROLE_INSTALLATION.txt'), [
+          `Contrôle de l'installation — ${modlist.name} v${modlist.version || '?'} — ${new Date().toLocaleString('fr-FR')}`,
+          `Fichiers vérifiés : ${installCheck.checked}`,
+          ...sect('ARCHIVES ABSENTES OU INCORRECTES', missingReport.map((m) => `  ${isGameFileArchive(m.arc) ? path.basename(gameFileRel(m.arc)) : m.arc.Name} — ${m.arc.wrongVersion ? `mauvaise version : ${describeWrongVersion(m.arc)}` : 'absente'} — ${m.files} directive(s)${archiveSourceUrl(m.arc) ? ` — ${archiveSourceUrl(m.arc)}` : ''}`)),
+          ...sect('ABSENTS (archive manquante)', installCheck.explained.map((m) => `  ${m.to}`)),
+          ...sect('ABSENTS (cause inconnue)', installCheck.unexplained.map((m) => `  ${m.to}`)),
+          ...sect('TAILLE DIFFÉRENTE', installCheck.wrongSize.map((m) => `  ${m.to} — ${m.actual} o au lieu de ${m.expected} o`)),
+        ].join('\n') + '\n', 'utf-8');
+      }
 
       broadcastLog('success', `✓ plugins.txt (${pluginCount} plugins) écrit.`);
       broadcastLog('success', `✓ loadorder.txt et README créés.`);
@@ -2848,8 +2941,8 @@ app.post('/api/install/start', async (req, res) => {
             broadcastLog('warn', `  • ${path.basename(gameFileRel(m.arc))} — fichier original du jeu (${m.arc.State?.Game || 'Skyrim'} ${m.arc.State?.GameVersion || ''})`.trimEnd());
             broadcastLog('warn', `      Emplacement attendu : ${expectedGameFilePath(m.arc, gamePath)}`);
           } else {
-            broadcastLog('warn', `  • ${m.arc.Name} — archive de mod`);
-            const url = manualUrls.get(m.arc.Name) || (m.arc.State?.Url?.startsWith('http') ? m.arc.State.Url : null);
+            broadcastLog('warn', `  • ${m.arc.Name} — ${m.arc.wrongVersion ? `mauvaise version (${describeWrongVersion(m.arc)})` : 'archive de mod'}`);
+            const url = manualUrls.get(m.arc.Name) || archiveSourceUrl(m.arc);
             if (url) broadcastLog('warn', `      Téléchargement : ${url}`);
             else broadcastLog('warn', `      Téléchargement : source inconnue`);
           }
@@ -2858,7 +2951,7 @@ app.post('/api/install/start', async (req, res) => {
         }
         if (lostFiles > 0) broadcastLog('warn', `  ℹ Conséquence : le jeu démarrera, mais les mods listés ci-dessus seront incomplets.`);
         if (hasGame) broadcastLog('warn', `  → Fichiers du jeu : indiquez le dossier du jeu (celui qui contient Data/) dans « Dossier du jeu Skyrim », puis relancez le déploiement.`);
-        if (hasMod) broadcastLog('warn', `  → Archives de mods : téléchargez-les, placez-les dans ${cleanDownloads} sous leur nom exact, puis relancez le déploiement.`);
+        if (hasMod) broadcastLog('warn', `  → Archives de mods : téléchargez-les, placez-les sous leur nom exact dans ${missingReport.some((m) => m.arc.wrongVersion) ? `${dedicatedDir} (dossier dédié à la liste, prioritaire sur le cache commun)` : cleanDownloads}, puis relancez le déploiement.`);
       }
       broadcastLog('success', `═══════════════════════════════════════════════════`);
       currentInstallJob.active = false;

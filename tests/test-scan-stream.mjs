@@ -12,7 +12,7 @@ const wab = process.argv[2] || path.join(root, 'tests', 'Authoria - Requiem Refo
 if (!fs.existsSync(wab)) { console.log('SKIP : fichier de test absent', wab); process.exit(0); }
 
 const port = 3900 + Math.floor(Math.random() * 90);
-const child = spawn(process.execPath, [path.join(root, 'server', 'server.js')], {
+const child = spawn(process.execPath, [path.join(root, 'web', 'server', 'server.js')], {
   env: { ...process.env, PORT: String(port) }, stdio: ['ignore', 'pipe', 'pipe'],
 });
 const stop = () => { try { child.kill(); } catch { /* déjà arrêté */ } };
