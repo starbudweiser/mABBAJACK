@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseModlistTxt, detectChoices, choiceOverrides, classifyOptions, dedupeByPriority, buildSelection, buildOptions, renderModlistTxt, loadRawModlist, readZipEntry } from '../web/server/modprofile.js';
+import { parseModlistTxt, detectChoices, choiceOverrides, classifyOptions, singletonFiles, baseOf, dedupeByPriority, buildSelection, buildOptions, renderModlistTxt, loadRawModlist, readZipEntry } from '../web/server/modprofile.js';
 
 // ── Unitaires ───────────────────────────────────────────────
 // Choix exclusifs : familles d'interface, format d'écran, variantes
@@ -85,6 +85,35 @@ void outPathOf;
   assert.equal(sel3.keep('mods/Core/a.dll'), true);
 }
 
+// Fichiers « uniques » : presets ENB exclusifs, extensions liées à leur base
+{
+  const txt = ['-(ENB) Rudy ENB', '-(ENB) AMON ENB For NAT III 2026', '-(ENB) NAT.ENB III', '-(ENB) Everwild ENB - Fantasy',
+    '-(ENB) Everwild ENB', '+(ENB) NAT Effect 11', '-(ENB) Shader Cache', '-16.1 ENBSERIES_separator'].join('\n');
+  const files = {
+    'Rudy ENB': ['Root/enbseries.ini', 'Root/enblocal.ini'], 'AMON ENB For NAT III 2026': ['enbseries/a.ini'],
+    'NAT.ENB III': ['enbseries/enbeffect.fx'], 'Everwild ENB - Fantasy': ['enbseries.ini'], 'Everwild ENB': ['enbseries.ini'],
+    'NAT Effect 11': ['enbseries.ini', 'SKSE/x.dll'], 'Shader Cache': ['ShaderCache/a.bin'],
+  };
+  const raw = { Directives: Object.entries(files).flatMap(([m, fs]) => fs.map((f) => ({ To: `mods/(ENB) ${m}/${f}` }))) };
+  const singles = singletonFiles(raw);
+  assert.deepEqual([...singles.get('(enb) rudy enb')].sort(), ['enb-preset', 'enblocal.ini']);
+  assert.equal(singles.has('(enb) shader cache'), false);
+  const items = parseModlistTxt(txt);
+  const by = (n) => items.find((i) => i.name === `(ENB) ${n}`);
+  assert.equal(baseOf(by('AMON ENB For NAT III 2026'), items)?.name, '(ENB) NAT.ENB III');
+  assert.equal(baseOf(by('Everwild ENB - Fantasy'), items)?.name, '(ENB) Everwild ENB');
+  assert.equal(baseOf(by('Rudy ENB'), items), null);
+  const det = detectChoices(items, singles);
+  const ex = det.choices.find((c) => c.kind === 'exclusive');
+  assert.equal(ex.default, '(ENB) NAT Effect 11');
+  assert.deepEqual(ex.options.map((o) => o.id).sort(), ['(ENB) Everwild ENB', '(ENB) NAT Effect 11', '(ENB) NAT.ENB III', '(ENB) Rudy ENB', 'none']);
+  assert.deepEqual(det.extensions.get('(enb) amon enb for nat iii 2026'), { choice: ex.id, option: '(ENB) NAT.ENB III' });
+  const on = [...choiceOverrides(det, { [ex.id]: '(ENB) Rudy ENB' })].filter(([, v]) => v).map(([k]) => k);
+  assert.deepEqual(on, ['(enb) rudy enb']);
+  const cls = classifyOptions(items, det);
+  assert.deepEqual(cls.requiresChoice.get('(enb) everwild enb - fantasy'), { choice: ex.id, option: '(ENB) Everwild ENB' });
+}
+
 // ── Réel (optionnel) ────────────────────────────────────────
 const here = path.dirname(fileURLToPath(import.meta.url));
 const file = process.argv[2] || path.join(here, 'Authoria - Requiem Reforged.wabbajack');
@@ -101,7 +130,8 @@ if (fs.existsSync(file)) {
   console.log('exclus', sel.excludedMods.length, '| directives ignorées', sel.droppedCount, '| archives non nécessaires', sel.skipHashes.size, '| plugins retirés', sel.pluginsExcluded.size);
   // Mods désactivés = optionnels à cocher + options des choix exclusifs restées inactives (format 16:9 par défaut)
   const fmt = p.choices.find((c) => c.kind === 'format');
-  const fmtMods = fmt ? fmt.options.flatMap((o) => o.mods).length : 0;
+  // mods des options non retenues par défaut dans les choix exclusifs (format, presets…)
+  const fmtMods = p.choices.flatMap((c) => c.options.filter((o) => o.id !== c.default)).flatMap((o) => o.mods).length;
   assert.equal(sel.excludedMods.length, p.optionalCount + fmtMods);
   assert.equal(sel.keep('mods/Cabbage ENB/x.dll'), false);
   assert.equal(sel.keep('mods/Skyrim Script Extender (SKSE)/x'), true);

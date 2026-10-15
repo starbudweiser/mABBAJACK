@@ -101,7 +101,7 @@ const FORMAT_ORDER = ['21x9', '32x9', '16x10'];
  *   default:string, options:{id:string, label:string, mods:string[]}[]}[],
  *   formatMods: {name:string, format:string, choice:string|null, family:string|null}[], used:Set<string>}}
  */
-export function detectChoices(items) {
+export function detectChoices(items, singletons = null) {
   const mods = items.filter((it) => !it.separator);
   const used = new Set();
   const choices = [];
@@ -174,7 +174,45 @@ export function detectChoices(items) {
       options: list.map((it) => ({ id: it.name, label: it.name.slice(base.length + 3), mods: [it.name] })) });
     for (const it of list) used.add(lc(it.name));
   }
-  return { choices, formatMods: fmtList, used };
+  // 4. Mods d'une même section qui fournissent le même fichier « unique » (enbseries.ini,
+  //    dossier enbseries/…) : un seul peut être actif (presets ENB…). Une extension nommée
+  //    d'après un autre membre (« Foo - Bar », « … For Foo ») n'est pas une option : elle reste
+  //    une case à cocher qui exige sa base.
+  const extensions = new Map(); // nom (lc) → { choice, option }
+  if (singletons) {
+    const byGroup = new Map();
+    for (const it of mods) {
+      if (used.has(lc(it.name)) || !it.group) continue;
+      const keys = singletons.get(lc(it.name));
+      if (!keys?.size) continue;
+      if (!byGroup.has(it.group)) byGroup.set(it.group, []);
+      byGroup.get(it.group).push({ it, keys });
+    }
+    for (const [group, list] of byGroup) {
+      // composantes connexes par fichier partagé
+      const comp = new Map(list.map((e) => [e, e]));
+      const root = (e) => { while (comp.get(e) !== e) e = comp.get(e); return e; };
+      for (const a of list) for (const b of list) {
+        if (a !== b && [...a.keys].some((k) => b.keys.has(k))) comp.set(root(a), root(b));
+      }
+      const parts = new Map();
+      for (const e of list) { const r = root(e); if (!parts.has(r)) parts.set(r, []); parts.get(r).push(e.it); }
+      for (const members of parts.values()) {
+        const bases = members.filter((m) => !baseOf(m, members));
+        if (bases.length < 2 || bases.filter((m) => m.enabled).length > 1) continue;
+        const id = `exclusive:${group}`;
+        const on = bases.find((m) => m.enabled);
+        choices.push({ id, kind: 'exclusive', label: group, group, default: on ? on.name : 'none',
+          options: [...bases.map((m) => ({ id: m.name, label: m.name, mods: [m.name] })), { id: 'none', label: 'none', mods: [] }] });
+        for (const m of bases) used.add(lc(m.name));
+        for (const m of members) {
+          const b = baseOf(m, members);
+          if (b) extensions.set(lc(m.name), { choice: id, option: b.name });
+        }
+      }
+    }
+  }
+  return { choices, formatMods: fmtList, used, extensions };
 }
 
 // ── Consignes de la liste ─────────────────────────────────────────────────
@@ -200,9 +238,10 @@ export function classifyOptions(items, det) {
   const requires = new Map(), requiresChoice = new Map();
   for (const m of offered) {
     // Patch nommé d'après un autre mod optionnel : « Foo - Bar Patch » dépend de « Foo »
-    const deps = offered.filter((n) => n !== m && lc(m.name).startsWith(lc(n.name))
-      && /^[\s-]/.test(m.name.slice(n.name.length))).map((n) => lc(n.name));
-    if (deps.length) requires.set(lc(m.name), deps);
+    const base = baseOf(m, offered);
+    if (base) requires.set(lc(m.name), [lc(base.name)]);
+    const ext = det.extensions?.get(lc(m.name));
+    if (ext) { requiresChoice.set(lc(m.name), ext); continue; }
     // Mod d'une famille d'interface : « (UI) Edge UI - … » n'a de sens qu'avec la famille Edge
     const { tag, rest } = splitTag(m.name);
     const fam = tag && det.choices.find((c) => c.id === `family:${tag}`);
@@ -210,6 +249,50 @@ export function classifyOptions(items, det) {
     if (opt) requiresChoice.set(lc(m.name), { choice: fam.id, option: opt.id });
   }
   return { locked, debug, requires, requiresChoice };
+}
+
+const GENERIC_WORDS = new Set(['enb', 'the', 'a', 'mod', 'for', 'and', 'of']);
+const words = (s) => lc(s).replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(' ').filter(Boolean);
+/**
+ * Mod dont `m` est une extension parmi `candidates` : « Foo - Bar » → « Foo » ;
+ * « AMON ENB For NAT III 2026 » → « NAT.ENB III » (mots distinctifs de la base après « for »).
+ */
+export function baseOf(m, candidates) {
+  for (const n of candidates) {
+    if (n === m) continue;
+    if (lc(m.name).startsWith(lc(n.name)) && /^[\s-]/.test(m.name.slice(n.name.length))) return n;
+  }
+  const f = /\bfor\s+(.+)$/i.exec(splitTag(m.name).rest);
+  if (!f) return null;
+  const target = new Set(words(f[1]));
+  for (const n of candidates) {
+    if (n === m) continue;
+    const need = words(splitTag(n.name).rest).filter((w) => !GENERIC_WORDS.has(w));
+    if (need.length && need.every((w) => target.has(w))) return n;
+  }
+  return null;
+}
+
+/** Fichiers « uniques » par mod (un seul exemplaire possible dans le jeu) : nom de mod (lc) → Set de clés. */
+const SINGLETON_FILE_RE = /^(enbseries\.ini|enblocal\.ini|d3d11\.dll|d3dcompiler_46e\.dll|dxgi\.dll|reshade\.ini)$/i;
+export function singletonFiles(raw) {
+  const out = new Map();
+  for (const d of raw.Directives || raw.directives || []) {
+    const parts = norm(d.To || d.to).split('/');
+    if (lc(parts[0]) !== 'mods' || parts.length < 3) continue;
+    const rel = parts.slice(2);
+    if (lc(rel[0]) === 'root') rel.shift(); // Root/… = racine du jeu, même rôle
+    let key = null;
+    // enbseries.ini et le dossier enbseries/ forment un même preset ENB
+    if (rel.length === 1 && lc(rel[0]) === 'enbseries.ini') key = 'enb-preset';
+    else if (rel.length === 1 && SINGLETON_FILE_RE.test(rel[0])) key = lc(rel[0]);
+    else if (rel.length > 1 && lc(rel[0]) === 'enbseries') key = 'enb-preset';
+    if (!key) continue;
+    const mod = lc(parts[1]);
+    if (!out.has(mod)) out.set(mod, new Set());
+    out.get(mod).add(key);
+  }
+  return out;
 }
 
 /** État (activé ou non) imposé par les choix : nom de mod (lc) → booléen. */
@@ -255,7 +338,8 @@ export async function buildOptions(raw, readEntry) {
   const profiles = await loadProfiles(raw, readEntry);
   const def = pickProfile(profiles, null, raw.Name);
   const sizes = modSizes(raw);
-  const dets = new Map([...profiles.values()].map((p) => [p, detectChoices(p.items)]));
+  const singles = singletonFiles(raw);
+  const dets = new Map([...profiles.values()].map((p) => [p, detectChoices(p.items, singles)]));
   // Variante dont la valeur change d'un profil à l'autre (ex. DynDOLOD Ultra / Standard) :
   // elle découle du profil choisi, on ne la propose pas séparément.
   const defaults = new Map();
@@ -312,7 +396,7 @@ export async function buildSelection(raw, readEntry, options = {}) {
   const profiles = await loadProfiles(raw, readEntry);
   const profile = pickProfile(profiles, options.profile, raw.Name);
   const enable = new Set((options.enable || []).map(lc));
-  const det = profile ? detectChoices(profile.items) : null;
+  const det = profile ? detectChoices(profile.items, singletonFiles(raw)) : null;
   const overrides = profile ? choiceOverrides(det, options.choices || {}) : new Map();
   if (profile) {
     // Consignes de la liste : jamais de mod « DO NOT ENABLE », ni de mod dont la dépendance est absente

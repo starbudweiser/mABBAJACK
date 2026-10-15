@@ -165,12 +165,13 @@ export const MANUAL_UI: Record<Language, ManualUi> = {
 export interface OptionsUi {
   title: string; hint: string; loading: string; error: string; profile: string;
   selected: string; checkAll: string; uncheckAll: string; note: string;
-  debugTitle: string; debugHint: string; locked: string; requires: string;
+  none: string; debugTitle: string; debugHint: string; locked: string; requires: string;
   profilesHint: string; choicesTitle: string; format: string; formatDetected: string; family: string; variant: string;
 }
 
 export const OPTIONS_UI: Record<Language, OptionsUi> = {
   fr: {
+    none: 'Aucun',
     debugTitle: 'Outils de débogage (déconseillé)', debugHint: "Outils de test de l'auteur de la liste : inutiles pour jouer, ils peuvent ralentir le jeu.", locked: "{n} mod(s) non proposé(s) : « {sep} », consigne de la liste (ne pas activer).", requires: 'Nécessite : {deps}',
     profilesHint: 'Un seul profil peut être installé.', choicesTitle: 'Choix exclusifs', format: "Format d'écran", formatDetected: 'détecté : {ratio}', family: 'Interface {tag}', variant: '{label}',
     title: 'Mods optionnels', hint: 'Désactivés par défaut dans la modlist (ex. ultra-wide, manette, ENB, contenus NSFW). Seuls les mods cochés seront installés.',
@@ -179,6 +180,7 @@ export const OPTIONS_UI: Record<Language, OptionsUi> = {
     note: 'Les mods non cochés ne sont ni téléchargés ni installés.',
   },
   en: {
+    none: 'None',
     debugTitle: 'Debugging tools (not recommended)', debugHint: "The list author's test tools: not needed to play, they can slow the game down.", locked: '{n} mod(s) not offered: “{sep}”, per the list instructions (do not enable).', requires: 'Requires: {deps}',
     profilesHint: 'Only one profile can be installed.', choicesTitle: 'Exclusive choices', format: 'Screen format', formatDetected: 'detected: {ratio}', family: 'Interface {tag}', variant: '{label}',
     title: 'Optional mods', hint: 'Disabled by default in the modlist (e.g. ultra-wide, controller, ENB, NSFW content). Only checked mods will be installed.',
@@ -187,6 +189,7 @@ export const OPTIONS_UI: Record<Language, OptionsUi> = {
     note: 'Unchecked mods are neither downloaded nor installed.',
   },
   es: {
+    none: 'Ninguno',
     debugTitle: 'Herramientas de depuración (desaconsejado)', debugHint: 'Herramientas de prueba del autor de la lista: no son necesarias para jugar y pueden ralentizar el juego.', locked: '{n} mod(s) no ofrecido(s): «{sep}», según las instrucciones de la lista (no activar).', requires: 'Requiere: {deps}',
     profilesHint: 'Solo se puede instalar un perfil.', choicesTitle: 'Opciones exclusivas', format: 'Formato de pantalla', formatDetected: 'detectado: {ratio}', family: 'Interfaz {tag}', variant: '{label}',
     title: 'Mods opcionales', hint: 'Desactivados por defecto en la modlist (p. ej. ultra-wide, mando, ENB, contenido NSFW). Solo se instalarán los mods marcados.',
@@ -195,6 +198,7 @@ export const OPTIONS_UI: Record<Language, OptionsUi> = {
     note: 'Los mods sin marcar no se descargan ni se instalan.',
   },
   it: {
+    none: 'Nessuno',
     debugTitle: 'Strumenti di debug (sconsigliato)', debugHint: "Strumenti di test dell'autore della lista: non servono per giocare e possono rallentare il gioco.", locked: '{n} mod non proposta/e: «{sep}», secondo le istruzioni della lista (non attivare).', requires: 'Richiede: {deps}',
     profilesHint: 'È possibile installare un solo profilo.', choicesTitle: 'Scelte esclusive', format: 'Formato schermo', formatDetected: 'rilevato: {ratio}', family: 'Interfaccia {tag}', variant: '{label}',
     title: 'Mod opzionali', hint: 'Disattivate per impostazione predefinita nella modlist (es. ultra-wide, controller, ENB, contenuti NSFW). Verranno installate solo le mod selezionate.',

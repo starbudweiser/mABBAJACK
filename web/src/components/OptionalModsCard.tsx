@@ -201,7 +201,7 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
                   {c.options.map((o) => (
                     <label key={o.id} className="text-body text-[#dddddd] flex items-center gap-1.5 py-0.5" title={o.mods.join('\n')}>
                       <input type="radio" name={`mabba-${c.id}`} checked={cur === o.id} onChange={() => pick(c, o.id)} />
-                      <span>{o.label}</span>
+                      <span>{c.kind === 'exclusive' && o.id === 'none' ? ui.none : o.label}</span>
                       {o.size >= 1048576 && <span className="text-caption text-[#666666]">{formatBytes(o.size, fr)}</span>}
                     </label>
                   ))}

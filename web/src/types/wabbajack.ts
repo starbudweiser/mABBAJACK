@@ -189,7 +189,8 @@ export interface ModlistOptionGroup { separator: string; mods: ModlistOptionMod[
 export interface ModlistChoiceOption { id: string; label: string; mods: string[]; size: number; }
 export interface ModlistChoice {
   id: string;
-  kind: 'family' | 'format' | 'variant';
+  /** exclusive : mods d'une section qui fournissent le même fichier unique (presets ENB…) */
+  kind: 'family' | 'format' | 'variant' | 'exclusive';
   label: string;
   group: string | null;
   default: string;
