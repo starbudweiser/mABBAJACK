@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { translateLog } from '../web/src/locales/logCatalog.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const files = [`${root}/server/server.js`, `${root}/src/App.tsx`];
+const files = [`${root}/web/server/server.js`, `${root}/web/src/App.tsx`];
 const missing = [];
 for (const f of files) {
   const src = fs.readFileSync(f, 'utf8');

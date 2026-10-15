@@ -456,38 +456,73 @@ export const App: React.FC = () => {
     [addLog]
   );
 
-  // 4. Native File Picker for .wabbajack on macOS
-  const handlePickNativeWabbajackFile = useCallback(async () => {
+  // 4. Analyse d'un .wabbajack local par son chemin : le serveur lit le fichier sur place
+  // (aucun transfert HTTP, et localFilePath reste le vrai chemin, utile au dossier dédié à la liste).
+  const inspectWabbajackPath = useCallback(async (filePath: string) => {
     try {
-      const fileRes = await pickNativeFile(APP_UI[langRef.current].pickFileTitle);
-      if (fileRes.path) {
-        setIsInspecting(true);
-        const base = fileRes.path.split('/').pop() || fileRes.path;
-        setImportProgress({ fileName: base, phase: 'analyze', sent: 0, total: 0, startedAt: Date.now() });
-        addLog('info', `Inspection directe de : ${fileRes.path}...`);
-        const inspectRes = await fetch(`${getApiBaseUrl()}/api/wabbajack/inspect-path`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filePath: fileRes.path }),
-        });
-        if (inspectRes.ok) {
-          const parsed = await inspectRes.json();
-          setParsedFile(parsed);
-          setActiveTab('inspector');
-          addLog('success', `Modlist "${parsed.name}" analysé : ${parsed.numberOfArchives} archives.`);
-          return;
-        }
-        const err = await inspectRes.json().catch(() => ({ error: `HTTP ${inspectRes.status}` }));
-        addLog('error', `Erreur lors de l'analyse du fichier .wabbajack : ${err.error || inspectRes.status}`);
-        alert(`${APP_UI[langRef.current].analysisError} ${translateLog(String(err.error || inspectRes.status), langRef.current)}`);
+      setIsInspecting(true);
+      const base = filePath.split('/').pop() || filePath;
+      setImportProgress({ fileName: base, phase: 'analyze', sent: 0, total: 0, startedAt: Date.now() });
+      addLog('info', `Inspection directe de : ${filePath}...`);
+      const inspectRes = await fetch(`${getApiBaseUrl()}/api/wabbajack/inspect-path`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filePath }),
+      });
+      if (inspectRes.ok) {
+        const parsed = await inspectRes.json();
+        setParsedFile(parsed);
+        setActiveTab('inspector');
+        addLog('success', `Modlist "${parsed.name}" analysé : ${parsed.numberOfArchives} archives.`);
+        return;
       }
+      const err = await inspectRes.json().catch(() => ({ error: `HTTP ${inspectRes.status}` }));
+      addLog('error', `Erreur lors de l'analyse du fichier .wabbajack : ${err.error || inspectRes.status}`);
+      alert(`${APP_UI[langRef.current].analysisError} ${translateLog(String(err.error || inspectRes.status), langRef.current)}`);
     } catch (err: any) {
-      addLog('warn', `Erreur dialogue natif : ${err.message}`);
+      addLog('error', `Erreur lors de l'analyse du fichier .wabbajack : ${err.message}`);
     } finally {
       setIsInspecting(false);
       setImportProgress(null);
     }
   }, [addLog]);
+
+  // Native File Picker for .wabbajack on macOS
+  const handlePickNativeWabbajackFile = useCallback(async () => {
+    try {
+      const fileRes = await pickNativeFile(APP_UI[langRef.current].pickFileTitle);
+      if (fileRes.path) await inspectWabbajackPath(fileRes.path);
+    } catch (err: any) {
+      addLog('warn', `Erreur dialogue natif : ${err.message}`);
+    }
+  }, [addLog, inspectWabbajackPath]);
+
+  // Glisser-déposer dans l'app native : python_app/mabbajack_app.py transmet le vrai chemin
+  // du fichier déposé (window.mabbajackDroppedPath), ce que l'API File du navigateur ne donne pas.
+  const droppedPathRef = useRef<{ path: string; at: number } | null>(null);
+  const lastDropRef = useRef<{ key: string; at: number } | null>(null);
+  const droppedWaiterRef = useRef<((p: string) => void) | null>(null);
+  useEffect(() => {
+    const w = window as unknown as { mabbajackDroppedPath?: (p: string) => void };
+    w.mabbajackDroppedPath = (p: string) => {
+      droppedPathRef.current = { path: p, at: Date.now() };
+      droppedWaiterRef.current?.(p);
+    };
+    return () => { delete w.mabbajackDroppedPath; };
+  }, []);
+  const waitDroppedPath = useCallback((fileName: string): Promise<string | null> => {
+    if (!(window as unknown as { pywebview?: unknown }).pywebview) return Promise.resolve(null);
+    const matches = (p: string) => p.split('/').pop() === fileName;
+    const recent = droppedPathRef.current;
+    if (recent && Date.now() - recent.at < 5000 && matches(recent.path)) return Promise.resolve(recent.path);
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => { droppedWaiterRef.current = null; resolve(null); }, 1500);
+      droppedWaiterRef.current = (p) => {
+        if (!matches(p)) return;
+        clearTimeout(timer); droppedWaiterRef.current = null; resolve(p);
+      };
+    });
+  }, []);
 
 
   // 5. Load .wabbajack via browser file input — upload to server for parsing
@@ -496,6 +531,12 @@ export const App: React.FC = () => {
   //  the parsed object WITH localFilePath so real installation is possible.)
   const handleLoadWabbajackFile = useCallback(
     async (file: File) => {
+      // Le dépôt est capté à la fois par l'écouteur global et par l'Inspecteur : un seul traitement.
+      const key = `${file.name}:${file.size}`;
+      if (lastDropRef.current && lastDropRef.current.key === key && Date.now() - lastDropRef.current.at < 3000) return;
+      lastDropRef.current = { key, at: Date.now() };
+      const nativePath = await waitDroppedPath(file.name);
+      if (nativePath) { await inspectWabbajackPath(nativePath); return; }
       setIsInspecting(true);
       const startedAt = Date.now();
       setImportProgress({ fileName: file.name, phase: 'upload', sent: 0, total: file.size, startedAt });
@@ -522,7 +563,7 @@ export const App: React.FC = () => {
         setImportProgress(null);
       }
     },
-    [addLog]
+    [addLog, waitDroppedPath, inspectWabbajackPath]
   );
 
   // 6. Load Demo Phoenix Modlist

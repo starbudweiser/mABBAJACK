@@ -178,14 +178,27 @@ export interface NexusAccount {
 /** Mod optionnel (désactivé par défaut dans le profil MO2 de la modlist) */
 export interface ModlistOptionMod { name: string; size: number; }
 export interface ModlistOptionGroup { separator: string; mods: ModlistOptionMod[]; }
+/** Choix exclusif détecté (famille d'interface, format d'écran, variantes « Base - X ») */
+export interface ModlistChoiceOption { id: string; label: string; mods: string[]; size: number; }
+export interface ModlistChoice {
+  id: string;
+  kind: 'family' | 'format' | 'variant';
+  label: string;
+  group: string | null;
+  default: string;
+  /** Variante imposée par le profil (ex. DynDOLOD Ultra / Standard) : non proposée */
+  hidden?: boolean;
+  options: ModlistChoiceOption[];
+}
 export interface ModlistOptionProfile {
   name: string;
   isDefault: boolean;
   groups: ModlistOptionGroup[];
+  choices?: ModlistChoice[];
   optionalCount: number;
   optionalBytes: number;
 }
 export interface ModlistOptions { profiles: ModlistOptionProfile[]; }
 
 /** Choix de l'utilisateur envoyés au serveur : profil + mods optionnels à installer */
-export interface InstallOptions { profile?: string; enable: string[]; }
+export interface InstallOptions { profile?: string; enable: string[]; choices?: Record<string, string>; }

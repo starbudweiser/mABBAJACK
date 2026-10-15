@@ -9,7 +9,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const ROOT = new URL('..', import.meta.url).pathname;
-const SRC = join(ROOT, 'src');
+const SRC = join(ROOT, 'web', 'src');
 const SKIP_DIRS = new Set(['locales']);
 
 function walk(dir, out = []) {

@@ -165,28 +165,33 @@ export const MANUAL_UI: Record<Language, ManualUi> = {
 export interface OptionsUi {
   title: string; hint: string; loading: string; error: string; profile: string;
   selected: string; checkAll: string; uncheckAll: string; note: string;
+  profilesHint: string; choicesTitle: string; format: string; formatDetected: string; family: string; variant: string;
 }
 
 export const OPTIONS_UI: Record<Language, OptionsUi> = {
   fr: {
+    profilesHint: 'Un seul profil peut être installé.', choicesTitle: 'Choix exclusifs', format: "Format d'écran", formatDetected: 'détecté : {ratio}', family: 'Interface {tag}', variant: '{label}',
     title: 'Mods optionnels', hint: 'Désactivés par défaut dans la modlist (ex. ultra-wide, manette, ENB, contenus NSFW). Seuls les mods cochés seront installés.',
     loading: 'Analyse des options…', error: 'Options indisponibles pour ce fichier.', profile: 'Profil',
     selected: '{n} / {total} sélectionné(s) · {size}', checkAll: 'Tout cocher', uncheckAll: 'Tout décocher',
     note: 'Les mods non cochés ne sont ni téléchargés ni installés.',
   },
   en: {
+    profilesHint: 'Only one profile can be installed.', choicesTitle: 'Exclusive choices', format: 'Screen format', formatDetected: 'detected: {ratio}', family: 'Interface {tag}', variant: '{label}',
     title: 'Optional mods', hint: 'Disabled by default in the modlist (e.g. ultra-wide, controller, ENB, NSFW content). Only checked mods will be installed.',
     loading: 'Analyzing options…', error: 'Options unavailable for this file.', profile: 'Profile',
     selected: '{n} / {total} selected · {size}', checkAll: 'Check all', uncheckAll: 'Uncheck all',
     note: 'Unchecked mods are neither downloaded nor installed.',
   },
   es: {
+    profilesHint: 'Solo se puede instalar un perfil.', choicesTitle: 'Opciones exclusivas', format: 'Formato de pantalla', formatDetected: 'detectado: {ratio}', family: 'Interfaz {tag}', variant: '{label}',
     title: 'Mods opcionales', hint: 'Desactivados por defecto en la modlist (p. ej. ultra-wide, mando, ENB, contenido NSFW). Solo se instalarán los mods marcados.',
     loading: 'Analizando opciones…', error: 'Opciones no disponibles para este archivo.', profile: 'Perfil',
     selected: '{n} / {total} seleccionado(s) · {size}', checkAll: 'Marcar todo', uncheckAll: 'Desmarcar todo',
     note: 'Los mods sin marcar no se descargan ni se instalan.',
   },
   it: {
+    profilesHint: 'È possibile installare un solo profilo.', choicesTitle: 'Scelte esclusive', format: 'Formato schermo', formatDetected: 'rilevato: {ratio}', family: 'Interfaccia {tag}', variant: '{label}',
     title: 'Mod opzionali', hint: 'Disattivate per impostazione predefinita nella modlist (es. ultra-wide, controller, ENB, contenuti NSFW). Verranno installate solo le mod selezionate.',
     loading: 'Analisi delle opzioni…', error: 'Opzioni non disponibili per questo file.', profile: 'Profilo',
     selected: '{n} / {total} selezionata/e · {size}', checkAll: 'Seleziona tutto', uncheckAll: 'Deseleziona tutto',

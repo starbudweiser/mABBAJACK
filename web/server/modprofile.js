@@ -79,6 +79,127 @@ function pickProfile(profiles, wanted, modlistName) {
   return profiles.values().next().value || null;
 }
 
+// ── Choix exclusifs ─────────────────────────────────────────────────────────
+// Un profil MO2 n'exprime pas l'exclusivité : on la déduit des noms.
+//  - familles : « (UI) Vel'dun … », « (UI) Norden … » : une seule famille active par étiquette ;
+//  - format d'écran : suffixes 21x9 / 32x9 / 16x10, un seul format (ou aucun = 16:9) ;
+//  - variantes : « Base - A », « Base - B » dont une seule est active dans le profil.
+const FORMAT_RE = /(?:^|[^\p{L}\p{N}])(16x10|21x9|32x9)(?=$|[^\p{L}\p{N}])/iu;
+const formatOf = (name) => (FORMAT_RE.exec(name)?.[1] || '').toLowerCase() || null;
+const splitTag = (name) => {
+  const m = /^\(([^)]*)\)\s*(.*)$/.exec(name);
+  return m ? { tag: m[1].trim(), rest: m[2] } : { tag: '', rest: name };
+};
+const firstWord = (s) => (String(s).trim().split(/\s+/)[0] || '').replace(/[^\p{L}\p{N}'’-]/gu, '');
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const hasWord = (text, w) => new RegExp(`(^|[^\\p{L}\\p{N}])${escapeRe(w)}($|[^\\p{L}\\p{N}])`, 'iu').test(text);
+const FORMAT_ORDER = ['21x9', '32x9', '16x10'];
+
+/**
+ * Détecte les choix exclusifs d'un profil.
+ * @returns {{choices: {id:string, kind:'family'|'format'|'variant', label:string, group:string|null,
+ *   default:string, options:{id:string, label:string, mods:string[]}[]}[],
+ *   formatMods: {name:string, format:string, choice:string|null, family:string|null}[], used:Set<string>}}
+ */
+export function detectChoices(items) {
+  const mods = items.filter((it) => !it.separator);
+  const used = new Set();
+  const choices = [];
+  const familyOf = new Map(); // nom (lc) → { choice, family }
+
+  // 1. Familles, par étiquette « (TAG) »
+  const byTag = new Map();
+  for (const it of mods) {
+    const { tag, rest } = splitTag(it.name);
+    if (!tag) continue;
+    if (!byTag.has(tag)) byTag.set(tag, []);
+    byTag.get(tag).push({ it, rest });
+  }
+  for (const [tag, list] of byTag) {
+    const byWord = new Map();
+    for (const e of list) {
+      if (formatOf(e.it.name)) continue;
+      const w = firstWord(e.rest);
+      if (!w) continue;
+      if (!byWord.has(lc(w))) byWord.set(lc(w), { word: w, members: [] });
+      byWord.get(lc(w)).members.push(e.it);
+    }
+    const fams = [...byWord.values()].filter((f) => f.members.length >= 3
+      && f.members.every((m) => m.enabled === f.members[0].enabled));
+    const on = fams.filter((f) => f.members[0].enabled);
+    if (fams.length < 2 || on.length !== 1) continue;
+    const id = `family:${tag}`;
+    const options = fams.map((f) => ({ id: f.word, label: f.word, mods: [], state: f.members[0].enabled }));
+    for (const e of list) {
+      const w = lc(firstWord(e.rest));
+      const opt = options.find((o) => lc(o.id) === w) || options.find((o) => hasWord(e.rest, o.id));
+      if (!opt) continue;
+      familyOf.set(lc(e.it.name), { choice: id, family: opt.id });
+      if (formatOf(e.it.name) || e.it.enabled !== opt.state) continue; // formats : traités à part
+      opt.mods.push(e.it.name);
+      used.add(lc(e.it.name));
+    }
+    choices.push({ id, kind: 'family', label: `(${tag})`, group: null, default: on[0].word,
+      options: options.map(({ state, ...o }) => o) });
+  }
+
+  // 2. Format d'écran
+  const formatMods = mods.filter((it) => formatOf(it.name));
+  const enabledFormats = new Set(formatMods.filter((it) => it.enabled).map((it) => formatOf(it.name)));
+  if (formatMods.length > 0 && enabledFormats.size <= 1) {
+    const tokens = FORMAT_ORDER.filter((t) => formatMods.some((it) => formatOf(it.name) === t));
+    choices.push({ id: 'format', kind: 'format', label: 'format', group: null, default: [...enabledFormats][0] || 'none',
+      options: [{ id: 'none', label: '16:9', mods: [] }, ...tokens.map((t) => ({ id: t, label: t.replace('x', ':'), mods: formatMods.filter((it) => formatOf(it.name) === t).map((it) => it.name) }))] });
+    for (const it of formatMods) used.add(lc(it.name));
+  }
+  const fmtList = choices.some((c) => c.id === 'format')
+    ? formatMods.map((it) => ({ name: it.name, format: formatOf(it.name), ...(familyOf.get(lc(it.name)) || { choice: null, family: null }) }))
+    : [];
+
+  // 3. Variantes « Base - Suffixe » : une seule active dans le profil
+  const byBase = new Map();
+  for (const it of mods) {
+    if (used.has(lc(it.name))) continue;
+    const i = it.name.lastIndexOf(' - ');
+    if (i <= 0) continue;
+    const key = `${it.group || ''}\u0000${lc(it.name.slice(0, i))}`;
+    if (!byBase.has(key)) byBase.set(key, []);
+    byBase.get(key).push(it);
+  }
+  for (const [key, list] of byBase) {
+    if (list.length < 2 || list.filter((it) => it.enabled).length !== 1) continue;
+    const base = list[0].name.slice(0, list[0].name.lastIndexOf(' - '));
+    choices.push({ id: `variant:${key}`, kind: 'variant', label: base, group: list[0].group || null,
+      default: list.find((it) => it.enabled).name,
+      options: list.map((it) => ({ id: it.name, label: it.name.slice(base.length + 3), mods: [it.name] })) });
+    for (const it of list) used.add(lc(it.name));
+  }
+  return { choices, formatMods: fmtList, used };
+}
+
+/** État (activé ou non) imposé par les choix : nom de mod (lc) → booléen. */
+export function choiceOverrides(det, picked = {}) {
+  const out = new Map();
+  const pick = (c) => {
+    const v = picked[c.id];
+    return c.options.some((o) => o.id === v) ? v : c.default;
+  };
+  for (const c of det.choices) {
+    if (c.kind === 'format') continue;
+    const chosen = pick(c);
+    for (const o of c.options) for (const m of o.mods) out.set(lc(m), o.id === chosen);
+  }
+  const fmt = det.choices.find((c) => c.kind === 'format');
+  if (fmt) {
+    const chosen = pick(fmt);
+    const famChoice = new Map(det.choices.filter((c) => c.kind === 'family').map((c) => [c.id, pick(c)]));
+    for (const m of det.formatMods) {
+      out.set(lc(m.name), m.format === chosen && (!m.choice || famChoice.get(m.choice) === m.family));
+    }
+  }
+  return out;
+}
+
 /** Taille installée (octets) par mod. */
 function modSizes(raw) {
   const sizes = new Map();
@@ -99,14 +220,23 @@ export async function buildOptions(raw, readEntry) {
   const profiles = await loadProfiles(raw, readEntry);
   const def = pickProfile(profiles, null, raw.Name);
   const sizes = modSizes(raw);
+  const dets = new Map([...profiles.values()].map((p) => [p, detectChoices(p.items)]));
+  // Variante dont la valeur change d'un profil à l'autre (ex. DynDOLOD Ultra / Standard) :
+  // elle découle du profil choisi, on ne la propose pas séparément.
+  const defaults = new Map();
+  for (const det of dets.values()) for (const c of det.choices) {
+    if (!defaults.has(c.id)) defaults.set(c.id, new Set());
+    defaults.get(c.id).add(c.default);
+  }
   const out = [];
   for (const p of profiles.values()) {
     const groups = new Map();
     let count = 0, bytes = 0;
+    const det = dets.get(p);
     // Ordre d'affichage = ordre de la liste MO2 (de bas en haut du fichier)
     for (let i = p.items.length - 1; i >= 0; i--) {
       const it = p.items[i];
-      if (it.separator || it.enabled) continue;
+      if (it.separator || it.enabled || det.used.has(lc(it.name))) continue;
       const size = sizes.get(lc(it.name)) || 0;
       const key = it.group || '—';
       if (!groups.has(key)) groups.set(key, []);
@@ -117,6 +247,11 @@ export async function buildOptions(raw, readEntry) {
       name: p.name,
       isDefault: p === def,
       groups: [...groups.entries()].map(([separator, mods]) => ({ separator, mods })),
+      choices: det.choices.map((c) => ({
+        ...c,
+        hidden: c.kind === 'variant' && defaults.get(c.id).size > 1,
+        options: c.options.map((o) => ({ ...o, size: o.mods.reduce((s, m) => s + (sizes.get(lc(m)) || 0), 0) })),
+      })),
       optionalCount: count,
       optionalBytes: bytes,
     });
@@ -128,18 +263,23 @@ export async function buildOptions(raw, readEntry) {
  * Construit la sélection d'installation.
  * @param raw manifeste brut (Directives, Archives…)
  * @param readEntry async (nomEntréeZip) => Buffer|null
- * @param options { profile?: string, enable?: string[] } — mods optionnels à installer
+ * @param options { profile?: string, enable?: string[], choices?: {[id]: optionId} }
+ *   enable : mods optionnels à installer ; choices : options retenues pour les choix exclusifs
  */
 export async function buildSelection(raw, readEntry, options = {}) {
   const profiles = await loadProfiles(raw, readEntry);
   const profile = pickProfile(profiles, options.profile, raw.Name);
   const enable = new Set((options.enable || []).map(lc));
+  const overrides = profile ? choiceOverrides(detectChoices(profile.items), options.choices || {}) : new Map();
   const excluded = new Set();
+  const turnedOn = new Set();
   const priority = new Map();
   if (profile) {
     for (const [key, it] of profile.mods) {
       priority.set(key, it.priority);
-      if (!it.enabled && !enable.has(key)) excluded.add(key);
+      const on = overrides.has(key) ? overrides.get(key) : (it.enabled || enable.has(key));
+      if (!on) excluded.add(key);
+      else if (!it.enabled) turnedOn.add(key);
     }
   }
   const chosen = profile ? lc(profile.name) : '';
@@ -167,6 +307,7 @@ export async function buildSelection(raw, readEntry, options = {}) {
   const droppedHashes = new Set();
   const keptPlugins = new Set();
   const droppedPlugins = new Set();
+  const pluginsAdded = new Map(); // plugins des mods activés par l'utilisateur : lc → nom
   let droppedCount = 0;
   let keptBytes = 0;
   for (const d of directives) {
@@ -175,7 +316,10 @@ export async function buildSelection(raw, readEntry, options = {}) {
     const hash = d.ArchiveHashPath?.[0];
     if (hash) (drop ? droppedHashes : keptHashes).add(hash);
     const base = to.split('/').pop();
-    if (PLUGIN_RE.test(base) && /^mods\//i.test(to)) (drop ? droppedPlugins : keptPlugins).add(lc(base));
+    if (PLUGIN_RE.test(base) && /^mods\//i.test(to)) {
+      (drop ? droppedPlugins : keptPlugins).add(lc(base));
+      if (!drop && to.split('/').length === 3 && turnedOn.has(lc(to.split('/')[1]))) pluginsAdded.set(lc(base), base);
+    }
     if (drop) droppedCount++;
     else keptBytes += Number(d.Size) || 0;
   }
@@ -186,7 +330,8 @@ export async function buildSelection(raw, readEntry, options = {}) {
     profile: profile ? profile.name : null,
     profileItems: profile ? profile.items : [],
     excludedMods: [...excluded],
-    enabledOptional: [...enable].filter((k) => profile?.mods.get(k) && !profile.mods.get(k).enabled),
+    enabledOptional: [...turnedOn],
+    pluginsAdded,
     skipHashes,
     pluginsExcluded,
     droppedCount,

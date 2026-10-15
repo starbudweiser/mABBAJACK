@@ -12,6 +12,7 @@ Ressources recherchées dans l'ordre :
 from __future__ import annotations
 
 import atexit
+import json
 import os
 import shutil
 import signal
@@ -235,6 +236,23 @@ def main() -> None:
             return
         window.load_url(f"http://127.0.0.1:{backend.port}")
 
+    def on_drop(event: dict) -> None:
+        # L'API File du navigateur ne donne pas le chemin du fichier déposé ; pywebview, si.
+        # L'interface analyse alors le fichier sur place au lieu de l'envoyer par HTTP.
+        for f in (event.get("dataTransfer") or {}).get("files") or []:
+            p = f.get("pywebviewFullPath")
+            if p:
+                window.evaluate_js(f"window.mabbajackDroppedPath && window.mabbajackDroppedPath({json.dumps(p)})")
+                return
+
+    def bind_drop() -> None:
+        try:
+            from webview.dom import DOMEventHandler
+            window.dom.document.events.drop += DOMEventHandler(on_drop, False, False)
+        except Exception:  # pywebview ancien : repli sur l'envoi HTTP
+            pass
+
+    window.events.loaded += bind_drop
     window.events.closed += backend.stop
     atexit.register(backend.stop)
     for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { translateLog } from '../web/src/locales/logCatalog.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const src = fs.readFileSync(`${root}/server/server.js`, 'utf8');
+const src = fs.readFileSync(`${root}/web/server/server.js`, 'utf8');
 const re = /(?:stageName|currentTask|errorMessage|error):\s*(`(?:[^`\\]|\\.|\$\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*`|'(?:[^'\\]|\\.)*')/g;
 const missing = new Set();
 let m;

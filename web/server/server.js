@@ -2729,7 +2729,8 @@ app.post('/api/install/start', async (req, res) => {
         broadcastLog('warn', `⚠ Avant déploiement : ${missingReport.length} archive(s) absente(s) ou incorrecte(s) — ${lost} fichier(s) de la modlist ne pourront pas être installés :`);
         for (const m of [...missingReport].sort((x, y) => y.files - x.files)) {
           const label = isGameFileArchive(m.arc) ? `${path.basename(gameFileRel(m.arc))} (fichier du jeu)` : m.arc.Name;
-          broadcastLog('warn', `  • ${label} — ${m.arc.wrongVersion ? 'mauvaise version' : 'absente'} — ${m.files} directive(s)`);
+          if (m.arc.wrongVersion) broadcastLog('warn', `  • ${label} — mauvaise version — ${m.files} directive(s)`);
+          else broadcastLog('warn', `  • ${label} — absente — ${m.files} directive(s)`);
         }
       }
 
@@ -2846,6 +2847,26 @@ app.post('/api/install/start', async (req, res) => {
           pluginsContent = kept.join('\n');
         }
       }
+      // Plugins des mods activés par l'utilisateur (options, autre famille d'interface…) :
+      // absents ou inactifs dans le plugins.txt du profil → activés, ajoutés en fin de liste.
+      if (selection && selection.pluginsAdded?.size > 0) {
+        const lines = pluginsContent.split('\n');
+        const seen = new Set();
+        let added = 0;
+        const next = lines.map((l) => {
+          const key = l.replace(/^\*/, '').trim().toLowerCase();
+          if (!selection.pluginsAdded.has(key)) return l;
+          seen.add(key);
+          if (l.startsWith('*')) return l;
+          added++;
+          return `*${l.trim()}`;
+        });
+        for (const [key, name] of selection.pluginsAdded) if (!seen.has(key)) { next.push(`*${name}`); added++; }
+        if (added > 0) {
+          broadcastLog('info', `ℹ ${added} plugin(s) de mods activés par vos choix ajoutés à plugins.txt.`);
+          pluginsContent = next.join('\n');
+        }
+      }
       if (selection && selection.profileItems.length > 0) {
         const ml = renderModlistTxt(selection);
         fs.writeFileSync(path.join(cleanDest, 'modlist.txt'), ml.text, 'utf-8');
@@ -2941,7 +2962,8 @@ app.post('/api/install/start', async (req, res) => {
             broadcastLog('warn', `  • ${path.basename(gameFileRel(m.arc))} — fichier original du jeu (${m.arc.State?.Game || 'Skyrim'} ${m.arc.State?.GameVersion || ''})`.trimEnd());
             broadcastLog('warn', `      Emplacement attendu : ${expectedGameFilePath(m.arc, gamePath)}`);
           } else {
-            broadcastLog('warn', `  • ${m.arc.Name} — ${m.arc.wrongVersion ? `mauvaise version (${describeWrongVersion(m.arc)})` : 'archive de mod'}`);
+            if (m.arc.wrongVersion) broadcastLog('warn', `  • ${m.arc.Name} — mauvaise version : ${describeWrongVersion(m.arc)}`);
+            else broadcastLog('warn', `  • ${m.arc.Name} — archive de mod`);
             const url = manualUrls.get(m.arc.Name) || archiveSourceUrl(m.arc);
             if (url) broadcastLog('warn', `      Téléchargement : ${url}`);
             else broadcastLog('warn', `      Téléchargement : source inconnue`);
@@ -2951,7 +2973,8 @@ app.post('/api/install/start', async (req, res) => {
         }
         if (lostFiles > 0) broadcastLog('warn', `  ℹ Conséquence : le jeu démarrera, mais les mods listés ci-dessus seront incomplets.`);
         if (hasGame) broadcastLog('warn', `  → Fichiers du jeu : indiquez le dossier du jeu (celui qui contient Data/) dans « Dossier du jeu Skyrim », puis relancez le déploiement.`);
-        if (hasMod) broadcastLog('warn', `  → Archives de mods : téléchargez-les, placez-les sous leur nom exact dans ${missingReport.some((m) => m.arc.wrongVersion) ? `${dedicatedDir} (dossier dédié à la liste, prioritaire sur le cache commun)` : cleanDownloads}, puis relancez le déploiement.`);
+        if (hasMod && missingReport.some((m) => m.arc.wrongVersion)) broadcastLog('warn', `  → Archives de mods : téléchargez-les, placez-les sous leur nom exact dans le dossier dédié à la liste ${dedicatedDir} (prioritaire sur le cache commun), puis relancez le déploiement.`);
+        else if (hasMod) broadcastLog('warn', `  → Archives de mods : téléchargez-les, placez-les dans ${cleanDownloads} sous leur nom exact, puis relancez le déploiement.`);
       }
       broadcastLog('success', `═══════════════════════════════════════════════════`);
       currentInstallJob.active = false;
@@ -3000,4 +3023,7 @@ if (fs.existsSync(distDir)) {
   });
 }
 
-app.listen(PORT, () => console.log(`[mABBAJACK Server] v3.0 (Directive Engine) actif sur http://localhost:${PORT}`));
+const httpServer = app.listen(PORT, () => console.log(`[mABBAJACK Server] v3.0 (Directive Engine) actif sur http://localhost:${PORT}`));
+// Envoi d'un .wabbajack de plusieurs Go (navigateur sans chemin de fichier) : pas de délai de 300 s par requête.
+httpServer.requestTimeout = 0;
+httpServer.timeout = 0;
