@@ -25,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
   const { t, language } = useI18n();
   const ui = COMMON_UI[language] ?? COMMON_UI.fr;
 
-  const TAB_BASE = 'px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all duration-150 cursor-pointer whitespace-nowrap';
+  const TAB_BASE = 'px-3 py-1.5 rounded-md text-body font-medium flex items-center gap-1.5 transition-all duration-150 cursor-pointer whitespace-nowrap';
   const TAB_ACTIVE = `${TAB_BASE} bg-[#0369a1] text-white font-semibold shadow-sm shadow-[#0369a1]/30`;
   const TAB_IDLE = `${TAB_BASE} text-[#aaaaaa] hover:text-white hover:bg-[#262626]`;
 
@@ -41,13 +41,13 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Brand */}
       <div className="flex items-center gap-2 flex-shrink-0">
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0369a1] to-[#0369a1] flex items-center justify-center text-white font-black text-xs shadow-md shadow-[#0369a1]/20 flex-shrink-0">
+        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0369a1] to-[#0369a1] flex items-center justify-center text-white font-black text-body shadow-md shadow-[#0369a1]/20 flex-shrink-0">
           ⚡
         </div>
         <div className="hidden sm:block">
-          <h1 className="text-sm font-extrabold text-white tracking-wide flex items-center gap-1.5">
+          <h1 className="text-title font-extrabold text-white tracking-wide flex items-center gap-1.5">
             <span>mABBAJACK</span>
-            <span className="text-[10px] font-mono px-1 py-0.5 rounded bg-[#0369a1]/15 text-[#38bdf8] border border-[#0ea5e9]/30">
+            <span className="text-caption font-mono px-1 py-0.5 rounded bg-[#0369a1]/15 text-[#38bdf8] border border-[#0ea5e9]/30">
               v3.0
             </span>
           </h1>
@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Right controls — flex-shrink-0 prevents squeezing */}
       <div className="flex items-center gap-1.5 flex-shrink-0">
         {/* Nexus badge — hidden below xl to avoid overflow */}
-        <div className={`hidden xl:flex items-center gap-1.5 h-7 px-2.5 rounded-md text-[11px] font-medium border whitespace-nowrap ${
+        <div className={`hidden xl:flex items-center gap-1.5 h-7 px-2.5 rounded-md text-meta font-medium border whitespace-nowrap ${
           nexusAccount?.isPremium
             ? 'bg-[#1e1e1e] text-[#38bdf8] border-[#0369a1]'
             : nexusAccount?.valid
@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           type="button"
           onClick={onOpenSettings}
-          className="h-7 px-2 rounded-md bg-[#1e1e1e] hover:bg-[#2c2c2c] border border-[#333333] text-[#aaaaaa] hover:text-white text-xs flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0"
+          className="h-7 px-2 rounded-md bg-[#1e1e1e] hover:bg-[#2c2c2c] border border-[#333333] text-[#aaaaaa] hover:text-white text-body flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0"
           title={t.header.tabs.settings}
         >
           <span>⚙️</span>

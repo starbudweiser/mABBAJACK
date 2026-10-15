@@ -1,14 +1,20 @@
+/* Design system Socle : copie synchronisée par /Volumes/SKYRIM/TOOLS/DESIGN/Socle/sync_apps.sh */
+@import './socle/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   color-scheme: dark;
+  /* Taille des textes fixe : 110 % (règle Socle). Seuls les textes sont agrandis. */
+  --text-scale: 1.1;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-sans);
+  font-size: calc(12px * var(--text-scale));
   background-color: #181818;
   color: #dddddd;
   user-select: none;
@@ -79,4 +85,14 @@ input, textarea, select, [contenteditable] {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Radios et cases : taille Socle (size-choice 16px), couleur d'accent */
+input[type='radio'], input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
 }

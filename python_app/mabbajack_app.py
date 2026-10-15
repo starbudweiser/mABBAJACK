@@ -246,6 +246,13 @@ def main() -> None:
                 return
 
     def bind_drop() -> None:
+        # Tous les écrans (window.screen ne donne que celui de la fenêtre) : sert à présélectionner
+        # le format d'écran des options (21:9, 32:9…).
+        try:
+            screens = [[int(sc.width), int(sc.height)] for sc in webview.screens]
+            window.evaluate_js(f"window.mabbajackScreens = {json.dumps(screens)}")
+        except Exception:
+            pass
         try:
             from webview.dom import DOMEventHandler
             window.dom.document.events.drop += DOMEventHandler(on_drop, False, False)

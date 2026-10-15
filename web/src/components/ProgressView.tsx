@@ -102,12 +102,12 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
         {/* Row 1: title + action toolbar */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 min-w-0">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2 flex-shrink-0">
+            <h2 className="text-title font-bold text-white flex items-center gap-2 flex-shrink-0">
               <span>⚡</span>
               <span>{t.progress.title}</span>
             </h2>
             {progress.stage !== 'idle' && (
-              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border flex-shrink-0 ${
+              <span className={`text-caption font-mono font-bold px-2 py-0.5 rounded-md border flex-shrink-0 ${
                 hasError     ? 'bg-[#ef4444]/15 text-[#f87171] border-[#ef4444]/40'
                 : isCompleted ? 'bg-[#22c55e]/15 text-[#4ade80] border-[#22c55e]/40'
                 : 'bg-[#0369a1]/15 text-[#38bdf8] border-[#0ea5e9]/30'
@@ -115,7 +115,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
                 {tr(progress.stageName)}
               </span>
             )}
-            <p className="text-[11px] text-[#666666] truncate hidden md:block">{t.progress.subtitle}</p>
+            <p className="text-meta text-[#666666] truncate hidden md:block">{t.progress.subtitle}</p>
           </div>
 
           {/* Action toolbar — grouped, separated by dividers */}
@@ -165,7 +165,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
 
         {/* Row 2: directory reminder */}
         {(downloadsPath || destPath) && (
-          <div className="bg-[#181818] border border-[#2e2e2e] rounded-lg px-3 py-2 flex flex-col md:flex-row md:items-center gap-1.5 text-[11px] font-mono">
+          <div className="bg-[#181818] border border-[#2e2e2e] rounded-lg px-3 py-2 flex flex-col md:flex-row md:items-center gap-1.5 text-body font-mono">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
               <span className="text-[#38bdf8] font-bold flex-shrink-0">📥 DL:</span>
               <span className="text-[#666666] truncate">{downloadsPath || '—'}</span>
@@ -184,10 +184,10 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
             <div className="flex items-start gap-3">
               <span className="text-2xl flex-shrink-0">❌</span>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold text-[#fecaca]">
+                <h3 className="text-title font-bold text-[#fecaca]">
                   {ui.interruptedAt} {progress.overallPercent.toFixed(1)}%
                 </h3>
-                <code className="text-[11px] text-[#fecaca] mt-1.5 block font-mono break-all bg-[#181818] p-2.5 rounded-lg border border-[#ef4444]/30">
+                <code className="text-body text-[#fecaca] mt-1.5 block font-mono break-all bg-[#181818] p-2.5 rounded-lg border border-[#ef4444]/30">
                   {tr(progress.errorMessage) || tr(progress.currentTask) || ui.diskError}
                 </code>
               </div>
@@ -197,7 +197,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
                 </button>
               )}
             </div>
-            <div className="text-[11px] text-[#fecaca]/80 bg-[#181818] p-2.5 rounded-lg border border-[#ef4444]/20 flex flex-col gap-1">
+            <div className="text-body text-[#fecaca]/80 bg-[#181818] p-2.5 rounded-lg border border-[#ef4444]/20 flex flex-col gap-1">
               <span className="font-semibold text-white">{ui.commonFixes}</span>
               <span>• <strong>{ui.fixVolume}</strong> — {ui.fixVolumeDesc}</span>
               <span>• <strong>{ui.fixNtfs}</strong> — {ui.fixNtfsDesc}</span>
@@ -208,11 +208,11 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
 
         {/* Row 4: progress bar */}
         <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between text-body">
             <span className={`font-medium truncate max-w-[70%] ${hasError ? 'text-[#f87171]' : 'text-[#aaaaaa]'}`}>
               {tr(progress.currentTask) || t.progress.overallProgress}
             </span>
-            <span className={`font-mono font-bold text-sm flex-shrink-0 ${hasError ? 'text-[#f87171]' : 'text-[#38bdf8]'}`}>
+            <span className={`font-mono font-bold text-title flex-shrink-0 ${hasError ? 'text-[#f87171]' : 'text-[#38bdf8]'}`}>
               {progress.overallPercent.toFixed(1)}%
             </span>
           </div>
@@ -240,13 +240,13 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
                       style={{ width: `${Math.min(100, progress.stagePercent)}%` }}
                     />
                   </div>
-                  <span className="text-[10px] font-mono text-[#666666] flex-shrink-0 w-8 text-right">
+                  <span className="text-caption font-mono text-[#666666] flex-shrink-0 w-8 text-right">
                     {progress.stagePercent}%
                   </span>
                 </div>
               )}
               {/* Animated current activity */}
-              <div className="flex items-center gap-2 text-[11px] text-[#666666] min-h-[16px]">
+              <div className="flex items-center gap-2 text-meta text-[#666666] min-h-[16px]">
                 <span className="inline-block w-2 h-2 rounded-full bg-[#0369a1] flex-shrink-0 animate-pulse" />
                 <span className="truncate italic">{tr(progress.currentTask) || ui.processing}</span>
               </div>
@@ -263,8 +263,8 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
             { label: t.progress.eta, value: formatSeconds(progress.etaSeconds), color: 'text-[#fbbf24]' },
           ].map((s) => (
             <div key={s.label} className="bg-[#181818] px-2.5 py-2 rounded-lg border border-[#2e2e2e]">
-              <span className="text-[10px] text-[#666666] uppercase font-bold block">{s.label}</span>
-              <span className={`text-xs font-mono font-bold ${s.color} block mt-0.5`}>{s.value}</span>
+              <span className="text-caption text-[#666666] uppercase font-bold block">{s.label}</span>
+              <span className={`text-body font-mono font-bold ${s.color} block mt-0.5`}>{s.value}</span>
             </div>
           ))}
         </div>
@@ -275,10 +275,10 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
 
         {/* Terminal toolbar */}
         <div className="h-9 px-3 bg-[#181818] border-b border-[#2e2e2e] flex items-center justify-between gap-3 flex-shrink-0">
-          <div className="flex items-center gap-2 text-[#666666] text-[11px]">
+          <div className="flex items-center gap-2 text-[#666666] text-meta">
             <span>💻</span>
             <span className="font-medium text-[#aaaaaa]">{t.progress.terminalLogs}</span>
-            <span className="px-1.5 py-0.5 rounded bg-[#222222] text-[10px]">{logs.length}</span>
+            <span className="px-1.5 py-0.5 rounded bg-[#222222] text-caption">{logs.length}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -289,7 +289,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
                   key={k}
                   type="button"
                   onClick={() => setLogFilter(k)}
-                  className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors cursor-pointer ${
+                  className={`px-2 py-0.5 rounded text-caption font-medium transition-colors cursor-pointer ${
                     logFilter === k ? `font-bold` : 'text-[#666666] hover:text-[#aaaaaa]'
                   }`}
                   style={logFilter === k ? { color: c } : {}}
@@ -301,7 +301,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
 
             <div className="w-px h-4 bg-[#333333]" />
 
-            <label className="flex items-center gap-1 text-[10px] text-[#666666] cursor-pointer select-none">
+            <label className="flex items-center gap-1 text-caption text-[#666666] cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={autoScroll}
@@ -313,19 +313,19 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
 
             <div className="w-px h-4 bg-[#333333]" />
 
-            <button type="button" onClick={handleCopyLogs} className="text-[10px] text-[#666666] hover:text-[#aaaaaa] cursor-pointer">
+            <button type="button" onClick={handleCopyLogs} className="text-caption text-[#666666] hover:text-[#aaaaaa] cursor-pointer">
               {copied ? ui.copied : t.progress.copyLogs}
             </button>
-            <button type="button" onClick={onClearLogs} className="text-[10px] text-[#666666] hover:text-[#f87171] cursor-pointer">
+            <button type="button" onClick={onClearLogs} className="text-caption text-[#666666] hover:text-[#f87171] cursor-pointer">
               {t.progress.clearLogs}
             </button>
           </div>
         </div>
 
         {/* Terminal body */}
-        <div className="flex-1 p-3 overflow-y-auto font-mono text-[11px] space-y-0.5 bg-[#181818]">
+        <div className="flex-1 p-3 overflow-y-auto font-mono text-body space-y-0.5 bg-[#181818]">
           {filteredLogs.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-[#666666] text-xs">
+            <div className="h-full flex items-center justify-center text-[#666666] text-body">
               {ui.waitingOps}
             </div>
           ) : (
@@ -340,8 +340,8 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
               const s = style[log.level] || { line: 'text-[#dddddd]', tag: 'text-[#666666]' };
               return (
                 <div key={log.id} className="flex items-start gap-2 hover:bg-[#181818] px-1 py-px rounded leading-relaxed">
-                  <span className="text-[#1e1e1e] select-none whitespace-nowrap text-[10px] flex-shrink-0">{log.timestamp}</span>
-                  <span className={`text-[10px] uppercase select-none w-[52px] flex-shrink-0 ${s.tag}`}>[{log.level}]</span>
+                  <span className="text-[#1e1e1e] select-none whitespace-nowrap text-caption flex-shrink-0">{log.timestamp}</span>
+                  <span className={`text-caption uppercase select-none w-[52px] flex-shrink-0 ${s.tag}`}>[{log.level}]</span>
                   <span className={`flex-1 break-all whitespace-pre-wrap ${s.line}`}>{tr(log.message)}</span>
                 </div>
               );

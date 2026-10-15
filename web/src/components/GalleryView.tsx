@@ -160,13 +160,13 @@ const TagBar: React.FC<{ tags: string[]; selectedTag: string; onSelect: (t: stri
       <button type="button" onClick={() => scroll('left')} title="◀" style={arrowStyle}>‹</button>
       <div ref={ref} style={{ display: 'flex', gap: 4, overflowX: 'auto', flex: 1, scrollbarWidth: 'none' }}>
         <button type="button" onClick={() => onSelect('all')}
-          style={{ flexShrink: 0, padding: '3px 10px', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', border: 'none',
+          style={{ flexShrink: 0, padding: '3px 10px', borderRadius: 6, fontSize: 'calc(12px * var(--text-scale))', fontWeight: 600, cursor: 'pointer', border: 'none',
             background: selectedTag === 'all' ? '#0ea5e9' : '#1a1a1a', color: selectedTag === 'all' ? '#ffffff' : '#707070' }}>
           {labelAll}
         </button>
         {tags.map((tag) => (
           <button key={tag} type="button" onClick={() => onSelect(tag === selectedTag ? 'all' : tag)}
-            style={{ flexShrink: 0, padding: '3px 10px', borderRadius: 6, fontSize: 11, fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap',
+            style={{ flexShrink: 0, padding: '3px 10px', borderRadius: 6, fontSize: 'calc(12px * var(--text-scale))', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap',
               background: selectedTag === tag ? '#262626' : '#1a1a1a',
               color: selectedTag === tag ? '#38bdf8' : '#707070',
               border: `1px solid ${selectedTag === tag ? 'rgba(14,165,233,0.4)' : 'transparent'}` }}>
@@ -185,7 +185,7 @@ const ExtLink: React.FC<{ url: string; label: string; bg: string; color: string;
     type="button"
     onClick={() => openExternalUrl(url)}
     style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 8,
-      fontSize: 12, fontWeight: 500, background: bg, color, border: `1px solid ${border}`,
+      fontSize: 'calc(12px * var(--text-scale))', fontWeight: 500, background: bg, color, border: `1px solid ${border}`,
       cursor: 'pointer' }}
   >
     {label}
@@ -212,7 +212,7 @@ const CardDescription: React.FC<{ raw?: string; language: Language; fallback: st
 
   const { translated } = useTranslated(visible ? text : undefined, language);
   return (
-    <p ref={ref} className="text-xs text-[#8f8f8f] line-clamp-2 leading-relaxed mb-3">
+    <p ref={ref} className="text-body text-[#8f8f8f] line-clamp-2 leading-relaxed mb-3">
       {text ? (translated || text) : fallback}
     </p>
   );
@@ -270,8 +270,8 @@ const DetailModal: React.FC<{
         <div style={{ padding: '16px 20px', background: '#181818', borderBottom: '1px solid #262626',
           display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexShrink: 0 }}>
           <div style={{ minWidth: 0 }}>
-            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#ffffff' }}>{modlist.title}</h3>
-            <p style={{ margin: '4px 0 0', fontSize: 11, color: '#aaaaaa' }}>
+            <h3 style={{ margin: 0, fontSize: 'calc(16px * var(--text-scale))', fontWeight: 700, color: '#ffffff' }}>{modlist.title}</h3>
+            <p style={{ margin: '4px 0 0', fontSize: 'calc(11px * var(--text-scale))', color: '#aaaaaa' }}>
               {t.gallery.byAuthor}{' '}
               <span style={{ color: '#38bdf8', fontWeight: 600 }}>{modlist.author}</span>
               {modlist.version && <>{' · '}<span style={{ fontFamily: 'monospace' }}>v{modlist.version}</span></>}
@@ -319,7 +319,7 @@ const DetailModal: React.FC<{
           <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* Description */}
-            <p style={{ margin: 0, fontSize: 13, color: !rawDescription ? '#707070' : '#dddddd', lineHeight: 1.6, fontStyle: !rawDescription ? 'italic' : 'normal', position: 'relative' }}>
+            <p style={{ margin: 0, fontSize: 'calc(15px * var(--text-scale))', color: !rawDescription ? '#707070' : '#dddddd', lineHeight: 1.6, fontStyle: !rawDescription ? 'italic' : 'normal', position: 'relative' }}>
               {description}
               {descLoading && (
                 <span style={{ marginLeft: 8, display: 'inline-block', width: 10, height: 10, borderRadius: '50%', border: '2px solid #38bdf8', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite', verticalAlign: 'middle' }} />
@@ -331,7 +331,7 @@ const DetailModal: React.FC<{
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {modlist.tags.map((tag) => (
                   <span key={tag} style={{
-                    fontSize: 10, padding: '2px 8px', borderRadius: 12,
+                    fontSize: 'calc(10px * var(--text-scale))', padding: '2px 8px', borderRadius: 12,
                     background: tag.toLowerCase().includes('anniversary') ? 'rgba(245,158,11,0.08)' : '#222222',
                     color: tag.toLowerCase().includes('anniversary') ? '#f59e0b' : '#aaaaaa',
                     border: `1px solid ${tag.toLowerCase().includes('anniversary') ? 'rgba(245,158,11,0.3)' : '#303030'}`,
@@ -349,8 +349,8 @@ const DetailModal: React.FC<{
                 [t.gallery.statGame,      modlist.game || '—', '#aaaaaa'],
               ] as [string, string, string][]).map(([label, value, color]) => (
                 <div key={label} style={{ background: '#181818', border: '1px solid #262626', borderRadius: 10, padding: '10px 12px' }}>
-                  <p style={{ margin: '0 0 2px', fontSize: 10, color: '#707070' }}>{label}</p>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color }}>{value}</p>
+                  <p style={{ margin: '0 0 2px', fontSize: 'calc(10px * var(--text-scale))', color: '#707070' }}>{label}</p>
+                  <p style={{ margin: 0, fontSize: 'calc(14px * var(--text-scale))', fontWeight: 700, color }}>{value}</p>
                 </div>
               ))}
             </div>
@@ -378,7 +378,7 @@ const DetailModal: React.FC<{
         <div style={{ padding: '12px 20px', background: '#181818', borderTop: '1px solid #262626',
           display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, flexShrink: 0 }}>
           <button type="button" onClick={onClose}
-            style={{ padding: '7px 20px', borderRadius: 8, background: '#262626', border: 'none', color: '#dddddd', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}>
+            style={{ padding: '7px 20px', borderRadius: 8, background: '#262626', border: 'none', color: '#dddddd', fontSize: 'calc(12px * var(--text-scale))', fontWeight: 500, cursor: 'pointer' }}>
             {t.gallery.detailClose}
           </button>
         </div>
@@ -478,33 +478,33 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
         {/* Row 1 — Title + Search */}
         <div className="px-4 pt-3.5 pb-2 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            <h2 className="text-title font-bold text-white flex items-center gap-2">
               <span>{t.gallery.title}</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-[#1e1e1e] text-[#38bdf8] border border-[#2e2e2e]">{filtered.length}</span>
+              <span className="text-caption font-mono px-1.5 py-0.5 rounded-full bg-[#1e1e1e] text-[#38bdf8] border border-[#2e2e2e]">{filtered.length}</span>
             </h2>
-            <p className="text-[11px] text-[#666666] truncate">{t.gallery.subtitle}</p>
+            <p className="text-meta text-[#666666] truncate">{t.gallery.subtitle}</p>
           </div>
           <div className="relative flex-shrink-0 w-56">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-[#666666]">🔍</span>
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-meta text-[#666666]">🔍</span>
             <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t.gallery.searchPlaceholder}
-              className="w-full h-8 pl-7 pr-7 bg-[#1e1e1e] border border-[#333333] rounded-md text-xs text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9]" />
-            {search && <button type="button" onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#666666] hover:text-white text-xs cursor-pointer">✕</button>}
+              className="w-full h-8 pl-7 pr-7 bg-[#1e1e1e] border border-[#333333] rounded-md text-body text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9]" />
+            {search && <button type="button" onClick={() => setSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#666666] hover:text-white text-body cursor-pointer">✕</button>}
           </div>
         </div>
 
         {/* Row 2 — Game filter buttons */}
         <div className="px-4 pb-2 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] text-[#666666] uppercase font-bold tracking-wider flex-shrink-0">{t.gallery.filterLabel}</span>
+          <span className="text-caption text-[#666666] uppercase font-bold tracking-wider flex-shrink-0">{t.gallery.filterLabel}</span>
           {BUTTON_FILTERS.map((f) => {
             const isActive = activeFilter === f.id;
             return (
               <button key={f.id} type="button" onClick={() => { setActiveFilter(f.id); setSelectedTag('all'); }}
-                className="flex items-center gap-1.5 px-3 h-[30px] rounded-lg text-[11px] font-semibold border transition-all duration-150 cursor-pointer flex-shrink-0"
+                className="flex items-center gap-1.5 px-3 h-[30px] rounded-lg text-body font-semibold border transition-all duration-150 cursor-pointer flex-shrink-0"
                 style={isActive ? { color: f.activeColor, background: f.activeBg, borderColor: f.activeBorder } : { color: '#707070', background: '#1a1a1a', borderColor: '#2c2c2c' }}>
                 <span>{f.icon}</span>
                 <span>{filterLabel(f.id, f.label, language)}</span>
-                {f.versionLabel && <span className="text-[9px] font-mono px-1 rounded font-bold opacity-80" style={isActive ? { color: f.color } : { color: '#444444' }}>{f.versionLabel}</span>}
-                <span className="px-1.5 py-px rounded-full text-[10px] font-bold" style={isActive ? { background: f.color + '22', color: f.color } : { background: '#262626', color: '#444444' }}>{bucketCounts[f.id] ?? 0}</span>
+                {f.versionLabel && <span className="text-caption font-mono px-1 rounded font-bold opacity-80" style={isActive ? { color: f.color } : { color: '#444444' }}>{f.versionLabel}</span>}
+                <span className="px-1.5 py-px rounded-full text-caption font-bold" style={isActive ? { background: f.color + '22', color: f.color } : { background: '#262626', color: '#444444' }}>{bucketCounts[f.id] ?? 0}</span>
               </button>
             );
           })}
@@ -521,7 +521,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
                   if (!e.target.value) return;
                   setActiveFilter('other'); setOtherGame(e.target.value); setSelectedTag('all');
                 }}
-                className="appearance-none ml-auto h-[30px] pl-3 pr-7 rounded-lg text-[11px] font-semibold leading-none border transition-all duration-150 cursor-pointer w-[140px] flex-shrink-0 truncate focus:outline-none"
+                className="appearance-none ml-auto h-[30px] pl-3 pr-7 rounded-lg text-body font-semibold leading-none border transition-all duration-150 cursor-pointer w-[140px] flex-shrink-0 truncate focus:outline-none"
                 style={{
                   ...(isActive
                     ? { color: OTHER_FILTER.activeColor, background: OTHER_FILTER.activeBg, borderColor: OTHER_FILTER.activeBorder }
@@ -540,7 +540,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
         {/* Row 3 — Tag bar with arrows + Sort */}
         <div className="px-4 pb-3 flex items-center gap-2 border-t border-[#2e2e2e] pt-2">
           <button type="button" id="gallery-hide-nsfw" aria-pressed={hideNsfw} onClick={() => setHideNsfw(!hideNsfw)}
-            className="flex-shrink-0 px-2.5 py-1 rounded-md text-[11px] font-semibold border cursor-pointer transition-all duration-150"
+            className="flex-shrink-0 px-2.5 py-1 rounded-md text-body font-semibold border cursor-pointer transition-all duration-150"
             style={hideNsfw
               ? { color: '#fecaca', background: '#1a1a1a', borderColor: '#ef444488' }
               : { color: '#707070', background: '#1a1a1a', borderColor: '#2c2c2c' }}>
@@ -549,14 +549,14 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
           <TagBar tags={availableTags} selectedTag={selectedTag} onSelect={setSelectedTag} labelAll={t.gallery.allGames} />
           <div className="flex items-center gap-1.5 flex-shrink-0 ml-1">
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)} title={t.gallery.sortBy}
-              className="bg-[#1e1e1e] border border-[#333333] rounded px-2 py-1 text-[11px] text-[#dddddd] focus:outline-none focus:border-[#0ea5e9] cursor-pointer">
+              className="bg-[#1e1e1e] border border-[#333333] rounded px-2 py-1 text-body text-[#dddddd] focus:outline-none focus:border-[#0ea5e9] cursor-pointer">
               <option value="sizeAsc">{t.gallery.sortSizeAsc}</option>
               <option value="sizeDesc">{t.gallery.sortSizeDesc}</option>
               <option value="name">{t.gallery.sortName}</option>
               <option value="updated">{t.gallery.sortUpdated}</option>
             </select>
             <button type="button" onClick={onRefresh} title={(COMMON_UI[language] ?? COMMON_UI.fr).refresh}
-              className="h-7 w-7 flex items-center justify-center rounded bg-[#1e1e1e] hover:bg-[#262626] border border-[#333333] text-[#aaaaaa] hover:text-white text-xs cursor-pointer">🔄</button>
+              className="h-7 w-7 flex items-center justify-center rounded bg-[#1e1e1e] hover:bg-[#262626] border border-[#333333] text-[#aaaaaa] hover:text-white text-body cursor-pointer">🔄</button>
           </div>
         </div>
       </div>
@@ -566,14 +566,14 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
         {isLoading ? (
           <div className="h-full flex flex-col items-center justify-center gap-3 text-[#aaaaaa]">
             <div className="w-8 h-8 border-2 border-[#0ea5e9] border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs">{t.gallery.loadingModlists}</p>
+            <p className="text-body">{t.gallery.loadingModlists}</p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center gap-4 text-[#666666] py-16">
             <span className="text-5xl">📦</span>
-            <p className="text-sm font-medium text-[#dddddd]">{t.gallery.noModlistsFound}</p>
+            <p className="text-body-lg font-medium text-[#dddddd]">{t.gallery.noModlistsFound}</p>
             <button type="button" onClick={() => { setSearch(''); setActiveFilter('all'); setOtherGame(ALL_OTHERS); setSelectedTag('all'); }}
-              className="px-3 py-1.5 rounded-md bg-[#0369a1]/20 text-[#38bdf8] border border-[#0ea5e9]/40 text-xs font-medium hover:bg-[#0369a1]/30 cursor-pointer">
+              className="px-3 py-1.5 rounded-md bg-[#0369a1]/20 text-[#38bdf8] border border-[#0ea5e9]/40 text-body font-medium hover:bg-[#0369a1]/30 cursor-pointer">
               {t.gallery.retryBtn}
             </button>
           </div>
@@ -600,17 +600,17 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#181818] via-transparent to-black/30" />
                     <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                      {modlist.official && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0369a1] text-white">{t.gallery.officialBadge}</span>}
-                      {modlist.nsfw && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#ef4444] text-white">{t.gallery.nsfwBadge}</span>}
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-black/60 text-[#aaaaaa]">v{modlist.version || '1.0'}</span>
+                      {modlist.official && <span className="px-2 py-0.5 rounded text-caption font-bold bg-[#0369a1] text-white">{t.gallery.officialBadge}</span>}
+                      {modlist.nsfw && <span className="px-2 py-0.5 rounded text-caption font-bold bg-[#ef4444] text-white">{t.gallery.nsfwBadge}</span>}
+                      <span className="px-1.5 py-0.5 rounded text-caption font-mono bg-black/60 text-[#aaaaaa]">v{modlist.version || '1.0'}</span>
                     </div>
                     <div className="absolute top-2.5 right-2.5">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold backdrop-blur-sm"
+                      <span className="px-2 py-0.5 rounded text-caption font-bold backdrop-blur-sm"
                         style={{ color: bd.color, background: 'rgba(0,0,0,0.70)', border: `1px solid ${bd.color}44` }}>
                         {bd.icon} {versionBadge(modlist, bd).text || filterLabel(bd.id, bd.label, language)}
                       </span>
                     </div>
-                    <div className="absolute bottom-2 left-2.5 text-[11px] flex items-center gap-1">
+                    <div className="absolute bottom-2 left-2.5 text-body flex items-center gap-1">
                       <span className="text-[#aaaaaa]">{t.gallery.byAuthor}</span>
                       <span className="text-[#38bdf8] font-semibold">{modlist.author}</span>
                     </div>
@@ -619,37 +619,37 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
                   {/* Card body */}
                   <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-white group-hover:text-[#38bdf8] transition-colors line-clamp-1 mb-1">{modlist.title}</h3>
+                      <h3 className="text-title font-bold text-white group-hover:text-[#38bdf8] transition-colors line-clamp-1 mb-1">{modlist.title}</h3>
                       <CardDescription raw={modlist.description} language={language} fallback={t.gallery.noDescription} />
                       {modlist.tags && modlist.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-3">
                           {modlist.tags.slice(0, 4).map((tag) => (
-                            <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded border"
+                            <span key={tag} className="text-caption px-1.5 py-0.5 rounded border"
                               style={tag.toLowerCase().includes('anniversary') || tag === 'AE'
                                 ? { background: 'rgba(245,158,11,0.08)', color: '#f59e0b', borderColor: 'rgba(245,158,11,0.25)' }
                                 : { background: '#222222', color: '#aaaaaa', borderColor: '#303030' }}>{tag}</span>
                           ))}
-                          {modlist.tags.length > 4 && <span className="text-[9px] px-1 py-0.5 rounded bg-[#222222] text-[#666666]">+{modlist.tags.length - 4}</span>}
+                          {modlist.tags.length > 4 && <span className="text-caption px-1 py-0.5 rounded bg-[#222222] text-[#666666]">+{modlist.tags.length - 4}</span>}
                         </div>
                       )}
                     </div>
 
                     <div className="pt-2 border-t border-[#2e2e2e] flex flex-col gap-2">
-                      <div className="grid grid-cols-2 gap-2 text-[11px]">
+                      <div className="grid grid-cols-2 gap-2 text-body">
                         <div className="bg-[#1e1e1e] p-1.5 rounded border border-[#2e2e2e]">
-                          <span className="text-[#666666] block text-[9px] uppercase tracking-wider">{t.gallery.statDl}</span>
+                          <span className="text-[#666666] block text-caption uppercase tracking-wider">{t.gallery.statDl}</span>
                           <span className="text-[#38bdf8] font-bold">{formatBytes(dlSize)}</span>
-                          <span className="text-[#666666] text-[9px] block">({archCount} {t.gallery.archivesCount})</span>
+                          <span className="text-[#666666] text-caption block">({archCount} {t.gallery.archivesCount})</span>
                         </div>
                         <div className="bg-[#1e1e1e] p-1.5 rounded border border-[#2e2e2e]">
-                          <span className="text-[#666666] block text-[9px] uppercase tracking-wider">{t.gallery.statInstalled}</span>
+                          <span className="text-[#666666] block text-caption uppercase tracking-wider">{t.gallery.statInstalled}</span>
                           <span className="text-[#4ade80] font-bold">{formatBytes(instSize)}</span>
-                          <span className="text-[#666666] text-[9px] block">{t.gallery.installedSize}</span>
+                          <span className="text-[#666666] text-caption block">{t.gallery.installedSize}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 mt-1">
                         <button type="button" onClick={() => setDetailModlist(modlist)}
-                          className="flex-1 py-2 px-3 rounded-lg bg-[#222222] hover:bg-[#2c2c2c] border border-[#333333] hover:border-[#38bdf8]/40 text-[#dddddd] hover:text-[#38bdf8] text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                          className="flex-1 py-2 px-3 rounded-lg bg-[#222222] hover:bg-[#2c2c2c] border border-[#333333] hover:border-[#38bdf8]/40 text-[#dddddd] hover:text-[#38bdf8] text-body font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                           <span>ℹ️</span><span>{t.gallery.detailsBtn || 'Infos'}</span>
                         </button>
                       </div>

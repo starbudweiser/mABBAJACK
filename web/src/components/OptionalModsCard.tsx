@@ -20,7 +20,10 @@ function formatBytes(bytes: number, fr: boolean): string {
 
 /** Format d'écran le plus proche de l'écran courant (null = 16:9, format natif des interfaces). */
 function detectScreenFormat(): { id: string | null; ratio: string } {
-  const w = window.screen?.width || 0, h = window.screen?.height || 0;
+  // App native : tous les écrans (fournis par python_app) → le plus large ; sinon l'écran de la fenêtre.
+  const all = (window as unknown as { mabbajackScreens?: [number, number][] }).mabbajackScreens;
+  const widest = all?.length ? all.reduce((a, b) => (b[0] > a[0] ? b : a)) : null;
+  const w = widest?.[0] || window.screen?.width || 0, h = widest?.[1] || window.screen?.height || 0;
   if (!w || !h) return { id: null, ratio: '?' };
   const r = Math.max(w, h) / Math.min(w, h);
   const known: [string | null, number][] = [[null, 16 / 9], ['16x10', 16 / 10], ['21x9', 64 / 27], ['32x9', 32 / 9]];
@@ -86,8 +89,8 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
   }, [profile, enabled]);
 
   if (!filePath) return null;
-  if (loading) return <div className={card}><span className="text-[11px] text-[#666666]">⏳ {ui.loading}</span></div>;
-  if (failed) return <div className={card}><span className="text-[11px] text-[#666666]">{ui.error}</span></div>;
+  if (loading) return <div className={card}><span className="text-meta text-[#666666]">⏳ {ui.loading}</span></div>;
+  if (failed) return <div className={card}><span className="text-meta text-[#666666]">{ui.error}</span></div>;
   if (!profile) return null;
   const visibleChoices: ModlistChoice[] = (profile.choices ?? []).filter((c) => !c.hidden);
   if (profile.optionalCount === 0 && visibleChoices.length === 0 && (options?.profiles.length ?? 0) < 2) return null;
@@ -113,13 +116,13 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
           {ui.selected.replace('{n}', String(enabled.size)).replace('{total}', String(profile.optionalCount)).replace('{size}', formatBytes(selectedBytes, fr))}
         </span>
       </div>
-      <p className="text-[11px] text-[#666666] -mt-1">{ui.hint}</p>
+      <p className="text-meta text-[#666666] -mt-1">{ui.hint}</p>
 
       {options && options.profiles.length > 1 && (
         <div className="bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-3 py-2 flex flex-col gap-1" role="radiogroup" aria-label={ui.profile}>
-          <span className="text-[11px] text-[#aaaaaa]">{ui.profile} <span className="text-[#666666]">— {ui.profilesHint}</span></span>
+          <span className="text-body text-[#aaaaaa]">{ui.profile} <span className="text-[#666666]">— {ui.profilesHint}</span></span>
           {options.profiles.map((p) => (
-            <label key={p.name} className="text-[11px] text-[#dddddd] flex items-center gap-2 py-0.5">
+            <label key={p.name} className="text-body text-[#dddddd] flex items-center gap-2 py-0.5">
               <input type="radio" name="mabba-profile" checked={p.name === profile.name}
                 onChange={() => onChange({ profile: p.name, enable: [], choices: defaultChoices(p) })} />
               <span className="truncate">{p.name}</span>
@@ -130,21 +133,21 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
 
       {visibleChoices.length > 0 && (
         <div className="flex flex-col gap-1.5">
-          <span className="text-[11px] text-[#aaaaaa]">{ui.choicesTitle}</span>
+          <span className="text-body text-[#aaaaaa]">{ui.choicesTitle}</span>
           {visibleChoices.map((c) => {
             const cur = picked[c.id] ?? c.default;
             return (
               <div key={c.id} className="bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-3 py-2 flex flex-col gap-1" role="radiogroup" aria-label={choiceTitle(c)}>
-                <span className="text-[12px] text-white flex items-center justify-between gap-2">
+                <span className="text-body text-white flex items-center justify-between gap-2">
                   <span className="truncate">{choiceTitle(c)}</span>
-                  {c.kind === 'format' && <span className="text-[10px] text-[#666666] shrink-0">{ui.formatDetected.replace('{ratio}', screen.ratio)}</span>}
+                  {c.kind === 'format' && <span className="text-caption text-[#666666] shrink-0">{ui.formatDetected.replace('{ratio}', screen.ratio)}</span>}
                 </span>
                 <div className="flex flex-wrap gap-x-4 gap-y-1">
                   {c.options.map((o) => (
-                    <label key={o.id} className="text-[11px] text-[#dddddd] flex items-center gap-1.5 py-0.5" title={o.mods.join('\n')}>
+                    <label key={o.id} className="text-body text-[#dddddd] flex items-center gap-1.5 py-0.5" title={o.mods.join('\n')}>
                       <input type="radio" name={`mabba-${c.id}`} checked={cur === o.id} onChange={() => pick(c, o.id)} />
                       <span>{o.label}</span>
-                      {o.size >= 1048576 && <span className="text-[10px] text-[#666666]">{formatBytes(o.size, fr)}</span>}
+                      {o.size >= 1048576 && <span className="text-caption text-[#666666]">{formatBytes(o.size, fr)}</span>}
                     </label>
                   ))}
                 </div>
@@ -165,20 +168,20 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
           const nSel = names.filter((n) => enabled.has(n)).length;
           return (
             <details key={g.separator} className="bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg">
-              <summary className="px-3 py-2 cursor-pointer text-[12px] text-white flex items-center justify-between gap-2 select-none">
+              <summary className="px-3 py-2 cursor-pointer text-body text-white flex items-center justify-between gap-2 select-none">
                 <span className="truncate">{g.separator}</span>
-                <span className="text-[10px] text-[#666666] shrink-0">{nSel} / {names.length}</span>
+                <span className="text-caption text-[#666666] shrink-0">{nSel} / {names.length}</span>
               </summary>
               <div className="px-3 pb-2 flex flex-col gap-1">
-                <label className="text-[11px] text-[#aaaaaa] flex items-center gap-2 py-0.5">
+                <label className="text-body text-[#aaaaaa] flex items-center gap-2 py-0.5">
                   <input type="checkbox" checked={nSel === names.length} onChange={(e) => set(names, e.target.checked)} />
                   <span>{nSel === names.length ? ui.uncheckAll : ui.checkAll}</span>
                 </label>
                 {g.mods.map((m) => (
-                  <label key={m.name} className="text-[11px] text-[#dddddd] flex items-center gap-2 py-0.5">
+                  <label key={m.name} className="text-body text-[#dddddd] flex items-center gap-2 py-0.5">
                     <input type="checkbox" checked={enabled.has(m.name)} onChange={(e) => set([m.name], e.target.checked)} />
                     <span className="truncate flex-1">{m.name}</span>
-                    <span className="text-[10px] text-[#666666] shrink-0">{formatBytes(m.size, fr)}</span>
+                    <span className="text-caption text-[#666666] shrink-0">{formatBytes(m.size, fr)}</span>
                   </label>
                 ))}
               </div>
@@ -186,7 +189,7 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
           );
         })}
       </div>
-      <p className="text-[10px] text-[#666666]">{ui.note}</p>
+      <p className="text-caption text-[#666666]">{ui.note}</p>
     </div>
   );
 };

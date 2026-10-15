@@ -36,10 +36,10 @@ export const ImportProgress: React.FC<{ state: ImportProgressState }> = ({ state
       id="import-progress-dialog"
     >
       <div className="w-[min(30rem,90vw)] bg-[#181818] border border-[#2e2e2e] rounded-xl shadow-2xl p-6">
-        <h2 className="text-sm font-bold text-white mb-1">{ui.title}</h2>
-        <p className="text-[11px] text-[#8f8f8f] font-mono truncate mb-4" title={state.fileName}>{state.fileName}</p>
+        <h2 className="text-title font-bold text-white mb-1">{ui.title}</h2>
+        <p className="text-meta text-[#8f8f8f] font-mono truncate mb-4" title={state.fileName}>{state.fileName}</p>
 
-        <div className="flex items-center justify-between text-xs text-[#dddddd] mb-1.5">
+        <div className="flex items-center justify-between text-body text-[#dddddd] mb-1.5">
           <span>{uploading ? ui.uploading : ui.analyzing}</span>
           <span className="font-mono font-bold text-[#38bdf8]">{pct !== null ? `${pct} %` : '…'}</span>
         </div>
@@ -61,12 +61,12 @@ export const ImportProgress: React.FC<{ state: ImportProgressState }> = ({ state
           )}
         </div>
 
-        <div className="flex items-center justify-between text-[10px] text-[#666666] font-mono mt-2">
+        <div className="flex items-center justify-between text-caption text-[#666666] font-mono mt-2">
           <span>{uploading && state.total > 0 ? `${fmtBytes(state.sent, language)} / ${fmtBytes(state.total, language)}` : ''}</span>
           <span>{ui.elapsed.replace('{s}', String(seconds))}</span>
         </div>
 
-        {!uploading && <p className="text-[11px] text-[#aaaaaa] mt-3 leading-relaxed">{ui.analyzingHint}</p>}
+        {!uploading && <p className="text-body text-[#aaaaaa] mt-3 leading-relaxed">{ui.analyzingHint}</p>}
       </div>
       <style>{'@keyframes importSlide { from { margin-left: 0 } to { margin-left: 66% } }'}</style>
     </div>

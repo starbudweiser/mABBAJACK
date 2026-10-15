@@ -83,15 +83,15 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
               📥
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
+              <h2 className="text-title font-bold text-white flex items-center gap-2">
                 <span>{ui.title}</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#ef4444]/20 text-[#f87171] border border-[#ef4444]/30">
+                <span className="text-caption font-mono px-2 py-0.5 rounded-full bg-[#ef4444]/20 text-[#f87171] border border-[#ef4444]/30">
                   {ui.missingCount
                     .replace('{n}', String(missingArchives.length))
                     .replace('{size}', formatBytes(totalMissingSize, isFr))}
                 </span>
               </h2>
-              <p className="text-[11px] text-[#8f8f8f]">{ui.subtitle}</p>
+              <p className="text-meta text-[#8f8f8f]">{ui.subtitle}</p>
             </div>
           </div>
 
@@ -99,7 +99,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label={ui.close}
-            className="w-8 h-8 rounded-lg bg-[#222222] hover:bg-[#303030] text-[#8f8f8f] hover:text-white flex items-center justify-center text-sm transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-lg bg-[#222222] hover:bg-[#303030] text-[#8f8f8f] hover:text-white flex items-center justify-center text-body-lg transition-colors cursor-pointer"
           >
             ✕
           </button>
@@ -113,7 +113,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={ui.search}
-              className="w-full h-8 px-3 bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg text-xs text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9]"
+              className="w-full h-8 px-3 bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg text-body text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9]"
             />
           </div>
 
@@ -122,7 +122,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
               type="button"
               onClick={onScanDownloads}
               disabled={isScanning}
-              className="h-8 px-3 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+              className="h-8 px-3 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-lg text-body font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
             >
               <span>🔄</span>
               <span>{isScanning ? ui.scanning : ui.verify}</span>
@@ -132,7 +132,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
               type="button"
               onClick={handleCopyPath}
               disabled={!downloadsPath}
-              className="h-8 px-3 bg-[#1e1e1e] hover:bg-[#2c2c2c] border border-[#333333] text-[#aaaaaa] hover:text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+              className="h-8 px-3 bg-[#1e1e1e] hover:bg-[#2c2c2c] border border-[#333333] text-[#aaaaaa] hover:text-white rounded-lg text-body font-medium flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
             >
               <span>📋</span>
               <span>{ui.copyPath}</span>
@@ -145,8 +145,8 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
           {filteredArchives.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-8">
               <span className="text-3xl mb-2">🎉</span>
-              <h3 className="text-sm font-bold text-white">{ui.allReady}</h3>
-              <p className="text-xs text-[#666666] mt-1">{ui.noMatch}</p>
+              <h3 className="text-title font-bold text-white">{ui.allReady}</h3>
+              <p className="text-body text-[#666666] mt-1">{ui.noMatch}</p>
             </div>
           ) : (
             filteredArchives.map((archive) => {
@@ -159,20 +159,20 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-white truncate">{archive.Name}</span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#262626] text-[#aaaaaa]">
+                      <span className="text-body-lg font-semibold text-white truncate">{archive.Name}</span>
+                      <span className="text-caption font-mono px-2 py-0.5 rounded bg-[#262626] text-[#aaaaaa]">
                         {formatBytes(archive.Size, isFr)}
                       </span>
                       {isGame && (
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-[#f59e0b]/20 text-[#fbbf24] border border-[#f59e0b]/40">
+                        <span className="text-caption font-semibold px-2 py-0.5 rounded bg-[#f59e0b]/20 text-[#fbbf24] border border-[#f59e0b]/40">
                           🎮 {ui.gameFile}
                         </span>
                       )}
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-[#666666] mt-1">
+                    <div className="flex flex-wrap items-center gap-3 text-meta text-[#666666] mt-1">
                       {archive.Hash && (
-                        <span className="font-mono text-[10px] text-[#666666]">
+                        <span className="font-mono text-caption text-[#666666]">
                           Hash: {archive.Hash.slice(0, 16)}…
                         </span>
                       )}
@@ -188,9 +188,9 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                     </div>
 
                     {isGame && (
-                      <div className="mt-1 text-[11px] text-[#d97706] space-y-0.5">
+                      <div className="mt-1 text-body text-[#d97706] space-y-0.5">
                         {archive.expectedPath && (
-                          <div className="font-mono text-[10px] break-all">
+                          <div className="font-mono text-caption break-all">
                             {ui.expectedAt} {archive.expectedPath}
                           </div>
                         )}
@@ -206,7 +206,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                           href={url}
                           target="_blank"
                           rel="noreferrer"
-                          className="h-8 px-3 bg-[#0369a1]/20 hover:bg-[#0369a1]/30 border border-[#0ea5e9]/50 text-[#38bdf8] rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                          className="h-8 px-3 bg-[#0369a1]/20 hover:bg-[#0369a1]/30 border border-[#0ea5e9]/50 text-[#38bdf8] rounded-lg text-body font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
                           <span>🔗</span>
                           <span>Nexus Mods</span>
@@ -216,7 +216,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                           href={`https://www.google.com/search?q=${encodeURIComponent(archive.Name + ' Skyrim mod')}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="h-8 px-3 bg-[#262626] hover:bg-[#303030] text-[#aaaaaa] hover:text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                          className="h-8 px-3 bg-[#262626] hover:bg-[#303030] text-[#aaaaaa] hover:text-white rounded-lg text-body font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
                           <span>🔍</span>
                           <span>{ui.googleSearch}</span>
@@ -232,7 +232,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
 
         {/* Footer */}
         <div className="p-3 bg-[#181818] border-t border-[#2e2e2e] flex items-center justify-between">
-          <div className="text-[11px] text-[#666666] flex items-center gap-2">
+          <div className="text-meta text-[#666666] flex items-center gap-2">
             <span>💡</span>
             <span>{ui.footer}</span>
           </div>
@@ -240,7 +240,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-[#222222] hover:bg-[#303030] text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+            className="px-4 py-1.5 bg-[#222222] hover:bg-[#303030] text-white rounded-lg text-body font-semibold transition-colors cursor-pointer"
           >
             {ui.close}
           </button>

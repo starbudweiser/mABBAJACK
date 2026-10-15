@@ -19,8 +19,20 @@ export default {
         purpleAccent: '#0369a1',
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['Menlo', 'Monaco', 'Courier New', 'monospace'],
+        sans: ['var(--font-sans)'],
+        mono: ['var(--font-mono)'],
+      },
+      // Échelle typographique Socle (tokens.json → typography), × --text-scale (110 %, règle Socle).
+      // N'utiliser que ces tailles : plus de text-[11px], text-xs, text-sm… dans les composants.
+      fontSize: {
+        caption: ['calc(10px * var(--text-scale))', { lineHeight: '1.4' }],
+        meta: ['calc(11px * var(--text-scale))', { lineHeight: '1.375' }],
+        body: ['calc(12px * var(--text-scale))', { lineHeight: '1.35' }],
+        'body-lg': ['calc(14px * var(--text-scale))', { lineHeight: '1.43' }],
+        title: ['calc(14px * var(--text-scale))', { lineHeight: '1.43', letterSpacing: '0.025em' }],
+        reading: ['calc(15px * var(--text-scale))', { lineHeight: '1.625' }],
+        heading: ['calc(16px * var(--text-scale))', { lineHeight: '1.5', letterSpacing: '0.025em' }],
+        display: ['calc(20px * var(--text-scale))', { lineHeight: '1.4', letterSpacing: '0.025em' }],
       },
     },
   },

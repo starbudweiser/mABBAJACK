@@ -139,29 +139,29 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-lg">⚙️</span>
             <div>
-              <h3 className="text-sm font-bold text-white">{t.settings.title}</h3>
-              <p className="text-[11px] text-[#8f8f8f]">{t.settings.subtitle}</p>
+              <h3 className="text-title font-bold text-white">{t.settings.title}</h3>
+              <p className="text-meta text-[#8f8f8f]">{t.settings.subtitle}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[#aaaaaa] hover:text-white px-2 py-1 text-base cursor-pointer"
+            className="text-[#aaaaaa] hover:text-white px-2 py-1 text-heading cursor-pointer"
           >
             ✕
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 overflow-y-auto space-y-5 text-xs select-text">
+        <div className="p-5 overflow-y-auto space-y-5 text-body select-text">
           {/* Section 1: Nexus Mods Integration */}
           <div className="space-y-2">
-            <span className="font-bold text-white text-xs uppercase tracking-wider block flex items-center gap-1.5">
+            <span className="font-bold text-white text-body uppercase tracking-wider block flex items-center gap-1.5">
               <span>🛡️</span>
               <span>{t.settings.nexusSection} / Vortex</span>
             </span>
 
-            <p className="text-[11px] text-[#8f8f8f] leading-relaxed">
+            <p className="text-meta text-[#8f8f8f] leading-relaxed">
               {t.settings.nexusApiKeyLabel}
             </p>
 
@@ -181,14 +181,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   }
                 }}
                 placeholder={ui.keyPlaceholder}
-                className="flex-1 h-9 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-xs font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
+                className="flex-1 h-9 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
               />
 
               <button
                 type="button"
                 onClick={() => setShowKey(!showKey)}
                 title={showKey ? ui.hideKey : ui.showKey}
-                className="h-9 px-2.5 bg-[#262626] hover:bg-[#303030] text-[#aaaaaa] hover:text-white rounded-md text-xs transition-colors cursor-pointer flex-shrink-0"
+                className="h-9 px-2.5 bg-[#262626] hover:bg-[#303030] text-[#aaaaaa] hover:text-white rounded-md text-body transition-colors cursor-pointer flex-shrink-0"
               >
                 {showKey ? '🔒' : '👁️'}
               </button>
@@ -197,7 +197,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="button"
                 onClick={handlePaste}
                 title={ui.pasteFromClipboard}
-                className="h-9 px-3 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white font-semibold text-xs rounded-md transition-colors cursor-pointer flex-shrink-0 flex items-center gap-1"
+                className="h-9 px-3 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white font-semibold text-body rounded-md transition-colors cursor-pointer flex-shrink-0 flex items-center gap-1"
               >
                 <span>📋</span>
                 <span>{ui.paste}</span>
@@ -207,7 +207,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="button"
                 onClick={handleVerify}
                 disabled={isVerifying || !keyInput.trim()}
-                className="h-9 px-3 rounded-md bg-[#0369a1] hover:bg-[#0369a1] disabled:bg-[#2c2c2c] disabled:text-[#666666] text-white font-bold text-xs transition-colors cursor-pointer flex-shrink-0"
+                className="h-9 px-3 rounded-md bg-[#0369a1] hover:bg-[#0369a1] disabled:bg-[#2c2c2c] disabled:text-[#666666] text-white font-bold text-body transition-colors cursor-pointer flex-shrink-0"
               >
                 {isVerifying ? ui.verifying : t.settings.verifyKeyBtn}
               </button>
@@ -215,7 +215,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {verifyMessage && (
               <div
-                className={`p-2 rounded text-[11px] font-medium ${
+                className={`p-2 rounded text-body font-medium ${
                   verifyMessage.startsWith('✓')
                     ? 'bg-[#262626] text-[#4ade80] border border-[#22c55e]'
                     : 'bg-[#1e1e1e] text-[#f87171] border border-[#ef4444]'
@@ -225,7 +225,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             )}
 
-            <div className="flex items-center justify-between text-[11px] pt-1">
+            <div className="flex items-center justify-between text-body pt-1">
               <span className="text-[#666666]">
                 {nexusAccount?.isPremium
                   ? t.settings.nexusPremiumActive
@@ -244,13 +244,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* Section 2: Default Paths (STRICTLY 2 DIRECTORIES) */}
           <div className="space-y-3 pt-3 border-t border-[#2e2e2e]">
-            <span className="font-bold text-white text-xs uppercase tracking-wider block flex items-center gap-1.5">
+            <span className="font-bold text-white text-body uppercase tracking-wider block flex items-center gap-1.5">
               <span>📁</span>
               <span>{ui.foldersSection}</span>
             </span>
 
             <div className="space-y-1">
-              <span className="text-[11px] text-[#aaaaaa] block">{ui.downloadsLabel}</span>
+              <span className="text-body text-[#aaaaaa] block">{ui.downloadsLabel}</span>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
@@ -261,12 +261,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     if (text) setDownloadsInput(text.trim());
                   }}
                   placeholder="/Volumes/SKYRIM/DOWNLOADS"
-                  className="flex-1 h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-xs font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
+                  className="flex-1 h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
                 />
                 <button
                   type="button"
                   onClick={() => handlePastePath(setDownloadsInput, downloadsInput)}
-                  className="h-8 px-2.5 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-md text-xs font-semibold cursor-pointer"
+                  className="h-8 px-2.5 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-md text-body font-semibold cursor-pointer"
                   title={ui.pastePath}
                 >
                   📋
@@ -274,7 +274,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button
                   type="button"
                   onClick={() => pickFolder(ui.downloadsPickTitle, downloadsInput, setDownloadsInput)}
-                  className="h-8 px-3 bg-[#262626] hover:bg-[#333333] border border-[#333333] text-white rounded-md text-xs font-semibold cursor-pointer"
+                  className="h-8 px-3 bg-[#262626] hover:bg-[#333333] border border-[#333333] text-white rounded-md text-body font-semibold cursor-pointer"
                 >
                   {isBrowsing === ui.downloadsPickTitle ? ui.selecting : ui.browse}
                 </button>
@@ -282,7 +282,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] text-[#aaaaaa] block">{ui.destLabel}</span>
+              <span className="text-body text-[#aaaaaa] block">{ui.destLabel}</span>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
@@ -293,12 +293,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     if (text) setDestInput(text.trim());
                   }}
                   placeholder="/Volumes/SKYRIM/READY_TO_PLAY"
-                  className="flex-1 h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-xs font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
+                  className="flex-1 h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
                 />
                 <button
                   type="button"
                   onClick={() => handlePastePath(setDestInput, destInput)}
-                  className="h-8 px-2.5 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-md text-xs font-semibold cursor-pointer"
+                  className="h-8 px-2.5 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-md text-body font-semibold cursor-pointer"
                   title={ui.pastePath}
                 >
                   📋
@@ -306,7 +306,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button
                   type="button"
                   onClick={() => pickFolder(ui.destPickTitle, destInput, setDestInput)}
-                  className="h-8 px-3 bg-[#262626] hover:bg-[#333333] border border-[#333333] text-white rounded-md text-xs font-semibold cursor-pointer"
+                  className="h-8 px-3 bg-[#262626] hover:bg-[#333333] border border-[#333333] text-white rounded-md text-body font-semibold cursor-pointer"
                 >
                   {isBrowsing === ui.destPickTitle ? ui.selecting : ui.browse}
                 </button>
@@ -316,7 +316,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* Section 3: Performance */}
           <div className="space-y-3 pt-3 border-t border-[#2e2e2e]">
-            <span className="font-bold text-white text-xs uppercase tracking-wider block flex items-center gap-1.5">
+            <span className="font-bold text-white text-body uppercase tracking-wider block flex items-center gap-1.5">
               <span>⚡</span>
               <span>{t.settings.performanceSection}</span>
             </span>
@@ -324,14 +324,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-white block font-medium">{t.settings.concurrencyThreads}</span>
-                <span className="text-[11px] text-[#666666]">
+                <span className="text-meta text-[#666666]">
                   {ui.threadsHint}
                 </span>
               </div>
               <select
                 value={concurrency}
                 onChange={(e) => setConcurrency(parseInt(e.target.value, 10))}
-                className="h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-xs text-white focus:outline-none focus:border-[#0ea5e9]"
+                className="h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body text-white focus:outline-none focus:border-[#0ea5e9]"
               >
                 <option value={2}>2 {ui.threads}</option>
                 <option value={4}>4 {ui.threads} ({ui.recommended})</option>
@@ -347,14 +347,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-[#262626] hover:bg-[#333333] text-[#dddddd] text-xs font-medium transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-[#262626] hover:bg-[#333333] text-[#dddddd] text-body font-medium transition-colors cursor-pointer"
           >
             {t.common.cancel}
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="px-4 py-2 rounded-lg bg-[#0369a1] hover:bg-[#0369a1] text-white text-xs font-bold transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-[#0369a1] hover:bg-[#0369a1] text-white text-body font-bold transition-colors cursor-pointer"
           >
             {t.settings.saveBtn}
           </button>

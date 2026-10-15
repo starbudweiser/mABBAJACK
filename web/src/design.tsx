@@ -42,7 +42,7 @@ export const colors = {
 
 // ── Button Base Classes ───────────────────────────────────────────────────────
 // Consistent height (h-8 = 32px), padding, font-size, border-radius, transitions
-const BASE = 'inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-semibold transition-all duration-150 cursor-pointer select-none whitespace-nowrap border';
+const BASE = 'inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-body font-semibold transition-all duration-150 cursor-pointer select-none whitespace-nowrap border';
 
 export const btn = {
   /**
@@ -85,13 +85,13 @@ export const btn = {
    * GHOST — no background, text link style
    * Use for: "🔄 Scanner", toolbar ghost actions
    */
-  ghost: `inline-flex items-center gap-1.5 h-8 px-2 rounded-md text-xs font-medium transition-colors duration-150 cursor-pointer select-none text-[#aaaaaa] hover:text-white hover:bg-[#262626]`,
+  ghost: `inline-flex items-center gap-1.5 h-8 px-2 rounded-md text-body font-medium transition-colors duration-150 cursor-pointer select-none text-[#aaaaaa] hover:text-white hover:bg-[#262626]`,
 
   /**
    * ICON — square icon-only button, same height
    * Use for: 👁 toggle, small toolbar icons
    */
-  icon: `inline-flex items-center justify-center h-8 w-8 rounded-lg text-xs transition-colors duration-150 cursor-pointer select-none bg-[#262626] hover:bg-[#303030] border border-[#333333] text-[#aaaaaa] hover:text-white`,
+  icon: `inline-flex items-center justify-center h-8 w-8 rounded-lg text-body transition-colors duration-150 cursor-pointer select-none bg-[#262626] hover:bg-[#303030] border border-[#333333] text-[#aaaaaa] hover:text-white`,
 
   /**
    * DISABLED state — apply on top of any variant
@@ -102,31 +102,31 @@ export const btn = {
 
 // ── Full-width CTA ────────────────────────────────────────────────────────────
 export const btnFull = {
-  primary: 'w-full h-12 flex items-center justify-center gap-2 rounded-xl font-extrabold text-sm uppercase tracking-wider transition-all duration-150 cursor-pointer bg-gradient-to-r from-[#0369a1] to-[#0369a1] hover:from-[#0369a1] hover:to-[#0369a1] text-white shadow-lg shadow-[#0369a1]/20 hover:scale-[1.01] hover:shadow-[#0369a1]/30',
-  disabled: 'w-full h-12 flex items-center justify-center gap-2 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-[#222222] text-[#666666] cursor-not-allowed border border-[#333333]',
+  primary: 'w-full h-12 flex items-center justify-center gap-2 rounded-xl font-extrabold text-title uppercase tracking-wider transition-all duration-150 cursor-pointer bg-gradient-to-r from-[#0369a1] to-[#0369a1] hover:from-[#0369a1] hover:to-[#0369a1] text-white shadow-lg shadow-[#0369a1]/20 hover:scale-[1.01] hover:shadow-[#0369a1]/30',
+  disabled: 'w-full h-12 flex items-center justify-center gap-2 rounded-xl font-extrabold text-title uppercase tracking-wider bg-[#222222] text-[#666666] cursor-not-allowed border border-[#333333]',
 } as const;
 
 // ── Badge / Tag ───────────────────────────────────────────────────────────────
 export const badge = {
-  blue:   'inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-[#0369a1]/15 text-[#38bdf8] border border-[#0ea5e9]/30',
-  green:  'inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-[#22c55e]/15 text-[#4ade80] border border-[#22c55e]/30',
-  amber:  'inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-[#f59e0b]/15 text-[#fbbf24] border border-[#f59e0b]/30',
-  red:    'inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-[#ef4444]/15 text-[#f87171] border border-[#ef4444]/30',
-  purple: 'inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-[#0369a1]/15 text-[#38bdf8] border border-[#0ea5e9]/30',
-  muted:  'inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-[#1e1e1e] text-[#aaaaaa] border border-[#2e2e2e]',
+  blue:   'inline-flex items-center gap-1 text-caption font-mono font-semibold px-2 py-0.5 rounded-md bg-[#0369a1]/15 text-[#38bdf8] border border-[#0ea5e9]/30',
+  green:  'inline-flex items-center gap-1 text-caption font-mono font-semibold px-2 py-0.5 rounded-md bg-[#22c55e]/15 text-[#4ade80] border border-[#22c55e]/30',
+  amber:  'inline-flex items-center gap-1 text-caption font-mono font-semibold px-2 py-0.5 rounded-md bg-[#f59e0b]/15 text-[#fbbf24] border border-[#f59e0b]/30',
+  red:    'inline-flex items-center gap-1 text-caption font-mono font-semibold px-2 py-0.5 rounded-md bg-[#ef4444]/15 text-[#f87171] border border-[#ef4444]/30',
+  purple: 'inline-flex items-center gap-1 text-caption font-mono font-semibold px-2 py-0.5 rounded-md bg-[#0369a1]/15 text-[#38bdf8] border border-[#0ea5e9]/30',
+  muted:  'inline-flex items-center gap-1 text-caption font-mono font-semibold px-2 py-0.5 rounded-md bg-[#1e1e1e] text-[#aaaaaa] border border-[#2e2e2e]',
 } as const;
 
 // ── Card ──────────────────────────────────────────────────────────────────────
 export const card = 'bg-[#181818] border border-[#2e2e2e] rounded-xl p-4 shadow-sm flex flex-col gap-3';
 
 // ── Section Label ─────────────────────────────────────────────────────────────
-export const sectionLabel = 'text-[11px] font-bold text-white uppercase tracking-wider flex items-center gap-1.5';
+export const sectionLabel = 'text-body font-bold text-white uppercase tracking-wider flex items-center gap-1.5';
 
 // ── Input field ───────────────────────────────────────────────────────────────
-export const inputField = 'flex-1 h-8 px-3 bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg text-xs font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] transition-colors select-text';
+export const inputField = 'flex-1 h-8 px-3 bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] transition-colors select-text';
 
 // ── Shortcut chip (path presets) ─────────────────────────────────────────────
-export const chip = 'text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#1e1e1e] text-[#aaaaaa] hover:text-white border border-[#2e2e2e] cursor-pointer transition-colors';
+export const chip = 'text-caption font-mono px-2 py-0.5 rounded-md bg-[#1e1e1e] text-[#aaaaaa] hover:text-white border border-[#2e2e2e] cursor-pointer transition-colors';
 
 // ── Divider (vertical, for button groups) ────────────────────────────────────
 export const Divider: React.FC = () => (
@@ -197,7 +197,7 @@ export const FieldRow: React.FC<FieldRowProps> = ({
     </div>
     {presets && presets.length > 0 && (
       <div className="flex items-center gap-1.5 flex-wrap">
-        <span className="text-[10px] text-[#666666]">→</span>
+        <span className="text-caption text-[#666666]">→</span>
         {presets.map((p) => (
           <button
             key={p.value}
@@ -246,7 +246,7 @@ export const ApiKeyRow: React.FC<ApiKeyRowProps> = ({
       <span className={sectionLabel}>
         <span>🛡️</span>
         <span>{ui.apiKeyLabel}</span>
-        <span className="text-[#666666] font-normal normal-case text-[10px]">{ui.optional}</span>
+        <span className="text-[#666666] font-normal normal-case text-caption">{ui.optional}</span>
       </span>
       {status}
     </div>
@@ -281,7 +281,7 @@ export const ApiKeyRow: React.FC<ApiKeyRowProps> = ({
       </button>
     </div>
     {message && (
-      <p className="text-[11px] text-[#38bdf8] font-medium pl-1">{message}</p>
+      <p className="text-body text-[#38bdf8] font-medium pl-1">{message}</p>
     )}
   </div>
   );

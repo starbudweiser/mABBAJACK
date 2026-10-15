@@ -846,10 +846,10 @@ export const App: React.FC = () => {
             boxShadow: '0 0 60px rgba(3,105,161,0.3)',
           }}>
             <div style={{ fontSize: '64px', marginBottom: '16px' }}>📦</div>
-            <div style={{ fontSize: '28px', fontWeight: 700, color: '#0ea5e9', marginBottom: '8px' }}>
+            <div style={{ fontSize: 'calc(20px * var(--text-scale))', fontWeight: 700, color: '#0ea5e9', marginBottom: '8px' }}>
               {appUi.dropTitle}
             </div>
-            <div style={{ fontSize: '15px', color: '#707070' }}>
+            <div style={{ fontSize: 'calc(15px * var(--text-scale))', color: '#707070' }}>
               {appUi.dropSubtitle}
             </div>
           </div>
@@ -861,13 +861,13 @@ export const App: React.FC = () => {
         <div className="absolute inset-0 z-[9998] flex items-center justify-center" style={{ background: 'rgba(14,14,17,0.93)', backdropFilter: 'blur(12px)' }}>
           <div style={{ width: 480, background: '#181818', border: '1px solid #303030', borderRadius: 16, padding: '32px 36px', boxShadow: '0 24px 80px rgba(0,0,0,0.7)' }}>
             <div style={{ fontSize: 44, textAlign: 'center', marginBottom: 16 }}>⬇️</div>
-            <h3 style={{ color: '#ffffff', fontSize: 16, fontWeight: 700, textAlign: 'center', marginBottom: 6 }}>{appUi.downloading}</h3>
-            <p style={{ color: '#aaaaaa', fontSize: 13, textAlign: 'center', marginBottom: 20 }}>{downloadingGallery.title}</p>
+            <h3 style={{ color: '#ffffff', fontSize: 'calc(16px * var(--text-scale))', fontWeight: 700, textAlign: 'center', marginBottom: 6 }}>{appUi.downloading}</h3>
+            <p style={{ color: '#aaaaaa', fontSize: 'calc(12px * var(--text-scale))', textAlign: 'center', marginBottom: 20 }}>{downloadingGallery.title}</p>
             <div style={{ background: '#181818', borderRadius: 8, height: 8, marginBottom: 12, overflow: 'hidden' }}>
               <div style={{ height: '100%', borderRadius: 8, background: 'linear-gradient(90deg,#0ea5e9,#0369a1)', width: `${downloadingGallery.pct}%`, transition: 'width 0.4s ease' }} />
             </div>
-            <p style={{ color: '#707070', fontSize: 11, textAlign: 'center', fontFamily: 'monospace', minHeight: 16 }}>{translateLog(downloadingGallery.status, language)}</p>
-            <p style={{ color: '#404040', fontSize: 10, textAlign: 'center', marginTop: 16 }}>{appUi.downloadingHint}</p>
+            <p style={{ color: '#707070', fontSize: 'calc(11px * var(--text-scale))', textAlign: 'center', fontFamily: 'monospace', minHeight: 16 }}>{translateLog(downloadingGallery.status, language)}</p>
+            <p style={{ color: '#404040', fontSize: 'calc(10px * var(--text-scale))', textAlign: 'center', marginTop: 16 }}>{appUi.downloadingHint}</p>
           </div>
         </div>
       )}

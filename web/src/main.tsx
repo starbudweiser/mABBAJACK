@@ -30,10 +30,10 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { err
           background: '#181818', color: '#f87171', fontFamily: 'monospace', padding: 32,
         }}>
           <div style={{ maxWidth: 640 }}>
-            <h1 style={{ color: '#ef4444', fontSize: 20, marginBottom: 12 }}>{ui.reactError}</h1>
+            <h1 style={{ color: '#ef4444', fontSize: 'calc(20px * var(--text-scale))', marginBottom: 12 }}>{ui.reactError}</h1>
             <pre style={{
               background: '#181818', border: '1px solid #ef444440', borderRadius: 8,
-              padding: 16, fontSize: 12, whiteSpace: 'pre-wrap', overflowY: 'auto', maxHeight: 400,
+              padding: 16, fontSize: 'calc(12px * var(--text-scale))', whiteSpace: 'pre-wrap', overflowY: 'auto', maxHeight: 400,
               color: '#fecaca',
             }}>
               {this.state.error.message}
@@ -44,7 +44,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { err
               onClick={() => this.setState({ error: null })}
               style={{
                 marginTop: 16, padding: '8px 20px', borderRadius: 8, border: 'none',
-                background: '#ef4444', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: 13,
+                background: '#ef4444', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: 'calc(12px * var(--text-scale))',
               }}
             >
               {ui.reload}

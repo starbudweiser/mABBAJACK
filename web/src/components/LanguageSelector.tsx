@@ -41,14 +41,14 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
               key={lang.code}
               type="button"
               onClick={() => setLanguage(lang.code as Language)}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md text-body font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
                 isActive
                   ? 'bg-[#0369a1] text-white shadow-sm font-semibold'
                   : 'text-[#aaaaaa] hover:text-white hover:bg-[#262626]'
               }`}
               title={lang.nativeName}
             >
-              <span className="text-xs leading-none">{lang.flag}</span>
+              <span className="text-body leading-none">{lang.flag}</span>
               <span>{lang.nativeName}</span>
             </button>
           );
@@ -62,11 +62,11 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="h-7 px-2.5 rounded-md bg-[#262626] hover:bg-[#303030] border border-[#333333] text-xs font-medium text-[#dddddd] flex items-center gap-1.5 transition-colors cursor-pointer"
+        className="h-7 px-2.5 rounded-md bg-[#262626] hover:bg-[#303030] border border-[#333333] text-body font-medium text-[#dddddd] flex items-center gap-1.5 transition-colors cursor-pointer"
         aria-label={(COMMON_UI[language] ?? COMMON_UI.fr).languageSelect}
       >
-        <span className="text-sm leading-none">{currentLang.flag}</span>
-        <span className="text-[11px] font-semibold uppercase tracking-wider">{currentLang.code}</span>
+        <span className="text-body-lg leading-none">{currentLang.flag}</span>
+        <span className="text-body font-semibold uppercase tracking-wider">{currentLang.code}</span>
         <svg
           className={`w-3 h-3 text-[#aaaaaa] transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
@@ -89,17 +89,17 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                   setLanguage(lang.code as Language);
                   setIsOpen(false);
                 }}
-                className={`w-full px-3 py-1.5 text-xs flex items-center justify-between transition-colors cursor-pointer text-left ${
+                className={`w-full px-3 py-1.5 text-body flex items-center justify-between transition-colors cursor-pointer text-left ${
                   isActive
                     ? 'bg-[#0369a1]/15 text-[#38bdf8] font-semibold'
                     : 'text-[#dddddd] hover:bg-[#262626] hover:text-white'
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-sm leading-none">{lang.flag}</span>
+                  <span className="text-body-lg leading-none">{lang.flag}</span>
                   <span>{lang.nativeName}</span>
                 </div>
-                {isActive && <span className="text-[#38bdf8] text-xs font-bold">✓</span>}
+                {isActive && <span className="text-[#38bdf8] text-body font-bold">✓</span>}
               </button>
             );
           })}

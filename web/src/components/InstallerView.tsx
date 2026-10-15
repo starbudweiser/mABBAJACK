@@ -172,11 +172,11 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
         {/* ── PAGE HEADER ─────────────────────────────────────────── */}
         <div className="flex items-center justify-between pb-3 border-b border-[#2e2e2e]">
           <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
+            <h2 className="text-heading font-bold text-white flex items-center gap-2">
               <span>⚡</span>
               <span>{ui.title}</span>
             </h2>
-            <p className="text-[11px] text-[#666666] mt-0.5">{ui.subtitle}</p>
+            <p className="text-meta text-[#666666] mt-0.5">{ui.subtitle}</p>
           </div>
           {parsedFile && (
             <button type="button" onClick={onOpenPluginsTxt} className={btn.secondary}>
@@ -205,13 +205,13 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             }}>
               <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0 }}>🚫</span>
               <div>
-                <p style={{ color: '#f87171', fontWeight: 700, fontSize: 12, marginBottom: 4 }}>
+                <p style={{ color: '#f87171', fontWeight: 700, fontSize: 'calc(12px * var(--text-scale))', marginBottom: 4 }}>
                   {ui.previewTitle}
                 </p>
-                <p style={{ color: '#fecaca', fontSize: 11, lineHeight: 1.5 }}>
+                <p style={{ color: '#fecaca', fontSize: 'calc(11px * var(--text-scale))', lineHeight: 1.5 }}>
                   {ui.previewBody1} {ui.previewBody2}
                 </p>
-                <p style={{ color: '#fecaca', fontSize: 11, marginTop: 6 }}>
+                <p style={{ color: '#fecaca', fontSize: 'calc(11px * var(--text-scale))', marginTop: 6 }}>
                   {ui.previewBody3} <strong>{ui.previewOpenBtn}</strong>{' '}
                   (<a href="https://www.wabbajack.org" target="_blank" rel="noreferrer" style={{ color: '#0ea5e9', textDecoration: 'underline' }}>wabbajack.org</a>)
                 </p>
@@ -223,8 +223,8 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             <>
               <div className="bg-[#1a1a1a] px-3 py-2.5 rounded-lg border border-[#2e2e2e] flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <span className="text-sm font-bold text-white block truncate">{parsedFile.name}</span>
-                  <span className="text-[11px] text-[#666666]">{ui.by} {parsedFile.author} · v{parsedFile.version || '1.0'}</span>
+                  <span className="text-title font-bold text-white block truncate">{parsedFile.name}</span>
+                  <span className="text-meta text-[#666666]">{ui.by} {parsedFile.author} · v{parsedFile.version || '1.0'}</span>
                 </div>
                 <span className={badge.green}>{ui.loaded}</span>
               </div>
@@ -233,19 +233,19 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
               {editionInfo && (
                 <div style={{ padding: '8px 12px', background: editionInfo.bg, border: `1px solid ${editionInfo.border}`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                   <div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: editionInfo.color }}>🎮 {editionInfo.label}</span>
-                    <span style={{ display: 'block', fontSize: 11, color: '#707070', marginTop: 2 }}>
+                    <span style={{ fontSize: 'calc(12px * var(--text-scale))', fontWeight: 700, color: editionInfo.color }}>🎮 {editionInfo.label}</span>
+                    <span style={{ display: 'block', fontSize: 'calc(11px * var(--text-scale))', color: '#707070', marginTop: 2 }}>
                       {ui.requiredVersion} <strong style={{ color: editionInfo.color }}>{editionInfo.version}</strong>
                     </span>
                   </div>
-                  <code style={{ fontSize: 10, fontFamily: 'monospace', padding: '2px 8px', borderRadius: 5, background: `${editionInfo.color}18`, color: editionInfo.color, border: `1px solid ${editionInfo.color}33` }}>
+                  <code style={{ fontSize: 'calc(10px * var(--text-scale))', fontFamily: 'monospace', padding: '2px 8px', borderRadius: 5, background: `${editionInfo.color}18`, color: editionInfo.color, border: `1px solid ${editionInfo.color}33` }}>
                     {parsedFile.gameType}
                   </code>
                 </div>
               )}
             </>
           ) : (
-            <div className="bg-[#181818] border border-[#f59e0b] px-3 py-2.5 rounded-lg text-[11px] text-[#fbbf24]">
+            <div className="bg-[#181818] border border-[#f59e0b] px-3 py-2.5 rounded-lg text-body text-[#fbbf24]">
               {ui.noModlist}
             </div>
           )}
@@ -265,7 +265,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
               </button>
             )}
           </div>
-          <p className="text-[11px] text-[#666666] -mt-1">{ui.downloadsHint}</p>
+          <p className="text-meta text-[#666666] -mt-1">{ui.downloadsHint}</p>
           <FieldRow
             label=""
             value={downloadsPath}
@@ -279,7 +279,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
           />
 
           {parsedFile && (
-            <div className="flex items-center justify-between bg-[#1a1a1a] border border-[#2e2e2e] px-3 py-2 rounded-lg text-[11px]">
+            <div className="flex items-center justify-between bg-[#1a1a1a] border border-[#2e2e2e] px-3 py-2 rounded-lg text-body">
               <span className="text-[#666666]">
                 {ui.cache} <strong className="text-white">{readyArchives}</strong> / {totalArchives} {ui.archivesReady}
               </span>
@@ -300,7 +300,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             <span className={sectionLabel}><span>🚀</span><span>{ui.destTitle}</span></span>
             <span className={badge.blue}>{ui.destBadge}</span>
           </div>
-          <p className="text-[11px] text-[#666666] -mt-1">{ui.destHint}</p>
+          <p className="text-meta text-[#666666] -mt-1">{ui.destHint}</p>
           <FieldRow
             label=""
             value={destPath}
@@ -317,7 +317,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
         {/* ── CARD 5: Dossier du jeu (fichiers originaux GameFileSource) ──── */}
         <div className={card}>
           <span className={sectionLabel}><span>🎮</span><span>{t.installer.gameFolderTitle}</span></span>
-          <p className="text-[11px] text-[#666666] -mt-1">{t.installer.gameFolderHint}</p>
+          <p className="text-meta text-[#666666] -mt-1">{t.installer.gameFolderHint}</p>
           <FieldRow
             label=""
             value={gamePath}
@@ -331,10 +331,10 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
           />
           {gameArchives.length > 0 && (
             missingGameArchives.length > 0 ? (
-              <div className="bg-[#181818] border border-[#f59e0b] px-3 py-2.5 rounded-lg text-[11px] text-[#fbbf24] flex flex-col gap-1">
+              <div className="bg-[#181818] border border-[#f59e0b] px-3 py-2.5 rounded-lg text-body text-[#fbbf24] flex flex-col gap-1">
                 <span className="font-semibold">⚠ {t.installer.gameFilesMissing.replace('{n}', String(missingGameArchives.length))}</span>
                 {missingGameArchives.map((a) => (
-                  <code key={a.Hash || a.Name} className="font-mono text-[10px] text-[#fbbf24] break-all">{a.expectedPath || a.Name}</code>
+                  <code key={a.Hash || a.Name} className="font-mono text-caption text-[#fbbf24] break-all">{a.expectedPath || a.Name}</code>
                 ))}
               </div>
             ) : (
@@ -345,7 +345,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
 
         {/* ── CARD 5: Clé API Nexus ────────────────────────────────── */}
         <div className={card}>
-          <p className="text-[11px] text-[#666666]">
+          <p className="text-meta text-[#666666]">
             <span className="text-[#fbbf24]">{ui.nexusInfoPremium}</span>{' '}
             <span className="text-white">{ui.nexusInfoStandard}</span>
           </p>
@@ -385,8 +385,8 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
               padding: '12px 16px',
               textAlign: 'center',
             }}>
-              <p style={{ color: '#f87171', fontWeight: 700, fontSize: 12, marginBottom: 4 }}>{ui.blockedTitle}</p>
-              <p style={{ color: '#fecaca', fontSize: 11 }}>{ui.blockedBody}</p>
+              <p style={{ color: '#f87171', fontWeight: 700, fontSize: 'calc(12px * var(--text-scale))', marginBottom: 4 }}>{ui.blockedTitle}</p>
+              <p style={{ color: '#fecaca', fontSize: 'calc(11px * var(--text-scale))' }}>{ui.blockedBody}</p>
             </div>
           ) : (
             <button
@@ -401,7 +401,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
           )}
 
 
-          <p className="text-[10px] text-[#666666] text-center">
+          <p className="text-caption text-[#666666] text-center">
             {ui.footer}
           </p>
         </div>

@@ -59,13 +59,13 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
               📄
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
+              <h2 className="text-title font-bold text-white flex items-center gap-2">
                 <span>{ui.title}</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#0369a1]/20 text-[#38bdf8] border border-[#0ea5e9]/30">
+                <span className="text-caption font-mono px-2 py-0.5 rounded-full bg-[#0369a1]/20 text-[#38bdf8] border border-[#0ea5e9]/30">
                   {lines.length} plugins
                 </span>
               </h2>
-              <p className="text-[11px] text-[#8f8f8f]">
+              <p className="text-meta text-[#8f8f8f]">
                 {ui.subtitle.replace('{name}', modlistName)}
               </p>
             </div>
@@ -74,7 +74,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-[#222222] hover:bg-[#303030] text-[#8f8f8f] hover:text-white flex items-center justify-center text-sm transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-lg bg-[#222222] hover:bg-[#303030] text-[#8f8f8f] hover:text-white flex items-center justify-center text-body-lg transition-colors cursor-pointer"
           >
             ✕
           </button>
@@ -88,7 +88,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               placeholder={ui.filter}
-              className="w-full h-8 px-3 bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg text-xs text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9]"
+              className="w-full h-8 px-3 bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg text-body text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9]"
             />
           </div>
 
@@ -96,7 +96,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
             <button
               type="button"
               onClick={handleCopy}
-              className="h-8 px-3 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="h-8 px-3 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-lg text-body font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <span>{copied ? '✓' : '📋'}</span>
               <span>{copied ? ui.copied : ui.copyAll}</span>
@@ -105,7 +105,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
             <button
               type="button"
               onClick={handleDownload}
-              className="h-8 px-3 bg-[#0369a1] hover:bg-[#0369a1] text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="h-8 px-3 bg-[#0369a1] hover:bg-[#0369a1] text-white rounded-lg text-body font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <span>💾</span>
               <span>{ui.download}</span>
@@ -114,7 +114,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
         </div>
 
         {/* Plugins List View */}
-        <div className="flex-1 overflow-y-auto p-4 font-mono text-xs bg-[#181818] select-text">
+        <div className="flex-1 overflow-y-auto p-4 font-mono text-body bg-[#181818] select-text">
           {filteredLines.length === 0 ? (
             <div className="text-[#666666] text-center py-12">
               {ui.noMatch}
@@ -129,7 +129,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
                     key={idx}
                     className="flex items-center gap-3 px-2 py-1 rounded hover:bg-[#181818] text-[#dddddd] transition-colors"
                   >
-                    <span className="text-[#666666] w-8 text-right select-none text-[10px]">
+                    <span className="text-[#666666] w-8 text-right select-none text-caption">
                       {idx + 1}
                     </span>
                     <span
@@ -151,7 +151,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
         </div>
 
         {/* Footer info */}
-        <div className="p-3 bg-[#181818] border-t border-[#2e2e2e] flex items-center justify-between text-[11px] text-[#666666]">
+        <div className="p-3 bg-[#181818] border-t border-[#2e2e2e] flex items-center justify-between text-meta text-[#666666]">
           <div className="flex items-center gap-2">
             <span>💡</span>
             <span>
@@ -165,7 +165,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-[#222222] hover:bg-[#303030] text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+            className="px-4 py-1.5 bg-[#222222] hover:bg-[#303030] text-white rounded-lg text-body font-semibold transition-colors cursor-pointer"
           >
             {ui.close}
           </button>
