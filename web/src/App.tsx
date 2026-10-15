@@ -20,7 +20,7 @@ import {
   InstallMode,
 } from './types/wabbajack';
 import JSZip from 'jszip';
-import { getApiBaseUrl, pickNativeFile, openFolderInFinder, uploadWabbajack, scanDownloads, ScanProgress } from './services/api';
+import { getApiBaseUrl, locateWabbajack, pickNativeFile, openFolderInFinder, uploadWabbajack, scanDownloads, ScanProgress } from './services/api';
 import ImportProgress, { ImportProgressState } from './components/ImportProgress';
 import { sendClientLog } from './services/clientLog';
 import { useI18n } from './locales';
@@ -535,7 +535,14 @@ export const App: React.FC = () => {
       const key = `${file.name}:${file.size}`;
       if (lastDropRef.current && lastDropRef.current.key === key && Date.now() - lastDropRef.current.at < 3000) return;
       lastDropRef.current = { key, at: Date.now() };
-      const nativePath = await waitDroppedPath(file.name);
+      // Chemin réel : fourni par l'app native au dépôt, sinon retrouvé par le serveur (nom + taille).
+      // Évite d'envoyer plusieurs Go par HTTP et garde le dossier du .wabbajack (dossier dédié à la liste).
+      let nativePath = await waitDroppedPath(file.name);
+      if (!nativePath && /\.wabbajack$/i.test(file.name)) {
+        setIsInspecting(true);
+        setImportProgress({ fileName: file.name, phase: 'analyze', sent: 0, total: 0, startedAt: Date.now() });
+        nativePath = await locateWabbajack(file.name, file.size);
+      }
       if (nativePath) { await inspectWabbajackPath(nativePath); return; }
       setIsInspecting(true);
       const startedAt = Date.now();

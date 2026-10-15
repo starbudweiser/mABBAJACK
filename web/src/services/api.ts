@@ -139,6 +139,21 @@ export async function fetchModlistOptions(filePath: string): Promise<import('../
   return res.json();
 }
 
+/** Chemin réel d'un .wabbajack déposé, retrouvé par le serveur (nom + taille) ; null si introuvable. */
+export async function locateWabbajack(name: string, size: number): Promise<string | null> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/api/wabbajack/locate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, size }),
+    });
+    if (!res.ok) return null;
+    return (await res.json()).path || null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Envoie un .wabbajack au serveur avec suivi de progression (fetch ne sait pas suivre l'envoi).
  * onUploadProgress(sent, total) : octets envoyés ; onUploadDone() : envoi terminé, analyse en cours.

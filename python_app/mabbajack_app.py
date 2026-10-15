@@ -236,10 +236,20 @@ def main() -> None:
             return
         window.load_url(f"http://127.0.0.1:{backend.port}")
 
+    def launcher_log(msg: str) -> None:
+        try:
+            LOG_DIR.mkdir(parents=True, exist_ok=True)
+            with open(LOG_DIR / "launcher.log", "a", encoding="utf-8") as f:
+                f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {msg}\n")
+        except OSError:
+            pass
+
     def on_drop(event: dict) -> None:
         # L'API File du navigateur ne donne pas le chemin du fichier déposé ; pywebview, si.
         # L'interface analyse alors le fichier sur place au lieu de l'envoyer par HTTP.
-        for f in (event.get("dataTransfer") or {}).get("files") or []:
+        files = (event.get("dataTransfer") or {}).get("files") or []
+        launcher_log(f"dépôt : {[(f.get('name'), f.get('pywebviewFullPath')) for f in files]}")
+        for f in files:
             p = f.get("pywebviewFullPath")
             if p:
                 window.evaluate_js(f"window.mabbajackDroppedPath && window.mabbajackDroppedPath({json.dumps(p)})")
@@ -256,8 +266,9 @@ def main() -> None:
         try:
             from webview.dom import DOMEventHandler
             window.dom.document.events.drop += DOMEventHandler(on_drop, False, False)
-        except Exception:  # pywebview ancien : repli sur l'envoi HTTP
-            pass
+            launcher_log("écouteur de dépôt installé")
+        except Exception as exc:  # repli : le serveur retrouve le fichier par nom et taille
+            launcher_log(f"écouteur de dépôt indisponible : {exc!r}")
 
     window.events.loaded += bind_drop
     window.events.closed += backend.stop

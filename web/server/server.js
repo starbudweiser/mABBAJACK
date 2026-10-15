@@ -22,6 +22,8 @@ import { inspectWabbajack as inspectWabbajackRaw } from './inspect.js';
 import { recordGameVersion, enrichCatalog } from './gameversions.js';
 import { openLazyZip } from './lazyzip.js';
 import { HashCache, verifyArchive, verifyInstalledFiles, findStrayFiles, archiveSourceUrl, listDownloadDir, modOf } from './archivecheck.js';
+import { isTempPath, locateWabbajack } from './locate.js';
+import { resolveDirectivePath, detectGameRootFolders, setGameRootFolders, getGameRootFolders, KNOWN_GAME_ROOT_NAMES, BSA_STAGING_DIR } from './paths.js';
 import { initLogger, writeLog, startInstallLog, endInstallLog, getLogInfo, tailLog } from './logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -667,101 +669,7 @@ function detectSkyrimAtPath(gamePath) {
 // ══════════════════════════════════════════════════════════
 // ──────────────────────────────────────────────────────────
 
-/**
- * Resolve the output path for a directive's `To` field.
- * Wabbajack `To` paths are relative to the MO2 install root.
- * Resolves a directive To path to the final Skyrim Data directory structure.
- * mods/{ModName}/textures/* → destRoot/textures/*
- * mods/{ModName}/Root/*     → destRoot/Root/*  (Skyrim root, not Data)
- * Everything else (MO2 binaries, Qt, NCC, etc.) → null (skipped)
- */
-
-// Subfolders inside mods/{ModName}/ that are MO2 artifacts — NOT game Data files
-const MODS_SKIP_SUBDIRS = new Set([
-  'shadercache', 'nemesis_engine', 'fomod', 'docs', 'readmes', 'bashtags',
-]);
-
-// Top-level folders that are MO2 application binaries — skip entirely
-const MO2_BINARY_ROOTS = new Set([
-  'plugins', 'translations', 'stylesheets', 'ncc', 'dlls', 'tutorials',
-  'licenses', 'qtqml', 'qtquick.2', 'pythoncore', 'resources', 'loot',
-  'platforms', 'styles', 'imageformats', 'bearer', 'mediaservice', 'locales',
-  'swiftshader', 'sqldrivers', 'position', 'sensorgesture', 'explorer++',
-]);
-
-const BSA_STAGING_DIR = '.mabbajack_bsa_staging';
-
-function resolveDirectivePath(toField, destRoot) {
-  if (!toField) return null;
-  const normalized = toField.replace(/\\/g, '/').trim();
-  if (!normalized) return null;
-
-  const lower = normalized.toLowerCase();
-
-  // Skip MO2 metadata file extensions
-  const dotIdx = lower.lastIndexOf('.');
-  const ext = dotIdx >= 0 ? lower.substring(dotIdx) : '';
-  if (ext === '.meta' || ext === '.modgroup' || ext === '.modgroups') return null;
-
-  // Skip known non-Data top-level prefixes
-  // TEMP_BSA_FILES/<TempID>/<chemin> : fichiers à empaqueter par une directive CreateBSA.
-  // Stagés dans un dossier temporaire, puis supprimés après création du BSA.
-  if (lower.startsWith('temp_bsa_files/')) {
-    const parts = normalized.split('/').slice(1);
-    if (parts.length < 2 || parts.some((p) => p === '..' || p === '')) return null;
-    const stagingRoot = path.join(destRoot, BSA_STAGING_DIR);
-    const resolved = path.join(stagingRoot, ...parts);
-    return resolved.startsWith(stagingRoot + path.sep) ? resolved : null;
-  }
-  if (lower.startsWith('downloads/') ||
-      lower.startsWith('webcache/')) return null;
-
-  // ── mods/{ModName}/{relPath} — the main case (98% of directives) ──────────
-  if (lower.startsWith('mods/')) {
-    const parts = normalized.split('/');
-    // parts[0]='mods', parts[1]=ModName, parts[2..]= relPath within mod
-    if (parts.length < 3) return null;
-
-    const relParts = parts.slice(2);
-    const firstSub = relParts[0].toLowerCase();
-
-    // Skip MO2-only artifact subdirs
-    if (MODS_SKIP_SUBDIRS.has(firstSub)) return null;
-
-    // mods/{ModName}/Root/{file} → destRoot/{file}
-    // These files belong at the Skyrim root (ENB dlls, SKSE preloader, d3d11.dll…)
-    if (firstSub === 'root') {
-      const rootRel = relParts.slice(1).join('/');
-      if (!rootRel) return null;
-      const resolved = path.join(destRoot, rootRel);
-      return resolved.startsWith(destRoot) ? resolved : null;
-    }
-
-    // All other mods files → go into destRoot/Data/
-    // mods/{ModName}/textures/foo.dds → destRoot/Data/textures/foo.dds
-    // mods/{ModName}/SomeMod.esp      → destRoot/Data/SomeMod.esp
-    const dataRel = relParts.join('/');
-    if (!dataRel) return null;
-    const resolved = path.join(destRoot, 'Data', dataRel);
-    return resolved.startsWith(destRoot) ? resolved : null;
-  }
-
-  // ── profiles/ → plugins.txt and loadorder.txt at destRoot root ────────────
-  if (lower.startsWith('profiles/')) {
-    const bn = path.basename(normalized).toLowerCase();
-    if (bn === 'plugins.txt' || bn === 'loadorder.txt') {
-      return path.join(destRoot, bn);
-    }
-    return null;
-  }
-
-  // ── MO2 binary top-level folders → skip ───────────────────────────────────
-  const topFolder = lower.split('/')[0];
-  if (MO2_BINARY_ROOTS.has(topFolder)) return null;
-
-  // Everything else (root-level MO2 files, unknown paths) → skip
-  return null;
-}
+// Résolution des destinations (directive.To → chemin installé) : voir paths.js
 
 /**
  * Process all directives from the parsed modlist.
@@ -1595,6 +1503,13 @@ app.get('/api/system/detect-skyrim', (req, res) => {
   res.json({ found: false, isValid: false, edition: 'Unknown', path: '', validationIssues: ['Aucune installation Skyrim détectée.'] });
 });
 
+// Chemin réel d'un .wabbajack déposé (nom + taille), pour l'analyser sur place au lieu de l'envoyer
+app.post('/api/wabbajack/locate', async (req, res) => {
+  const { name, size } = req.body || {};
+  try { res.json({ path: await locateWabbajack(String(name || ''), Number(size) || 0) }); }
+  catch (err) { res.status(500).json({ error: String(err.message || err) }); }
+});
+
 app.post('/api/wabbajack/inspect-path', async (req, res) => {
   const { filePath } = req.body || {};
   if (typeof filePath !== 'string' || !filePath || !fs.existsSync(filePath)) return res.status(400).json({ error: 'Fichier .wabbajack introuvable' });
@@ -2198,7 +2113,15 @@ app.post('/api/install/start', async (req, res) => {
       // Dossier dédié à la liste : celui du .wabbajack (ex. WABBAJACK LISTS/<LISTE>/), sinon
       // DOWNLOADS/<LISTE>/. Prioritaire sur le cache commun, qu'on ne modifie jamais pour une
       // archive de même nom : il sert peut-être à une autre modlist.
-      const listDir = listDownloadDir(modlist.localFilePath);
+      // Fichier chargé par copie temporaire (envoi du navigateur) : retrouver le vrai .wabbajack
+      let wabbajackRealPath = modlist.localFilePath;
+      if (isTempPath(wabbajackRealPath)) {
+        const tmpSize = fileSizeOf(wabbajackRealPath);
+        const found = tmpSize > 0 ? await locateWabbajack(path.basename(wabbajackRealPath), tmpSize) : null;
+        if (found) { wabbajackRealPath = found; broadcastLog('info', `📄 Fichier .wabbajack d'origine retrouvé : ${found}`); }
+        else broadcastLog('warn', `⚠ Fichier .wabbajack chargé par une copie temporaire et original introuvable : dossier dédié = ${path.join(cleanDownloads, modlistDirName)}`);
+      }
+      const listDir = listDownloadDir(wabbajackRealPath);
       const dedicatedDir = listDir || path.join(cleanDownloads, modlistDirName);
       if (listDir) broadcastLog('info', `📂 Dossier dédié à la liste (prioritaire) : ${listDir}`);
       const hashCache = new HashCache();
@@ -2740,6 +2663,9 @@ app.post('/api/install/start', async (req, res) => {
 
       // ── ÉTAPE 4 : TRAITEMENT DES DIRECTIVES ──────────────────────────
       let directives = modlist.directives || [];
+      setGameRootFolders(detectGameRootFolders(directives));
+      const extraRoots = [...getGameRootFolders()].filter((g) => !KNOWN_GAME_ROOT_NAMES.includes(g));
+      if (extraRoots.length) broadcastLog('info', `🎮 Dossier(s) de jeu de l'instance MO2 : ${extraRoots.join(', ')} → racine de l'installation.`);
       // Priorités MO2 : un même fichier fourni par plusieurs mods → le mod le plus prioritaire l'emporte
       if (selection && selection.priority.size > 0 && directives.length > 0) {
         const dd = dedupeByPriority(directives, (d) => resolveDirectivePath(d.To, cleanDest), selection.priority);

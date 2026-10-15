@@ -34,7 +34,7 @@ try {
   assert.equal(archiveSourceUrl({ State: { Url: 'https://x/y.zip' } }), 'https://x/y.zip');
   assert.equal(archiveSourceUrl({ State: {} }), null);
   fs.writeFileSync(path.join(dir, 'Liste.wabbajack'), '');
-  assert.equal(listDownloadDir(path.join(dir, 'Liste.wabbajack')), dir);
+  assert.equal(listDownloadDir(path.join(dir, 'Liste.wabbajack')), null, 'dossier temporaire : jamais dossier dédié');
   assert.equal(listDownloadDir('https://cdn/x.wabbajack'.replace('https://', '/nonexistent/')), null);
   assert.equal(modOf('mods/Pandora Output/meshes/a.hkx'), 'Pandora Output');
   assert.equal(modOf('profiles/Default/plugins.txt'), null);

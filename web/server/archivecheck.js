@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import xxhash from 'xxhash-wasm';
+import { isTempPath } from './locate.js';
 
 const DATA_DIR = process.env.MABBAJACK_DATA_DIR || path.join(os.homedir(), '.mabbajack');
 const CACHE_FILE = path.join(DATA_DIR, 'archive-hashes.json');
@@ -114,6 +115,7 @@ export function archiveSourceUrl(arc) {
 /** Dossier dédié à la liste : celui qui contient le fichier .wabbajack local (ex. WABBAJACK LISTS/<LISTE>/). */
 export function listDownloadDir(wabbajackPath) {
   if (typeof wabbajackPath !== 'string' || !/\.wabbajack$/i.test(wabbajackPath)) return null;
+  if (isTempPath(wabbajackPath)) return null; // copie envoyée par le navigateur : pas un dossier de travail
   const dir = path.dirname(path.resolve(wabbajackPath));
   return fs.existsSync(dir) ? dir : null;
 }

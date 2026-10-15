@@ -17,6 +17,9 @@ import type { Language } from './types';
 type Entry = [fr: string, en: string, es: string, it: string];
 
 const ENTRIES: Entry[] = [
+  ['📄 Fichier .wabbajack d\'origine retrouvé : {0}', '📄 Original .wabbajack file found: {0}', '📄 Archivo .wabbajack original encontrado: {0}', '📄 File .wabbajack originale trovato: {0}'],
+  ['⚠ Fichier .wabbajack chargé par une copie temporaire et original introuvable : dossier dédié = {0}', '⚠ .wabbajack file loaded from a temporary copy and original not found: list folder = {0}', '⚠ Archivo .wabbajack cargado desde una copia temporal y original no encontrado: carpeta dedicada = {0}', '⚠ File .wabbajack caricato da una copia temporanea e originale non trovato: cartella dedicata = {0}'],
+  ['🎮 Dossier(s) de jeu de l\'instance MO2 : {0} → racine de l\'installation.', '🎮 MO2 instance game folder(s): {0} → installation root.', '🎮 Carpeta(s) del juego de la instancia MO2: {0} → raíz de la instalación.', '🎮 Cartella/e di gioco dell\'istanza MO2: {0} → radice dell\'installazione.'],
   ['⚠ {0} fichier(s) de {1} mod(s) désactivé(s) présent(s) dans l\'installation : {2}', '⚠ {0} file(s) from {1} disabled mod(s) found in the installation: {2}', '⚠ {0} archivo(s) de {1} mod(s) desactivado(s) presente(s) en la instalación: {2}', '⚠ {0} file di {1} mod disattivata/e presente/i nell\'installazione: {2}'],
   ['→ Restes d\'une installation précédente : videz le dossier d\'installation avant de relancer (liste dans CONTROLE_INSTALLATION.txt).', '→ Leftovers from a previous installation: empty the installation folder before restarting (list in CONTROLE_INSTALLATION.txt).', '→ Restos de una instalación anterior: vacíe la carpeta de instalación antes de volver a lanzar (lista en CONTROLE_INSTALLATION.txt).', '→ Residui di un\'installazione precedente: svuota la cartella di installazione prima di riavviare (elenco in CONTROLE_INSTALLATION.txt).'],
   // ── Vérification des archives (taille + hash) et contrôle post-installation ──
