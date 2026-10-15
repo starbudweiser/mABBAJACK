@@ -177,6 +177,41 @@ export function detectChoices(items) {
   return { choices, formatMods: fmtList, used };
 }
 
+// ── Consignes de la liste ─────────────────────────────────────────────────
+// Séparateur « DO NOT ENABLE » : sources fusionnées ou ressources, jamais proposées.
+const LOCKED_SEP_RE = /\b(do\s*not|don'?t|never)\s+(enable|use|activate|install)\b/i;
+// Séparateur d'outils de test de l'auteur : proposés à part, déconseillés.
+const DEBUG_SEP_RE = /\b(game\s*testing|testing|debug(ging)?|dev(eloper)?\s*tools?|profil(er|ing))\b/i;
+
+/**
+ * Classe les mods désactivés d'un profil et leurs dépendances.
+ * @returns {{ locked: Set<string>, debug: Set<string>,
+ *   requires: Map<string, string[]>, requiresChoice: Map<string, {choice:string, option:string}> }}
+ *   (clés en minuscules ; requires → noms de mods optionnels dont dépend le mod)
+ */
+export function classifyOptions(items, det) {
+  const locked = new Set(), debug = new Set();
+  const optional = items.filter((it) => !it.separator && !it.enabled && !det.used.has(lc(it.name)));
+  for (const it of optional) {
+    if (it.group && LOCKED_SEP_RE.test(it.group)) locked.add(lc(it.name));
+    else if (it.group && DEBUG_SEP_RE.test(it.group)) debug.add(lc(it.name));
+  }
+  const offered = optional.filter((it) => !locked.has(lc(it.name)));
+  const requires = new Map(), requiresChoice = new Map();
+  for (const m of offered) {
+    // Patch nommé d'après un autre mod optionnel : « Foo - Bar Patch » dépend de « Foo »
+    const deps = offered.filter((n) => n !== m && lc(m.name).startsWith(lc(n.name))
+      && /^[\s-]/.test(m.name.slice(n.name.length))).map((n) => lc(n.name));
+    if (deps.length) requires.set(lc(m.name), deps);
+    // Mod d'une famille d'interface : « (UI) Edge UI - … » n'a de sens qu'avec la famille Edge
+    const { tag, rest } = splitTag(m.name);
+    const fam = tag && det.choices.find((c) => c.id === `family:${tag}`);
+    const opt = fam && fam.options.find((o) => hasWord(rest, o.id));
+    if (opt) requiresChoice.set(lc(m.name), { choice: fam.id, option: opt.id });
+  }
+  return { locked, debug, requires, requiresChoice };
+}
+
 /** État (activé ou non) imposé par les choix : nom de mod (lc) → booléen. */
 export function choiceOverrides(det, picked = {}) {
   const out = new Map();
@@ -233,20 +268,27 @@ export async function buildOptions(raw, readEntry) {
     const groups = new Map();
     let count = 0, bytes = 0;
     const det = dets.get(p);
+    const cls = classifyOptions(p.items, det);
+    const locked = new Map();
     // Ordre d'affichage = ordre de la liste MO2 (de bas en haut du fichier)
     for (let i = p.items.length - 1; i >= 0; i--) {
       const it = p.items[i];
       if (it.separator || it.enabled || det.used.has(lc(it.name))) continue;
       const size = sizes.get(lc(it.name)) || 0;
       const key = it.group || '—';
+      if (cls.locked.has(lc(it.name))) { locked.set(key, (locked.get(key) || 0) + 1); continue; }
       if (!groups.has(key)) groups.set(key, []);
-      groups.get(key).push({ name: it.name, size });
+      const requires = (cls.requires.get(lc(it.name)) || []).map((k) => p.mods.get(k)?.name || k);
+      const requiresChoice = cls.requiresChoice.get(lc(it.name));
+      groups.get(key).push({ name: it.name, size, ...(requires.length ? { requires } : {}), ...(requiresChoice ? { requiresChoice } : {}) });
       count++; bytes += size;
     }
     out.push({
       name: p.name,
       isDefault: p === def,
-      groups: [...groups.entries()].map(([separator, mods]) => ({ separator, mods })),
+      groups: [...groups.entries()].map(([separator, mods]) => ({ separator, mods, ...(DEBUG_SEP_RE.test(separator) ? { debug: true } : {}) })),
+      // Séparateurs « DO NOT ENABLE » : non proposés, seulement signalés
+      lockedGroups: [...locked.entries()].map(([separator, count]) => ({ separator, count })),
       choices: det.choices.map((c) => ({
         ...c,
         hidden: c.kind === 'variant' && defaults.get(c.id).size > 1,
@@ -270,7 +312,27 @@ export async function buildSelection(raw, readEntry, options = {}) {
   const profiles = await loadProfiles(raw, readEntry);
   const profile = pickProfile(profiles, options.profile, raw.Name);
   const enable = new Set((options.enable || []).map(lc));
-  const overrides = profile ? choiceOverrides(detectChoices(profile.items), options.choices || {}) : new Map();
+  const det = profile ? detectChoices(profile.items) : null;
+  const overrides = profile ? choiceOverrides(det, options.choices || {}) : new Map();
+  if (profile) {
+    // Consignes de la liste : jamais de mod « DO NOT ENABLE », ni de mod dont la dépendance est absente
+    const cls = classifyOptions(profile.items, det);
+    for (const k of cls.locked) enable.delete(k);
+    const picked = (c) => {
+      const choice = det.choices.find((x) => x.id === c);
+      const v = (options.choices || {})[c];
+      return choice && choice.options.some((o) => o.id === v) ? v : choice?.default;
+    };
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const k of [...enable]) {
+        const deps = cls.requires.get(k) || [];
+        const rc = cls.requiresChoice.get(k);
+        if (deps.some((d) => !enable.has(d)) || (rc && picked(rc.choice) !== rc.option)) { enable.delete(k); changed = true; }
+      }
+    }
+  }
   const excluded = new Set();
   const turnedOn = new Set();
   const priority = new Map();

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '../locales';
 import { OPTIONS_UI } from '../locales/uiExtra';
 import { fetchModlistOptions } from '../services/api';
-import { InstallOptions, ModlistChoice, ModlistOptionProfile, ModlistOptions } from '../types/wabbajack';
+import { InstallOptions, ModlistChoice, ModlistOptionGroup, ModlistOptionMod, ModlistOptionProfile, ModlistOptions } from '../types/wabbajack';
 import { badge, btn, card, sectionLabel } from '../design';
 
 interface Props {
@@ -95,7 +95,25 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
   const visibleChoices: ModlistChoice[] = (profile.choices ?? []).filter((c) => !c.hidden);
   if (profile.optionalCount === 0 && visibleChoices.length === 0 && (options?.profiles.length ?? 0) < 2) return null;
   const picked = value.choices ?? {};
-  const pick = (c: ModlistChoice, id: string) => onChange({ ...value, profile: profile.name, choices: { ...picked, [c.id]: id } });
+  const allMods = profile.groups.flatMap((g) => g.mods);
+  // Un mod n'est sélectionnable que si ses dépendances le sont (mod requis coché, famille choisie)
+  const unmet = (m: ModlistOptionMod, en: Set<string>, ch: Record<string, string>): string[] => {
+    const out = (m.requires ?? []).filter((r) => !en.has(r));
+    if (m.requiresChoice) {
+      const c = profile.choices?.find((x) => x.id === m.requiresChoice!.choice);
+      if ((ch[m.requiresChoice.choice] ?? c?.default) !== m.requiresChoice.option) out.push(m.requiresChoice.option);
+    }
+    return out;
+  };
+  const commit = (en: Set<string>, ch: Record<string, string>) => {
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const m of allMods) if (en.has(m.name) && unmet(m, en, ch).length) { en.delete(m.name); changed = true; }
+    }
+    onChange({ ...value, profile: profile.name, enable: [...en], choices: ch });
+  };
+  const pick = (c: ModlistChoice, id: string) => commit(new Set(value.enable), { ...picked, [c.id]: id });
   const screen = detectScreenFormat();
   const choiceTitle = (c: ModlistChoice) => c.kind === 'format' ? ui.format
     : c.kind === 'family' ? ui.family.replace('{tag}', c.label)
@@ -104,9 +122,46 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
   const set = (names: string[], on: boolean) => {
     const next = new Set(value.enable);
     for (const n of names) on ? next.add(n) : next.delete(n);
-    onChange({ ...value, profile: profile.name, enable: [...next] });
+    commit(next, picked);
   };
-  const allNames = profile.groups.flatMap((g) => g.mods.map((m) => m.name));
+  const allNames = allMods.map((m) => m.name);
+  const mainGroups = profile.groups.filter((g) => !g.debug);
+  const debugGroups = profile.groups.filter((g) => g.debug);
+
+  const renderGroup = (g: ModlistOptionGroup) => {
+    const selectable = g.mods.filter((m) => !unmet(m, enabled, picked).length).map((m) => m.name);
+    const nSel = g.mods.filter((m) => enabled.has(m.name)).length;
+    const allOn = selectable.length > 0 && selectable.every((n) => enabled.has(n));
+    return (
+      <details key={g.separator} className="bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg">
+        <summary className="px-3 py-2 cursor-pointer text-body text-white flex items-center justify-between gap-2 select-none">
+          <span className="truncate">{g.separator}</span>
+          <span className="text-caption text-[#666666] shrink-0">{nSel} / {g.mods.length}</span>
+        </summary>
+        <div className="px-3 pb-2 flex flex-col gap-1">
+          {selectable.length > 1 && (
+            <label className="text-body text-[#aaaaaa] flex items-center gap-2 py-0.5">
+              <input type="checkbox" checked={allOn} onChange={(e) => set(selectable, e.target.checked)} />
+              <span>{allOn ? ui.uncheckAll : ui.checkAll}</span>
+            </label>
+          )}
+          {g.mods.map((m) => {
+            const missing = unmet(m, enabled, picked);
+            const off = missing.length > 0;
+            return (
+              <label key={m.name} className={`text-body flex items-center gap-2 py-0.5 ${off ? 'text-[#666666]' : 'text-[#dddddd]'}`}
+                title={off ? ui.requires.replace('{deps}', missing.join(', ')) : undefined}>
+                <input type="checkbox" disabled={off} checked={enabled.has(m.name) && !off} onChange={(e) => set([m.name], e.target.checked)} />
+                <span className="truncate flex-1">{m.name}</span>
+                {off && <span className="text-caption text-[#666666] shrink-0 truncate max-w-[40%]">{ui.requires.replace('{deps}', missing.join(', '))}</span>}
+                <span className="text-caption text-[#666666] shrink-0">{formatBytes(m.size, fr)}</span>
+              </label>
+            );
+          })}
+        </div>
+      </details>
+    );
+  };
 
   return (
     <div className={card}>
@@ -158,37 +213,24 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
       )}
 
       {profile.optionalCount > 0 && <div className="flex items-center gap-2 flex-wrap">
-        <button type="button" className={btn.ghost} onClick={() => set(allNames, true)}>{ui.checkAll}</button>
         <button type="button" className={btn.ghost} onClick={() => set(allNames, false)}>{ui.uncheckAll}</button>
       </div>}
 
-      <div className="flex flex-col gap-1.5">
-        {profile.groups.map((g) => {
-          const names = g.mods.map((m) => m.name);
-          const nSel = names.filter((n) => enabled.has(n)).length;
-          return (
-            <details key={g.separator} className="bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg">
-              <summary className="px-3 py-2 cursor-pointer text-body text-white flex items-center justify-between gap-2 select-none">
-                <span className="truncate">{g.separator}</span>
-                <span className="text-caption text-[#666666] shrink-0">{nSel} / {names.length}</span>
-              </summary>
-              <div className="px-3 pb-2 flex flex-col gap-1">
-                <label className="text-body text-[#aaaaaa] flex items-center gap-2 py-0.5">
-                  <input type="checkbox" checked={nSel === names.length} onChange={(e) => set(names, e.target.checked)} />
-                  <span>{nSel === names.length ? ui.uncheckAll : ui.checkAll}</span>
-                </label>
-                {g.mods.map((m) => (
-                  <label key={m.name} className="text-body text-[#dddddd] flex items-center gap-2 py-0.5">
-                    <input type="checkbox" checked={enabled.has(m.name)} onChange={(e) => set([m.name], e.target.checked)} />
-                    <span className="truncate flex-1">{m.name}</span>
-                    <span className="text-caption text-[#666666] shrink-0">{formatBytes(m.size, fr)}</span>
-                  </label>
-                ))}
-              </div>
-            </details>
-          );
-        })}
-      </div>
+      <div className="flex flex-col gap-1.5">{mainGroups.map(renderGroup)}</div>
+
+      {debugGroups.length > 0 && (
+        <details className="border border-[#2e2e2e] rounded-lg">
+          <summary className="px-3 py-2 cursor-pointer text-body text-[#aaaaaa] select-none">⚠ {ui.debugTitle}</summary>
+          <div className="px-3 pb-2 flex flex-col gap-1.5">
+            <p className="text-meta text-[#8f8f8f]">{ui.debugHint}</p>
+            {debugGroups.map(renderGroup)}
+          </div>
+        </details>
+      )}
+
+      {(profile.lockedGroups ?? []).map((l) => (
+        <p key={l.separator} className="text-meta text-[#8f8f8f]">🔒 {ui.locked.replace('{n}', String(l.count)).replace('{sep}', l.separator)}</p>
+      ))}
       <p className="text-caption text-[#666666]">{ui.note}</p>
     </div>
   );

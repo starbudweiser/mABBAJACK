@@ -176,8 +176,15 @@ export interface NexusAccount {
 }
 
 /** Mod optionnel (désactivé par défaut dans le profil MO2 de la modlist) */
-export interface ModlistOptionMod { name: string; size: number; }
-export interface ModlistOptionGroup { separator: string; mods: ModlistOptionMod[]; }
+export interface ModlistOptionMod {
+  name: string;
+  size: number;
+  /** Mods optionnels requis (ex. « Foo - Patch » requiert « Foo ») */
+  requires?: string[];
+  /** Option d'un choix exclusif requise (ex. famille d'interface Edge) */
+  requiresChoice?: { choice: string; option: string };
+}
+export interface ModlistOptionGroup { separator: string; mods: ModlistOptionMod[]; /** Outils de test de l'auteur */ debug?: boolean; }
 /** Choix exclusif détecté (famille d'interface, format d'écran, variantes « Base - X ») */
 export interface ModlistChoiceOption { id: string; label: string; mods: string[]; size: number; }
 export interface ModlistChoice {
@@ -195,6 +202,8 @@ export interface ModlistOptionProfile {
   isDefault: boolean;
   groups: ModlistOptionGroup[];
   choices?: ModlistChoice[];
+  /** Séparateurs « DO NOT ENABLE » : mods non proposés */
+  lockedGroups?: { separator: string; count: number }[];
   optionalCount: number;
   optionalBytes: number;
 }

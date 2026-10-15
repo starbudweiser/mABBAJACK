@@ -152,3 +152,24 @@ export async function verifyInstalledFiles(directives, outPathOf, { signal, onPr
   onProgress?.(checked, byPath.size);
   return { checked, missing, wrongSize };
 }
+
+/**
+ * Fichiers de mods désactivés présents dans l'installation (restes d'une installation précédente
+ * ou déploiement à tort) : destinations des directives écartées qu'aucune directive conservée ne vise.
+ * Retourne [{ to, path, mod }].
+ */
+export async function findStrayFiles(dropped, kept, outPathOf, { signal } = {}) {
+  const keptPaths = new Set();
+  for (const d of kept) { const p = outPathOf(d.To); if (p) keptPaths.add(p.toLowerCase()); }
+  const seen = new Set(), stray = [];
+  for (const d of dropped) {
+    if (signal?.aborted) throw new Error('Annulé');
+    const mod = modOf(d.To);
+    if (!mod) continue;
+    const p = outPathOf(d.To);
+    if (!p || keptPaths.has(p.toLowerCase()) || seen.has(p)) continue;
+    seen.add(p);
+    try { await fs.promises.access(p); stray.push({ to: d.To, path: p, mod }); } catch { /* absent : normal */ }
+  }
+  return stray;
+}

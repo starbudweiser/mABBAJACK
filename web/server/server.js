@@ -21,7 +21,7 @@ import { checkDiskSpace, fmtBytes } from './diskspace.js';
 import { inspectWabbajack as inspectWabbajackRaw } from './inspect.js';
 import { recordGameVersion, enrichCatalog } from './gameversions.js';
 import { openLazyZip } from './lazyzip.js';
-import { HashCache, verifyArchive, verifyInstalledFiles, archiveSourceUrl, listDownloadDir, modOf } from './archivecheck.js';
+import { HashCache, verifyArchive, verifyInstalledFiles, findStrayFiles, archiveSourceUrl, listDownloadDir, modOf } from './archivecheck.js';
 import { initLogger, writeLog, startInstallLog, endInstallLog, getLogInfo, tailLog } from './logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -2393,6 +2393,7 @@ app.post('/api/install/start', async (req, res) => {
       broadcastLog('info', `═══════════════════════════════════════════════════`);
 
       let wabbajackZip = null;
+      let droppedDirectives = []; // directives des mods désactivés (profil, options)
       let wabbajackTempPath = null;
       const rawWabbajackRef = modlist.localFilePath;
       const CDN_PAGE_HOST = 'authored-files.wabbajack.org';
@@ -2670,7 +2671,10 @@ app.post('/api/install/start', async (req, res) => {
                   broadcastLog('warn', `⚠ Options non appliquées : ${String(e.message || e).slice(0, 160)}`);
                 }
               }
-              if (selection) modlist.directives = modlist.directives.filter((d) => selection.keep(d.To));
+              if (selection) {
+                droppedDirectives = modlist.directives.filter((d) => !selection.keep(d.To));
+                modlist.directives = modlist.directives.filter((d) => selection.keep(d.To));
+              }
               // Only overwrite archives if not already provided with localPath by client scan
               if (!modlist.archives || modlist.archives.length === 0) {
                 modlist.archives = (modlistJson.Archives || modlistJson.archives || []).map((a) => ({
@@ -2803,7 +2807,14 @@ app.post('/api/install/start', async (req, res) => {
           const archOf = new Map(toCheck.map((d) => [d.To, d.ArchiveHash]));
           const explained = chk.missing.filter((m) => lostHashes.has(archOf.get(m.to)));
           const unexplained = chk.missing.filter((m) => !lostHashes.has(archOf.get(m.to)));
-          installCheck = { checked: chk.checked, explained, unexplained, wrongSize: chk.wrongSize };
+          // Fichiers de mods désactivés présents malgré tout (installation précédente dans le même dossier…)
+          const stray = await findStrayFiles(droppedDirectives, directives, (to) => resolveDirectivePath(to, cleanDest), { signal });
+          installCheck = { checked: chk.checked, explained, unexplained, wrongSize: chk.wrongSize, stray };
+          if (stray.length > 0) {
+            const strayMods = [...new Set(stray.map((x) => x.mod))];
+            broadcastLog('warn', `⚠ ${stray.length} fichier(s) de ${strayMods.length} mod(s) désactivé(s) présent(s) dans l'installation : ${strayMods.slice(0, 8).join(', ')}${strayMods.length > 8 ? '…' : ''}`);
+            broadcastLog('warn', `  → Restes d'une installation précédente : videz le dossier d'installation avant de relancer (liste dans CONTROLE_INSTALLATION.txt).`);
+          }
           const bad = unexplained.length + chk.wrongSize.length;
           broadcastLog(bad === 0 && explained.length === 0 ? 'success' : 'warn',
             `🔍 Contrôle : ${chk.checked} fichier(s) vérifié(s) — ${explained.length} absent(s) à cause d'archives manquantes, ${unexplained.length} autre(s) absent(s), ${chk.wrongSize.length} de taille différente.`);
@@ -2905,7 +2916,7 @@ app.post('/api/install/start', async (req, res) => {
         `  Plugins actifs        : ${pluginCount}`,
         `  Fichiers sources manquants : ${missingReport.length} (${missingReport.reduce((s, m) => s + m.files, 0)} fichier(s) de la modlist non installés)`,
         ...missingReport.map((m) => `    - ${isGameFileArchive(m.arc) ? `[JEU] ${expectedGameFilePath(m.arc, gamePath)}` : `[MOD] ${m.arc.Name}${m.arc.wrongVersion ? ' [MAUVAISE VERSION]' : ''}${(manualUrls.get(m.arc.Name) || archiveSourceUrl(m.arc)) ? ` — ${manualUrls.get(m.arc.Name) || archiveSourceUrl(m.arc)}` : ''}`} (${m.files} fichier(s))`),
-        ...(installCheck ? [`  Contrôle des fichiers  : ${installCheck.checked} vérifiés, ${installCheck.explained.length + installCheck.unexplained.length} absents, ${installCheck.wrongSize.length} de taille différente (voir CONTROLE_INSTALLATION.txt)`] : []),
+        ...(installCheck ? [`  Contrôle des fichiers  : ${installCheck.checked} vérifiés, ${installCheck.explained.length + installCheck.unexplained.length} absents, ${installCheck.wrongSize.length} de taille différente, ${(installCheck.stray || []).length} de mods désactivés (voir CONTROLE_INSTALLATION.txt)`] : []),
         `  Généré le             : ${new Date().toLocaleString('fr-FR')}`,
         `======================================================================`,
       ].join('\n');
@@ -2919,6 +2930,7 @@ app.post('/api/install/start', async (req, res) => {
           ...sect('ABSENTS (archive manquante)', installCheck.explained.map((m) => `  ${m.to}`)),
           ...sect('ABSENTS (cause inconnue)', installCheck.unexplained.map((m) => `  ${m.to}`)),
           ...sect('TAILLE DIFFÉRENTE', installCheck.wrongSize.map((m) => `  ${m.to} — ${m.actual} o au lieu de ${m.expected} o`)),
+          ...sect('FICHIERS DE MODS DÉSACTIVÉS (à supprimer)', (installCheck.stray || []).map((m) => `  ${m.path}  ← ${m.mod}`)),
         ].join('\n') + '\n', 'utf-8');
       }
 

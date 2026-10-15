@@ -17,6 +17,8 @@ import type { Language } from './types';
 type Entry = [fr: string, en: string, es: string, it: string];
 
 const ENTRIES: Entry[] = [
+  ['⚠ {0} fichier(s) de {1} mod(s) désactivé(s) présent(s) dans l\'installation : {2}', '⚠ {0} file(s) from {1} disabled mod(s) found in the installation: {2}', '⚠ {0} archivo(s) de {1} mod(s) desactivado(s) presente(s) en la instalación: {2}', '⚠ {0} file di {1} mod disattivata/e presente/i nell\'installazione: {2}'],
+  ['→ Restes d\'une installation précédente : videz le dossier d\'installation avant de relancer (liste dans CONTROLE_INSTALLATION.txt).', '→ Leftovers from a previous installation: empty the installation folder before restarting (list in CONTROLE_INSTALLATION.txt).', '→ Restos de una instalación anterior: vacíe la carpeta de instalación antes de volver a lanzar (lista en CONTROLE_INSTALLATION.txt).', '→ Residui di un\'installazione precedente: svuota la cartella di installazione prima di riavviare (elenco in CONTROLE_INSTALLATION.txt).'],
   // ── Vérification des archives (taille + hash) et contrôle post-installation ──
   ['📂 Dossier dédié à la liste (prioritaire) : {0}', '📂 List-specific folder (takes priority): {0}', '📂 Carpeta dedicada a la lista (prioritaria): {0}', '📂 Cartella dedicata alla lista (prioritaria): {0}'],
   ['🔎 Vérification de {0} archive(s) : taille puis hash Wabbajack (mis en cache après le premier calcul)…', '🔎 Checking {0} archive(s): size then Wabbajack hash (cached after the first computation)…', '🔎 Verificando {0} archivo(s): tamaño y luego hash de Wabbajack (en caché tras el primer cálculo)…', '🔎 Verifica di {0} archivio/i: dimensione poi hash Wabbajack (in cache dopo il primo calcolo)…'],

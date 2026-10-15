@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseModlistTxt, detectChoices, choiceOverrides, dedupeByPriority, buildSelection, buildOptions, renderModlistTxt, loadRawModlist, readZipEntry } from '../web/server/modprofile.js';
+import { parseModlistTxt, detectChoices, choiceOverrides, classifyOptions, dedupeByPriority, buildSelection, buildOptions, renderModlistTxt, loadRawModlist, readZipEntry } from '../web/server/modprofile.js';
 
 // ── Unitaires ───────────────────────────────────────────────
 // Choix exclusifs : familles d'interface, format d'écran, variantes
@@ -56,6 +56,34 @@ const r = dedupeByPriority(dirs, (d) => (d.To.startsWith('mods/') ? '/out/' + d.
 assert.equal(r.removed, 1);
 assert.deepEqual(r.directives.map((d) => d.To), ['mods/Hi/A.dds', 'mods/Lo/b.dds', 'profiles/x/plugins.txt', 'skip']);
 void outPathOf;
+
+// Consignes de la liste : « DO NOT ENABLE », outils de test, dépendances par le nom
+{
+  const txt = ['-(RES) Ordinary People', '-NPCs RESOURCES (DO NOT ENABLE)_separator',
+    '-(DT) Debug Menu', '-01.5 GAME TESTING_separator',
+    '-(ENB) Everwild ENB - Fantasy', '-(ENB) Everwild ENB', '-16.1 ENBSERIES_separator', '+Core'].join('\n');
+  const items = parseModlistTxt(txt);
+  const cls = classifyOptions(items, detectChoices(items));
+  assert.deepEqual([...cls.locked], ['(res) ordinary people']);
+  assert.deepEqual([...cls.debug], ['(dt) debug menu']);
+  assert.deepEqual(cls.requires.get('(enb) everwild enb - fantasy'), ['(enb) everwild enb']);
+
+  const raw = { Name: 'T', Directives: [
+    { To: 'profiles/T/modlist.txt', SourceDataID: 'p' },
+    ...['(RES) Ordinary People', '(DT) Debug Menu', '(ENB) Everwild ENB - Fantasy', '(ENB) Everwild ENB', 'Core']
+      .map((m) => ({ To: `mods/${m}/a.dll`, Size: 1 })),
+  ] };
+  const read = async (n) => (n === 'p' ? Buffer.from(txt) : null);
+  const sel = await buildSelection(raw, read, { enable: ['(RES) Ordinary People', '(DT) Debug Menu', '(ENB) Everwild ENB - Fantasy'] });
+  assert.equal(sel.keep('mods/(RES) Ordinary People/a.dll'), false, 'DO NOT ENABLE : jamais installé');
+  assert.equal(sel.keep('mods/(DT) Debug Menu/a.dll'), true, 'outil de test : installé seulement si coché');
+  assert.equal(sel.keep('mods/(ENB) Everwild ENB - Fantasy/a.dll'), false, 'dépendance absente → non installé');
+  const sel2 = await buildSelection(raw, read, { enable: ['(ENB) Everwild ENB - Fantasy', '(ENB) Everwild ENB'] });
+  assert.equal(sel2.keep('mods/(ENB) Everwild ENB - Fantasy/a.dll'), true);
+  const sel3 = await buildSelection(raw, read, {});
+  assert.equal(sel3.keep('mods/(DT) Debug Menu/a.dll'), false, 'mod désactivé non coché : jamais déployé');
+  assert.equal(sel3.keep('mods/Core/a.dll'), true);
+}
 
 // ── Réel (optionnel) ────────────────────────────────────────
 const here = path.dirname(fileURLToPath(import.meta.url));

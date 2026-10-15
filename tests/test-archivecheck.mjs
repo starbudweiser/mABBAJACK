@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
-  toWabbajackHash, hashFile, HashCache, verifyArchive, verifyInstalledFiles, archiveSourceUrl, listDownloadDir, modOf,
+  toWabbajackHash, hashFile, HashCache, verifyArchive, verifyInstalledFiles, findStrayFiles, archiveSourceUrl, listDownloadDir, modOf,
 } from '../web/server/archivecheck.js';
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mabba-archivecheck-'));
@@ -57,6 +57,12 @@ try {
   assert.equal(r.checked, 4);
   assert.deepEqual(r.missing.map((m) => m.to), ['mods/A/meshes/absent.nif']);
   assert.deepEqual(r.wrongSize.map((m) => [m.to, m.actual]), [['mods/A/meshes/bad.nif', 2]]);
+  // Fichiers de mods désactivés restés dans l'installation
+  fs.writeFileSync(path.join(data, 'meshes', 'debug.dll'), 'x');
+  const stray = await findStrayFiles(
+    [{ To: 'mods/DT/meshes/debug.dll' }, { To: 'mods/DT/meshes/ok.nif' }, { To: 'mods/DT/meshes/absent.dll' }],
+    [{ To: 'mods/A/meshes/ok.nif' }], out);
+  assert.deepEqual(stray.map((x) => [x.mod, path.basename(x.path)]), [['DT', 'debug.dll']]);
 } finally {
   fs.rmSync(dir, { recursive: true, force: true });
 }
