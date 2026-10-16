@@ -12,6 +12,7 @@ import http from 'http';
 import { createWriteStream, mkdirSync } from 'fs';
 import multer from 'multer';
 import { openBsa, extractFileFromBsa } from './bsa.js';
+import { looksLikeBsa, extractNestedArchive } from './nested.js';
 import { createBsa } from './bsawriter.js';
 import { patchFile } from './octodiff.js';
 import { remapMagicStrings } from './remap.js';
@@ -970,6 +971,7 @@ async function processDirectives({ directives, archiveStatuses, destRoot, wabbaj
     let archiveErrors = 0;
     let usedUnar = false; // set to true when unar is used instead of 7z (RAR5)
     const nestedBsa = new Map(); // bsaPath → open BSA reader (depth-3 directives)
+    const nestedArchives = new Map(); // innerPath → Map(chemin normalisé → fichier extrait)
 
     let heartbeatActive = true;
     let heartbeat = setInterval(() => {
@@ -984,8 +986,14 @@ async function processDirectives({ directives, archiveStatuses, destRoot, wabbaj
     }, 3000);
 
     try {
+      // Chaque chemin est demandé sous ses deux formes : certains zip faits sous Windows
+      // nomment leurs entrées « Data\\SKSE\\x.dll » (antislash dans le nom), que 7zz
+      // garde tel quel et ne fait pas correspondre à « Data/SKSE/x.dll ».
       const neededPaths = [...new Set(
-        archDirectives.map(d => (d.SourcePath || d.From || '').replace(/\\/g, '/').trim()).filter(Boolean)
+        archDirectives.flatMap(d => {
+          const fwd = (d.SourcePath || d.From || '').replace(/\\/g, '/').trim();
+          return fwd ? [fwd, fwd.replace(/\//g, '\\')] : [];
+        })
       )];
 
       const listFilePath = `${tmpDir}.list`;
@@ -1121,7 +1129,28 @@ async function processDirectives({ directives, archiveStatuses, destRoot, wabbaj
         if (d.BsaInternalPath) {
           // The BSA was extracted into tmpDir via SourcePath
           const bsaPath = extractedFiles.get(srcFwd) || extractedFiles.get(path.basename(srcRaw).toLowerCase());
-          if (bsaPath && fs.existsSync(bsaPath)) {
+          if (bsaPath && fs.existsSync(bsaPath) && !looksLikeBsa(bsaPath)) {
+            // ── Niveau 3 dans une archive imbriquée (zip/7z/rar dans le zip) ──
+            try {
+              let files = nestedArchives.get(bsaPath);
+              if (!files) {
+                files = await extractNestedArchive(sevenZipBin, bsaPath, `${tmpDir}_nested${nestedArchives.size}`);
+                nestedArchives.set(bsaPath, files);
+              }
+              const innerFwd = d.BsaInternalPath.replace(/\\/g, '/').toLowerCase();
+              const innerFile = files.get(innerFwd);
+              if (innerFile) {
+                await deliver(d, outputPath, { file: innerFile });
+                archiveProcessed++; processed++; processedBytes += d.Size || 0;
+              } else {
+                debugLog(`Introuvable dans l'archive imbriquée : ${archive.Name} :: ${srcRaw} :: ${d.BsaInternalPath}`);
+                archiveErrors++; errors++; processedBytes += d.Size || 0;
+              }
+            } catch (nestErr) {
+              broadcastLog('warn', `  ⚠ Archive imbriquée ${path.basename(srcRaw)} : ${String(nestErr.message).slice(0, 120)}`);
+              archiveErrors++; errors++; processedBytes += d.Size || 0;
+            }
+          } else if (bsaPath && fs.existsSync(bsaPath)) {
             try {
               let nb = nestedBsa.get(bsaPath);
               if (!nb) { nb = openBsa(bsaPath); nestedBsa.set(bsaPath, nb); }
@@ -1179,6 +1208,9 @@ async function processDirectives({ directives, archiveStatuses, destRoot, wabbaj
     } finally {
       for (const nb of nestedBsa.values()) nb.close();
       try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+      for (let i = 0; i < nestedArchives.size; i++) {
+        try { fs.rmSync(`${tmpDir}_nested${i}`, { recursive: true, force: true }); } catch {}
+      }
     }
 
     if (archiveProcessed > 0) {
