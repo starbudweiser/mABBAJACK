@@ -14,13 +14,13 @@
 Fonctionnalités :
 - Galerie des modlists officielles (≈ 226) avec filtres par jeu (SE, AE, VR, Enderal, « Autres jeux »), tags, recherche et tri (taille, nom, date).
 - Inspecteur de fichier `.wabbajack` (glisser-déposer).
-- Installation complète : extraction (7zz / unar, lecteur BSA natif), patchs OctoDiff, création de BSA native, fichiers originaux du jeu copiés sans décompression.
+- Installation complète : extraction (7zz / unar, lecteur BSA natif), patchs OctoDiff, textures transformées converties avec texconv (DirectXTex natif), création de BSA native, fichiers originaux du jeu copiés sans décompression.
 - Téléchargements Nexus automatiques (compte **Premium**) ou liens manuels (compte standard).
 - Organisation des téléchargements « à la Vortex » (`<dossier>/skyrimse`).
 - Détection automatique du jeu (Steam, CrossOver, Whisky, `/Volumes/*/GAMES`).
 - Journal en direct (filtres Tous / Avertissements / Erreurs), journaux enregistrés dans `~/Library/Logs/mABBAJACK/`.
 - Interface en 4 langues : français, anglais, espagnol, italien.
-- Application autonome : fenêtre native, Node, 7zz et unar embarqués.
+- Application autonome : fenêtre native, Node, 7zz, unar et texconv embarqués.
 
 ![Galerie](docs/screenshots/gallery.png)
 
@@ -53,13 +53,13 @@ Wabbajack est uniquement disponible sous Windows. Les utilisateurs de Mac devaie
 Features:
 - Gallery of official modlists (≈ 226) with game filters (SE, AE, VR, Enderal, "Other games"), tags, search and sorting (size, name, date).
 - `.wabbajack` file inspector (drag & drop).
-- Full install: extraction (7zz / unar, native BSA reader), OctoDiff patches, native BSA writer, original game files copied without decompression.
+- Full install: extraction (7zz / unar, native BSA reader), OctoDiff patches, transformed textures converted with texconv (native DirectXTex), native BSA writer, original game files copied without decompression.
 - Automatic Nexus downloads (**Premium** account) or manual links (free account).
 - Vortex-style download layout (`<folder>/skyrimse`).
 - Automatic game detection (Steam, CrossOver, Whisky, `/Volumes/*/GAMES`).
 - Live log (All / Warnings / Errors filters); logs saved in `~/Library/Logs/mABBAJACK/`.
 - 4 UI languages: French, English, Spanish, Italian.
-- Standalone app: native window, bundled Node, 7zz and unar.
+- Standalone app: native window, bundled Node, 7zz, unar and texconv.
 
 ### Why?
 Wabbajack only runs on Windows. Mac users had to rely on a heavy, slow VM. mABBAJACK provides a native, simple, VM-free install producing files ready to use (e.g. through CrossOver or Whisky).

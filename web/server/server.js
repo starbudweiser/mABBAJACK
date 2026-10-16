@@ -16,6 +16,7 @@ import { looksLikeBsa, extractNestedArchive } from './nested.js';
 import { matchInRoot, rankGameRoots, siblingGameRoots } from './gameroot.js';
 import { createBsa } from './bsawriter.js';
 import { patchFile } from './octodiff.js';
+import { findTexconv, TextureQueue } from './textures.js';
 import { remapMagicStrings } from './remap.js';
 import { downloadWabbajackCdn, downloadGoogleDrive } from './downloaders.js';
 import { buildOptions, buildSelection, dedupeByPriority, renderModlistTxt, loadRawModlist, readZipEntry } from './modprofile.js';
@@ -200,6 +201,8 @@ function find7z() {
   }
   return null;
 }
+
+function findTexconvBin() { return findTexconv(BUNDLED_BIN_DIR); }
 
 function findUnar() {
   const bundled = BUNDLED_BIN_DIR ? [path.join(BUNDLED_BIN_DIR, 'unar')] : [];
@@ -678,7 +681,7 @@ function detectSkyrimAtPath(gamePath) {
  * Handles FromArchive, InlineFile, PatchedFromArchive.
  * Returns { processed, skipped, errors }
  */
-async function processDirectives({ directives, archiveStatuses, destRoot, wabbajackZip, sevenZipBin, unarBin, signal, onProgress, gamePath = '', downloadsPath = '' }) {
+async function processDirectives({ directives, archiveStatuses, destRoot, wabbajackZip, sevenZipBin, unarBin, signal, onProgress, gamePath = '', downloadsPath = '', texconvBin = null }) {
   // Clean up any leftover temp dirs from previous crashed/killed runs
   purgeMwabTmpDirs();
   let processed = 0;
@@ -688,7 +691,10 @@ async function processDirectives({ directives, archiveStatuses, destRoot, wabbaj
   let gameDirectCopies = 0;   // fichiers originaux du jeu copiés tels quels
   let modDirectCopies = 0;    // archives « fichier unique » (ex. .esp téléchargé directement)
   const patchStats = { patched: 0, already: 0, fallback: 0, noPatch: 0 };
-  let transformedTextures = 0;   // TransformedTexture : texture source copiée (fallback)
+  let transformedTextures = 0;   // TransformedTexture copiée sans conversion (texconv absent)
+  // TransformedTexture : textures collectées pendant l'extraction, converties en lot ensuite
+  const textureQueue = texconvBin ? new TextureQueue({ bin: texconvBin, stageRoot: path.join(destRoot, '.mabbajack_textures') }) : null;
+  textureQueue?.cleanup();
   let remappedFiles = 0;         // RemappedInlineFile : chemins remplacés
   let remapUnresolved = 0;
   const patchFallbackNames = [];
@@ -736,9 +742,12 @@ async function processDirectives({ directives, archiveStatuses, destRoot, wabbaj
    */
   async function deliver(d, outputPath, src) {
     makeDirResilient(path.dirname(outputPath));
-    // TransformedTexture : le redimensionnement/recompression DDS n'est pas implémenté —
-    // la texture source est copiée telle quelle (valide, mais plus lourde en VRAM).
-    if (/transformedtexture/i.test(d?.$type || '')) transformedTextures++;
+    // TransformedTexture : mise de côté pour texconv (sauf si la source a déjà l'état demandé).
+    // Sans texconv, la texture source est copiée telle quelle (valide, mais d'une autre taille).
+    if (/transformedtexture/i.test(d?.$type || '')) {
+      if (textureQueue) { if (textureQueue.add(d, outputPath, src)) return; }
+      else transformedTextures++;
+    }
     if (isPatchedDirective(d)) {
       const base = src.buffer || fs.readFileSync(src.file);
       const delta = await loadPatch(d);
@@ -1226,6 +1235,36 @@ async function processDirectives({ directives, archiveStatuses, destRoot, wabbaj
     if (archiveIdx % 10 === 0) purgeMwabTmpDirs();
   }
 
+  // ── 2 bis. TRANSFORMED TEXTURES : conversion texconv en lot ───────────
+  if (textureQueue?.alreadyOk) {
+    broadcastLog('info', `🖼 ${textureQueue.alreadyOk} texture(s) TransformedTexture déjà au bon format — copiées telles quelles.`);
+  }
+  if (textureQueue && textureQueue.size > 0) {
+    const n = textureQueue.size;
+    broadcastLog('info', `🖼 Conversion de ${n} texture(s) (TransformedTexture, ${textureQueue.groups.size} format(s) cible(s)) avec texconv…`);
+    let lastLog = 0;
+    const t0 = Date.now();
+    const r = await textureQueue.run({
+      signal,
+      onProgress: (done, tot) => {
+        broadcastProgress({ currentTask: `🖼 Conversion des textures : ${done}/${tot}`, stagePercent: Math.round((done / tot) * 100) });
+        const pct = Math.floor((done / tot) * 10) * 10;
+        if (pct > lastLog && done < tot) { lastLog = pct; broadcastLog('info', `  🖼 Textures : ${done}/${tot} (${pct} %)`); }
+      },
+    });
+    const secs = Math.round((Date.now() - t0) / 1000);
+    const names = (list) => list.slice(0, 5).map((f) => path.basename(f.to.replace(/\\/g, '/'))).join(', ') + (list.length > 5 ? '…' : '');
+    broadcastLog('success', `  ✓ ${r.converted}/${n} texture(s) convertie(s) en ${secs} s.`);
+    if (r.failed.length > 0) {
+      broadcastLog('warn', `  ⚠ ${r.failed.length} texture(s) non convertie(s) — source copiée telle quelle : ${names(r.failed)}`);
+      for (const f of r.failed) debugLog(`texconv échec : ${f.to} — ${f.reason}`);
+    }
+    if (r.sizeMismatch.length > 0) {
+      broadcastLog('warn', `  ⚠ ${r.sizeMismatch.length} texture(s) convertie(s) d'une taille différente du manifeste : ${names(r.sizeMismatch)}`);
+      for (const f of r.sizeMismatch) debugLog(`texconv taille : ${f.to} — ${f.actual} o au lieu de ${f.expected} o`);
+    }
+  }
+
   // ── 3. BILAN : fichiers originaux du jeu & patchs OctoDiff ─────────────
   if (gameDirectCopies > 0) {
     broadcastLog('success', `🎮 ${gameDirectCopies} fichier(s) original(aux) du jeu copié(s) directement (sans décompression).`);
@@ -1234,7 +1273,7 @@ async function processDirectives({ directives, archiveStatuses, destRoot, wabbaj
     broadcastLog('info', `📄 ${modDirectCopies} fichier(s) copié(s) tel(s) quel(s) depuis DOWNLOADS (téléchargement direct, sans archive).`);
   }
   if (transformedTextures > 0) {
-    broadcastLog('warn', `🖼 ${transformedTextures} texture(s) transformée(s) : texture source copiée telle quelle (non redimensionnée / recompressée).`);
+    broadcastLog('warn', `🖼 ${transformedTextures} texture(s) transformée(s) : texconv introuvable, texture source copiée telle quelle (non redimensionnée / recompressée).`);
   }
   if (remappedFiles > 0) {
     broadcastLog('info', `📝 ${remappedFiles} fichier(s) de configuration adapté(s) à cette machine (chemins remplacés).`);
@@ -2075,6 +2114,10 @@ app.post('/api/install/start', async (req, res) => {
       const unarBin = findUnar();
       if (unarBin) broadcastLog('info', `✓ unar disponible (fallback RAR5) : ${unarBin}`);
 
+      const texconvBin = findTexconvBin();
+      if (texconvBin) broadcastLog('info', `✓ texconv disponible (textures transformées) : ${texconvBin}`);
+      else broadcastLog('warn', `⚠ texconv introuvable — les textures transformées seront copiées sans conversion.`);
+
       await new Promise((r) => setTimeout(r, 200));
 
       // ── ÉTAPE 2 : Scan DOWNLOADS ───────────────────────────────────
@@ -2648,6 +2691,8 @@ app.post('/api/install/start', async (req, res) => {
                   FromHash: d.FromHash || '',
                   SourceDataID: d.SourceDataID || '',
                   ArchiveName: d.State?.Name || '',
+                  // TransformedTexture : état cible (Width, Height, Format, MipLevels)
+                  ImageState: d.ImageState || undefined,
                   // CreateBSA
                   TempID: d.TempID || '',
                   FileStates: d.FileStates || undefined,
@@ -2762,6 +2807,7 @@ app.post('/api/install/start', async (req, res) => {
           wabbajackZip,
           sevenZipBin,
           unarBin,
+          texconvBin,
           signal,
           gamePath: gamePath || '',
           downloadsPath: downloadsPath || '',

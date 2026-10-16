@@ -1,7 +1,7 @@
 #!/bin/bash
 # Compile mABBAJACK.app : application macOS TOTALEMENT autonome (arm64).
 #   - fenêtre native (pywebview/WKWebView) : aucun navigateur
-#   - Node.js, 7zz et unar embarqués : aucune installation requise sur la machine cible
+#   - Node.js, 7zz, unar et texconv (textures transformées) embarqués : aucune installation requise sur la machine cible
 # Usage : ./build_app.sh        → produit ./mABBAJACK.app à la racine du projet
 # Prérequis de COMPILATION : python3, npm, 7zz et unar (Homebrew), accès réseau.
 # Tous les fichiers temporaires (venv, cache, __pycache__) sont supprimés en fin de build ; dist/ est conservé (preview Vite).
@@ -27,6 +27,8 @@ trap cleanup EXIT
 SEVENZ="$(command -v 7zz || true)"; [ -n "$SEVENZ" ] || { echo "7zz introuvable (brew install sevenzip)"; exit 1; }
 UNAR="$(command -v unar || true)";  [ -n "$UNAR" ]   || { echo "unar introuvable (brew install unar)"; exit 1; }
 SEVENZ="$(readlink -f "$SEVENZ")"; UNAR="$(readlink -f "$UNAR")"
+TEXCONV="$(cd "$ROOT/.." && pwd)/_tools/texconv/texconv-mac"   # recompilation : _tools/texconv/build.sh
+[ -x "$TEXCONV" ] || echo "⚠ texconv-mac introuvable ($TEXCONV) : textures transformées copiées sans conversion"
 
 rm -rf "$BUILD" "$ROOT/$APP_NAME"
 mkdir -p "$CACHE" "$PAYLOAD/bin"
@@ -49,6 +51,7 @@ tar -xzf "$NODE_TGZ" -C "$CACHE" "$NODE_DIR/bin/node"
 cp "$CACHE/$NODE_DIR/bin/node" "$PAYLOAD/bin/node"
 cp "$SEVENZ" "$PAYLOAD/bin/7zz"
 cp "$UNAR" "$PAYLOAD/bin/unar"
+[ -x "$TEXCONV" ] && cp "$TEXCONV" "$PAYLOAD/bin/texconv"
 chmod 755 "$PAYLOAD/bin/"*
 
 echo "▶ Serveur + interface + dépendances de production"
