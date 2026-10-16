@@ -121,6 +121,11 @@ export function listDownloadDir(wabbajackPath) {
 }
 
 /** Nom du mod MO2 d'une destination de directive (mods/<mod>/…), sinon null. */
+/** Premier dossier d'une destination (ex. « Game Root » pour les fichiers du dossier du jeu). */
+function topFolder(to) {
+  return String(to || '').replace(/\\/g, '/').split('/')[0] || null;
+}
+
 export function modOf(to) {
   const parts = String(to || '').replace(/\\/g, '/').split('/');
   return parts[0].toLowerCase() === 'mods' && parts[1] ? parts[1] : null;
@@ -147,8 +152,8 @@ export async function verifyInstalledFiles(directives, outPathOf, { signal, onPr
     if (signal?.aborted) throw new Error('Annulé');
     let size = -1;
     try { size = (await fs.promises.stat(p)).size; } catch { /* absent */ }
-    if (size < 0) missing.push({ to: d.To, path: p, mod: modOf(d.To) });
-    else if (!sizes.has(0) && !sizes.has(size)) wrongSize.push({ to: d.To, path: p, mod: modOf(d.To), expected: [...sizes][0], actual: size });
+    if (size < 0) missing.push({ to: d.To, path: p, mod: modOf(d.To) || topFolder(d.To) });
+    else if (!sizes.has(0) && !sizes.has(size)) wrongSize.push({ to: d.To, path: p, mod: modOf(d.To) || topFolder(d.To), expected: [...sizes][0], actual: size });
     if (++checked % 2000 === 0) onProgress?.(checked, byPath.size);
   }
   onProgress?.(checked, byPath.size);

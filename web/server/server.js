@@ -13,6 +13,7 @@ import { createWriteStream, mkdirSync } from 'fs';
 import multer from 'multer';
 import { openBsa, extractFileFromBsa } from './bsa.js';
 import { looksLikeBsa, extractNestedArchive } from './nested.js';
+import { matchInRoot, rankGameRoots, siblingGameRoots } from './gameroot.js';
 import { createBsa } from './bsawriter.js';
 import { patchFile } from './octodiff.js';
 import { remapMagicStrings } from './remap.js';
@@ -2115,27 +2116,64 @@ app.post('/api/install/start', async (req, res) => {
       // ── Fichiers ORIGINAUX du jeu (GameFileSource) : identifiés EN PREMIER ──
       // Ils ne sont jamais téléchargés ni décompressés : lus dans le dossier du jeu.
       const fileSizeOf = (p) => { try { return fs.statSync(p).size; } catch { return -1; } };
-      const gameRootOf = (p) => String(p || '').replace(/\/data\/.*$/i, '') || path.dirname(String(p || ''));
+      // Un seul dossier du jeu, choisi parce que ses fichiers ont la taille attendue par le
+      // manifeste : les patchs s'appliquent sur ces fichiers, une autre version donnerait des
+      // fichiers faux. Un fichier qui ne correspond pas n'est jamais déployé.
       const resolveGameFiles = (list) => {
+        const games = list.filter((a) => isGameFileArchive(a) && !isIgnorableGameFile(a));
+        let chosenRoot = null;
+        if (games.length > 0) {
+          const gameName = games[0]?.State?.Game;
+          const exes = GAME_EXES[String(gameName || '').toLowerCase()] || GAME_EXES.skyrimspecialedition;
+          const isRoot = (p) => isGameRoot(p, exes);
+          const userRoot = gamePath && String(gamePath).trim() ? path.resolve(String(gamePath).trim()) : null;
+          const roots = [];
+          if (userRoot) {
+            if (isRoot(userRoot)) roots.push(userRoot);
+            // Le dossier indiqué, ses sous-dossiers et ses voisins (autres versions du jeu)
+            roots.push(...siblingGameRoots(path.join(userRoot, '_'), isRoot, 3, 2));
+          }
+          roots.push(...gameSearchDirs(games[0], null, true));
+          const ranking = rankGameRoots(roots, games, userRoot);
+          const ver = games[0]?.State?.GameVersion || '?';
+          const best = ranking[0];
+          if (best && best.matched > 0) {
+            chosenRoot = best.root;
+            const inUser = (r) => r === userRoot || r.startsWith(`${userRoot}/`);
+            const userRank = userRoot ? ranking.find((r) => r.root === userRoot) || ranking.find((r) => inUser(r.root)) : null;
+            if (userRoot && !inUser(best.root)) {
+              broadcastLog('warn', `⚠ Dossier du jeu indiqué : ${userRoot}${userRank ? ` (${userRank.matched}/${games.length} fichiers conformes à la version ${ver})` : ''}.`);
+              broadcastLog('warn', `  → Dossier retenu, conforme à la version ${ver} : ${best.root} (${best.matched}/${games.length}).`);
+            }
+            const ties = ranking.filter((r) => r.matched === best.matched && r.root !== best.root);
+            if (ties.length > 0) broadcastLog('info', `  ℹ Autre(s) dossier(s) du jeu équivalent(s) : ${ties.map((r) => r.root).join(', ')}`);
+          }
+          if (ranking.length > 0) debugLog(`Dossiers du jeu (version ${ver}) : ${ranking.map((r) => `${r.root} = ${r.matched}/${games.length}`).join(' · ')}`);
+        }
+        const downloads = fs.existsSync(cleanDownloads) ? cleanDownloads : null;
         const out = list.map((a) => {
           if (isIgnorableGameFile(a)) return { ...a, status: 'ready', sourceKind: 'game', ignored: true };
           if (!isGameFileArchive(a)) return a;
-          if (a.status === 'ready' && a.localPath) return { ...a, sourceKind: 'game' };
-          const r = resolveGameFileArchive(a, gamePath, fs.existsSync(cleanDownloads) ? cleanDownloads : null);
-          return r
-            ? { ...a, status: 'ready', localPath: r.path, sourceKind: 'game', sizeMatches: r.sizeMatches }
-            : { ...a, sourceKind: 'game' };
+          if (a.status === 'ready' && a.localPath && (!a.Size || fileSizeOf(a.localPath) === a.Size)) return { ...a, sourceKind: 'game' };
+          let p = chosenRoot ? matchInRoot(chosenRoot, a) : null;
+          if (!p && downloads) {
+            p = [a.Name, path.basename(gameFileRel(a))].filter(Boolean).map((n) => path.join(downloads, n))
+              .find((c) => { const sz = fileSizeOf(c); return sz > 0 && (!a.Size || sz === a.Size); }) || null;
+          }
+          return p
+            ? { ...a, status: 'ready', localPath: p, sourceKind: 'game', sizeMatches: true }
+            : { ...a, status: 'missing', localPath: null, sourceKind: 'game' };
         });
-        const games = out.filter((a) => isGameFileArchive(a) && !a.ignored);
         if (games.length > 0) {
-          const found = games.filter((a) => a.status === 'ready' && a.localPath);
-          const dirs = [...new Set(found.map((a) => gameRootOf(a.localPath)))];
-          broadcastLog(found.length === games.length ? 'success' : 'warn',
-            `🎮 Fichiers originaux du jeu : ${found.length}/${games.length} identifiés${dirs.length ? ` dans ${dirs.join(', ')}` : ''}`);
-          const diff = found.filter((a) => a.Size && fileSizeOf(a.localPath) !== a.Size).length;
-          if (diff > 0) {
-            const ver = games[0]?.State?.GameVersion || '?';
-            broadcastLog('info', `  ℹ ${diff} fichier(s) du jeu diffèrent de la version ${ver} (ex. masters déjà nettoyés) — contrôlés via les patchs du manifeste.`);
+          const ver = games[0]?.State?.GameVersion || '?';
+          const found = out.filter((a) => isGameFileArchive(a) && !a.ignored && a.status === 'ready');
+          const absent = out.filter((a) => isGameFileArchive(a) && !a.ignored && a.status !== 'ready');
+          broadcastLog(absent.length === 0 ? 'success' : 'warn',
+            `🎮 Fichiers originaux du jeu (version ${ver}) : ${found.length}/${games.length} conformes${chosenRoot ? ` dans ${chosenRoot}` : ''}`);
+          if (absent.length > 0) {
+            const names = absent.map((a) => gameFileRel(a) || a.Name);
+            broadcastLog('error', `  ✗ ${absent.length} fichier(s) du jeu absent(s) ou d'une autre version : ${names.slice(0, 8).join(', ')}${names.length > 8 ? '…' : ''}`);
+            broadcastLog('error', `  → Les fichiers qui en dépendent ne seront pas installés. Indiquez un dossier du jeu en version ${ver}.`);
           }
         }
         return out;
@@ -2757,7 +2795,10 @@ app.post('/api/install/start', async (req, res) => {
         broadcastProgress({ stage: 'extracting_files', stageName: 'Contrôle de l\'installation', overallPercent: 86, currentTask: 'Contrôle des fichiers installés…' });
         try {
           const lostHashes = new Set(missingReport.map((m) => m.arc.Hash).filter(Boolean));
-          const toCheck = directives.filter((d) => modOf(d.To) && !/Remapped/i.test(d.$type || ''));
+          // Fichiers des mods et du dossier du jeu de l'instance (« Game Root/ », « Stock Game/ »…)
+          const rootFolders = new Set([...getGameRootFolders()].map((n) => n.toLowerCase()));
+          const isGameRootOut = (to) => rootFolders.has(String(to || '').replace(/\\/g, '/').split('/')[0].toLowerCase());
+          const toCheck = directives.filter((d) => (modOf(d.To) || isGameRootOut(d.To)) && !/Remapped/i.test(d.$type || ''));
           const chk = await verifyInstalledFiles(toCheck, (to) => resolveDirectivePath(to, cleanDest), {
             signal,
             onProgress: (done, total) => broadcastProgress({ currentTask: `Contrôle des fichiers installés : ${done}/${total}`, stagePercent: Math.round((done / Math.max(1, total)) * 100) }),
