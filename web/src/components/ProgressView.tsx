@@ -38,11 +38,12 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
   const [autoScroll, setAutoScroll] = useState(true);
   const [logFilter, setLogFilter] = useState<'all' | 'error' | 'warn'>('all');
   const [copied, setCopied] = useState(false);
-  const terminalEndRef = useRef<HTMLDivElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
 
+  // Journal affiché du plus récent au plus ancien : le défilement auto reste collé en haut.
   useEffect(() => {
-    if (autoScroll && terminalEndRef.current) {
-      terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (autoScroll && terminalRef.current) {
+      terminalRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [logs, autoScroll]);
 
@@ -323,13 +324,13 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
         </div>
 
         {/* Terminal body */}
-        <div className="flex-1 p-3 overflow-y-auto font-mono text-body space-y-0.5 bg-[#181818]">
+        <div ref={terminalRef} className="flex-1 p-3 overflow-y-auto font-mono text-body space-y-0.5 bg-[#181818]">
           {filteredLogs.length === 0 ? (
             <div className="h-full flex items-center justify-center text-[#666666] text-body">
               {ui.waitingOps}
             </div>
           ) : (
-            filteredLogs.map((log) => {
+            [...filteredLogs].reverse().map((log) => {
               const style: Record<string, { line: string; tag: string }> = {
                 success: { line: 'text-[#4ade80]', tag: 'text-[#4ade80] font-bold' },
                 warn:    { line: 'text-[#fbbf24]', tag: 'text-[#fbbf24] font-bold' },
@@ -347,7 +348,6 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
               );
             })
           )}
-          <div ref={terminalEndRef} />
         </div>
       </div>
     </div>
