@@ -258,7 +258,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
         <UpdateCard filePath={parsedFile?.localFilePath} destPath={destPath} value={updateRequest} onChange={setUpdateRequest} />
 
         {/* ── Mods optionnels (désactivés par défaut dans la modlist) ───── */}
-        <OptionalModsCard filePath={parsedFile?.localFilePath} value={installOptions} onChange={setInstallOptions} />
+        <OptionalModsCard filePath={parsedFile?.localFilePath} destPath={destPath} value={installOptions} onChange={setInstallOptions} />
 
         {/* ── CARD 3: DOWNLOADS ───────────────────────────────────── */}
         <div className={card}>

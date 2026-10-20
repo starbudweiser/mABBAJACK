@@ -2,12 +2,15 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '../locales';
 import { OPTIONS_UI } from '../locales/uiExtra';
 import { fetchModlistOptions } from '../services/api';
+import { compare } from './UpdateCard';
 import { InstallOptions, ModlistChoice, ModlistOptionGroup, ModlistOptionMod, ModlistOptionProfile, ModlistOptions } from '../types/wabbajack';
 import { badge, btn, card, sectionLabel } from '../design';
 
 interface Props {
   /** Chemin local du .wabbajack (absent = mode aperçu : rien à afficher) */
   filePath?: string;
+  /** Dossier READY TO PLAY : options reprises de l'installation existante de la liste */
+  destPath?: string;
   value: InstallOptions;
   onChange: (v: InstallOptions) => void;
 }
@@ -43,7 +46,7 @@ function defaultChoices(p: ModlistOptionProfile): Record<string, string> {
 }
 
 /** Choix du profil, choix exclusifs (boutons radio) et mods désactivés par défaut (cases à cocher). */
-export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange }) => {
+export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, onChange }) => {
   const { language } = useI18n();
   const ui = OPTIONS_UI[language] ?? OPTIONS_UI.fr;
   const fr = language === 'fr';
@@ -51,18 +54,29 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
   const [options, setOptions] = useState<ModlistOptions | null>(null);
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [restored, setRestored] = useState<'saved' | 'disk' | null>(null);
 
   useEffect(() => {
     setOptions(null);
     setFailed(false);
+    setRestored(null);
     onChange({ enable: [] });
     if (!filePath) return;
     let cancelled = false;
     setLoading(true);
     fetchModlistOptions(filePath)
-      .then((o) => {
+      .then(async (o) => {
         if (cancelled) return;
         setOptions(o);
+        // Liste déjà installée : mêmes options que l'installation existante
+        const prev = destPath ? await compare(filePath, destPath).then((r) => r.previousOptions).catch(() => null) : null;
+        if (cancelled) return;
+        const pp = prev ? o.profiles.find((x) => x.name === prev.profile) : null;
+        if (prev && pp) {
+          onChange({ profile: pp.name, enable: prev.enable, choices: { ...defaultChoices(pp), ...prev.choices } });
+          setRestored(prev.source);
+          return;
+        }
         const p = o.profiles.find((x) => x.isDefault) ?? o.profiles[0];
         if (p) onChange({ profile: p.name, enable: [], choices: defaultChoices(p) });
       })
@@ -70,7 +84,7 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filePath]);
+  }, [filePath, destPath]);
 
   const profile = useMemo(() => {
     if (!options?.profiles.length) return null;
@@ -172,6 +186,7 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, value, onChange })
         </span>
       </div>
       <p className="text-meta text-[#666666] -mt-1">{ui.hint}</p>
+      {restored && <p className="text-body text-[#4ade80]">{restored === 'saved' ? ui.restoredSaved : ui.restoredDisk}</p>}
 
       {options && options.profiles.length > 1 && (
         <div className="bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-3 py-2 flex flex-col gap-1" role="radiogroup" aria-label={ui.profile}>

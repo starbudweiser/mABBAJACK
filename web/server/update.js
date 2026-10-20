@@ -445,3 +445,69 @@ export function removeFiles(files, root) {
   }
   return removed;
 }
+
+// ── Options de l'installation précédente ──────────────────────────────────
+
+/**
+ * Options (profil, mods optionnels, choix exclusifs) de l'installation existante, à reprendre
+ * pour la mise à jour. `saved` = options enregistrées dans l'instantané ; sinon déduites du disque :
+ * - mod optionnel installé si la majorité de ses fichiers propres (fournis par lui seul) sont présents ;
+ * - choix exclusif : option dont les fichiers sont présents avec la taille attendue.
+ * options = résultat de buildOptions ; resolve(d) → chemin absolu ou null.
+ */
+export function inferOptions({ raw, options, resolve, saved }) {
+  const profiles = options?.profiles || [];
+  const prof = (saved?.profile && profiles.find((p) => p.name === saved.profile)) || profiles.find((p) => p.isDefault) || profiles[0];
+  if (!prof) return null;
+  const optional = new Map();
+  for (const g of prof.groups) for (const m of g.mods) optional.set(lc(m.name), m.name);
+  const choices = (prof.choices || []).filter((c) => !c.hidden);
+
+  if (saved && Array.isArray(saved.enable)) {
+    const out = { profile: prof.name, enable: (saved.enable || []).filter((n) => optional.has(lc(n))).map((n) => optional.get(lc(n))), choices: {}, source: 'saved' };
+    for (const c of choices) {
+      const v = saved.choices?.[c.id];
+      if (c.options.some((o) => o.id === v)) out.choices[c.id] = v;
+    }
+    return out;
+  }
+
+  // Fichiers de chaque mod (destination finale) et nombre de mods fournissant chaque destination
+  const files = new Map();
+  const providers = new Map();
+  for (const d of raw.Directives || raw.directives || []) {
+    const to = posix(d.To || d.to);
+    const m = modName(to);
+    if (!m) continue;
+    const out = resolve({ To: to });
+    if (!out) continue;
+    const k = lc(out);
+    if (!providers.has(k)) providers.set(k, new Set());
+    providers.get(k).add(lc(m));
+    if (!files.has(lc(m))) files.set(lc(m), []);
+    files.get(lc(m)).push({ out, size: Number(d.Size) || 0 });
+  }
+  const sample = (list) => list.length <= 200 ? list : list.filter((_, i) => i % Math.ceil(list.length / 200) === 0);
+  const exists = (f) => { try { return fs.statSync(f).isFile(); } catch { return false; } };
+  const sizeOk = (f) => { try { return fs.statSync(f.out).size === f.size; } catch { return false; } };
+
+  const enable = [];
+  for (const [k, name] of optional) {
+    const own = (files.get(k) || []).filter((f) => providers.get(lc(f.out)).size === 1);
+    if (!own.length) continue;
+    const s = sample(own);
+    if (s.filter((f) => exists(f.out)).length / s.length >= 0.5) enable.push(name);
+  }
+  const picked = {};
+  for (const c of choices) {
+    const scores = c.options.map((o) => {
+      const fl = sample(o.mods.flatMap((m) => files.get(lc(m)) || []));
+      return fl.length ? fl.filter(sizeOk).length / fl.length : 0;
+    });
+    const best = Math.max(...scores);
+    const i = scores.indexOf(best);
+    // Option nettement reconnue, sinon valeur par défaut
+    if (best >= 0.5 && scores.filter((x) => x === best).length === 1) picked[c.id] = c.options[i].id;
+  }
+  return { profile: prof.name, enable, choices: picked, source: 'disk' };
+}

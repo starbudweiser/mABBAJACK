@@ -7,7 +7,7 @@ import { hashFile } from '../web/server/archivecheck.js';
 import { resolveDirectivePath } from '../web/server/paths.js';
 import {
   installDirName, manifestEntries, manifestArchives, manifestFingerprint, diffManifests, writeSnapshot, readSnapshot,
-  findInstallation, compareWithInstalled, baselineFromSnapshot, baselineFromManifest, planUpdate, removeFiles,
+  findInstallation, compareWithInstalled, inferOptions, baselineFromSnapshot, baselineFromManifest, planUpdate, removeFiles,
 } from '../web/server/update.js';
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mwab_upd_'));
@@ -146,6 +146,17 @@ try {
   await writeSnapshot(dest, { raw: v2, installed: parse(v2), resolve });
   assert.equal((await compareWithInstalled(v2File, path.join(tmp, 'READY'))).status, 'same');
   assert.equal((await compareWithInstalled(v2File, path.join(tmp, 'AILLEURS'))).status, 'not-installed');
+
+  // Options de l'installation existante : déduites du disque, puis enregistrées
+  const opts = { profiles: [{ name: 'P', isDefault: true, groups: [{ separator: 'x', mods: [{ name: 'ModD' }, { name: 'ModZ' }] }],
+    choices: [{ id: 'c', default: 'o2', options: [{ id: 'o1', mods: ['ModA'] }, { id: 'o2', mods: ['ModQ'] }] }] }] };
+  for (const d of v2.Directives) {
+    const out = resolve(d); fs.mkdirSync(path.dirname(out), { recursive: true });
+    fs.copyFileSync(path.join(src, { 'mods\\ModA\\textures\\a.dds': 'a2', 'mods\\ModB\\meshes\\b.nif': 'b', 'mods\\ModB\\C.esp': 'c', 'mods\\ModD\\d.txt': 'd' }[d.To]), out);
+  }
+  assert.deepEqual(inferOptions({ raw: v2, options: opts, resolve }), { profile: 'P', enable: ['ModD'], choices: { c: 'o1' }, source: 'disk' });
+  assert.deepEqual(inferOptions({ raw: v2, options: opts, resolve, saved: { profile: 'P', enable: ['modz', 'Inconnu'], choices: { c: 'o2' } } }),
+    { profile: 'P', enable: ['ModZ'], choices: { c: 'o2' }, source: 'saved' });
 
   console.log('test-update : OK');
 } finally {

@@ -17,7 +17,7 @@ interface Props {
 
 // Une comparaison par (fichier, dossier, ancienne version) : partagée entre l'Inspecteur et l'Installation
 const cache = new Map<string, Promise<InstalledComparison>>();
-function compare(filePath: string, destPath: string, previousFile?: string, fresh = false) {
+export function compare(filePath: string, destPath: string, previousFile?: string, fresh = false) {
   const key = `${filePath}\n${destPath}\n${previousFile ?? ''}`;
   if (fresh || !cache.has(key)) {
     const p = compareInstalled(filePath, destPath, previousFile);

@@ -221,6 +221,8 @@ export interface InstalledComparison {
   installed: null | { dir: string; hasSnapshot: boolean; version?: string; installedAt?: string; files?: number };
   baseline?: 'snapshot' | 'previous-wabbajack' | 'disk';
   previousFile?: string; previousVersion?: string;
+  /** Options de l'installation existante : enregistrées (saved) ou déduites des fichiers présents (disk) */
+  previousOptions?: { profile: string; enable: string[]; choices: Record<string, string>; source: 'saved' | 'disk' } | null;
   diff?: {
     mods: {
       added: { name: string; files: number; size: number }[]; removed: { name: string; files: number }[]; changed: ModChange[];

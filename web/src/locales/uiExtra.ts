@@ -167,6 +167,7 @@ export interface OptionsUi {
   selected: string; checkAll: string; uncheckAll: string; note: string;
   none: string; debugTitle: string; debugHint: string; locked: string; requires: string;
   profilesHint: string; choicesTitle: string; format: string; formatDetected: string; family: string; variant: string;
+  restoredSaved: string; restoredDisk: string;
 }
 
 export const OPTIONS_UI: Record<Language, OptionsUi> = {
@@ -178,6 +179,7 @@ export const OPTIONS_UI: Record<Language, OptionsUi> = {
     loading: 'Analyse des options…', error: 'Options indisponibles pour ce fichier.', profile: 'Profil',
     selected: '{n} / {total} sélectionné(s) · {size}', checkAll: 'Tout cocher', uncheckAll: 'Tout décocher',
     note: 'Les mods non cochés ne sont ni téléchargés ni installés.',
+    restoredSaved: '✓ Sélections reprises de l\'installation existante.', restoredDisk: '✓ Sélections déduites de l\'installation existante (fichiers présents) : vérifiez-les avant la mise à jour.',
   },
   en: {
     none: 'None',
@@ -187,6 +189,7 @@ export const OPTIONS_UI: Record<Language, OptionsUi> = {
     loading: 'Analyzing options…', error: 'Options unavailable for this file.', profile: 'Profile',
     selected: '{n} / {total} selected · {size}', checkAll: 'Check all', uncheckAll: 'Uncheck all',
     note: 'Unchecked mods are neither downloaded nor installed.',
+    restoredSaved: '✓ Selections restored from the existing installation.', restoredDisk: '✓ Selections inferred from the existing installation (files present): check them before updating.',
   },
   es: {
     none: 'Ninguno',
@@ -196,6 +199,7 @@ export const OPTIONS_UI: Record<Language, OptionsUi> = {
     loading: 'Analizando opciones…', error: 'Opciones no disponibles para este archivo.', profile: 'Perfil',
     selected: '{n} / {total} seleccionado(s) · {size}', checkAll: 'Marcar todo', uncheckAll: 'Desmarcar todo',
     note: 'Los mods sin marcar no se descargan ni se instalan.',
+    restoredSaved: '✓ Selecciones recuperadas de la instalación existente.', restoredDisk: '✓ Selecciones deducidas de la instalación existente (archivos presentes): revíselas antes de actualizar.',
   },
   it: {
     none: 'Nessuno',
@@ -205,6 +209,7 @@ export const OPTIONS_UI: Record<Language, OptionsUi> = {
     loading: 'Analisi delle opzioni…', error: 'Opzioni non disponibili per questo file.', profile: 'Profilo',
     selected: '{n} / {total} selezionata/e · {size}', checkAll: 'Seleziona tutto', uncheckAll: 'Deseleziona tutto',
     note: 'Le mod non selezionate non vengono né scaricate né installate.',
+    restoredSaved: '✓ Selezioni riprese dall\'installazione esistente.', restoredDisk: '✓ Selezioni dedotte dall\'installazione esistente (file presenti): verificale prima dell\'aggiornamento.',
   },
 };
 

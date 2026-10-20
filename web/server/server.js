@@ -27,7 +27,7 @@ import { openLazyZip } from './lazyzip.js';
 import { HashCache, verifyArchive, verifyInstalledFiles, findStrayFiles, archiveSourceUrl, listDownloadDir, modOf } from './archivecheck.js';
 import { isTempPath, locateWabbajack } from './locate.js';
 import { resolveDirectivePath, detectGameRootFolders, setGameRootFolders, getGameRootFolders, KNOWN_GAME_ROOT_NAMES, BSA_STAGING_DIR } from './paths.js';
-import { installDirName, compareWithInstalled, readSnapshot, writeSnapshot, findPreviousWabbajack, manifestEntries, manifestArchives, manifestFingerprint, baselineFromSnapshot, baselineFromManifest, planUpdate, removeFiles } from './update.js';
+import { installDirName, compareWithInstalled, readSnapshot, writeSnapshot, findPreviousWabbajack, manifestEntries, manifestArchives, manifestFingerprint, baselineFromSnapshot, baselineFromManifest, planUpdate, removeFiles, inferOptions } from './update.js';
 import { initLogger, writeLog, startInstallLog, endInstallLog, getLogInfo, tailLog } from './logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -1696,7 +1696,19 @@ app.post('/api/wabbajack/compare-installed', async (req, res) => {
     return res.status(400).json({ error: 'Ancienne version .wabbajack introuvable' });
   }
   try {
-    res.json(await compareWithInstalled(filePath, path.resolve(destPath.trim()), { previousFile }));
+    const raw = await loadRawModlist(filePath);
+    const r = await compareWithInstalled(filePath, path.resolve(destPath.trim()), { raw, previousFile });
+    // Options de l'installation existante (enregistrées, sinon déduites du disque) : reprises pour la mise à jour.
+    // La détection des dossiers de jeu est globale : pas pendant une installation.
+    if (r.installed && !currentInstallJob.active) {
+      try {
+        const opts = await buildOptions(raw, (n) => readZipEntry(filePath, n));
+        const dirs = (raw.Directives || raw.directives || []).map((d) => ({ To: String(d.To || '').replace(/\\/g, '/') }));
+        setGameRootFolders(detectGameRootFolders(dirs));
+        r.previousOptions = inferOptions({ raw, options: opts, resolve: (d) => resolveDirectivePath(d.To, r.installed.dir), saved: readSnapshot(r.installed.dir)?.options || null });
+      } catch { /* options non retrouvées : valeurs par défaut */ }
+    }
+    res.json(r);
   } catch (err) { res.status(500).json({ error: String(err.message || err) }); }
 });
 
