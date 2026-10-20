@@ -111,6 +111,12 @@ try {
   assert.equal(plan3.skip.size, 2);
   assert.equal(plan3.removed.length, 1);
 
+  // Mod renommé : même fichier, même destination → conservé
+  const v3 = { ...v2, Directives: v2.Directives.map((d) => ({ ...d, To: d.To.replace('ModB', 'ModB v2') })) };
+  const plan5 = await planUpdate({ directives: parse(v3), resolve, baseline: baselineFromManifest(manifestEntries(v1)) });
+  assert.ok(plan5.skip.has('mods/modb v2/c.esp') && plan5.skip.has('mods/modb v2/meshes/b.nif'));
+  assert.equal(plan5.removed.length, 1); // e.txt seulement : b.nif et C.esp restent des destinations
+
   // Sans aucune base : comparaison au disque (taille puis hash)
   const plan4 = await planUpdate({ directives: parse(v2), resolve, baseline: null });
   assert.deepEqual([...plan4.skip].sort(), ['mods/modb/c.esp', 'mods/modb/meshes/b.nif']);

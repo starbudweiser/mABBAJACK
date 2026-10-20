@@ -13,6 +13,7 @@
 //   3. aucun : contenu du disque (taille puis hash Wabbajack de chaque fichier).
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import xxhash from 'xxhash-wasm';
@@ -166,16 +167,21 @@ const squash = (s) => lc(s).replace(/\.wabbajack$/, '').replace(/[^a-z0-9]/g, ''
  * d'empreinte différente. Seuls les fichiers dont le nom ressemble à la liste sont ouverts.
  */
 export async function findPreviousWabbajack(filePath, name, fingerprint) {
-  const dir = path.dirname(filePath);
   const keys = [squash(name), squash(path.basename(filePath))].filter((k) => k.length >= 4);
-  let names = [];
-  try { names = fs.readdirSync(dir); } catch { return null; }
-  const candidates = names
-    .filter((n) => /\.wabbajack$/i.test(n) && path.join(dir, n) !== filePath)
-    .filter((n) => keys.some((k) => squash(n).includes(k) || k.includes(squash(n))))
-    .map((n) => path.join(dir, n))
-    .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)
-    .slice(0, 4);
+  // Dossier du nouveau fichier, puis copies faites par l'appli lors d'un glisser-déposer
+  const dirs = [path.dirname(filePath), path.join(os.tmpdir(), 'mabbajack-uploads')];
+  const candidates = [];
+  for (const dir of dirs) {
+    let names = [];
+    try { names = fs.readdirSync(dir); } catch { continue; }
+    for (const n of names) {
+      const f = path.join(dir, n);
+      if (!/\.wabbajack$/i.test(n) || f === filePath) continue;
+      if (keys.some((k) => squash(n).includes(k) || k.includes(squash(n)))) candidates.push(f);
+    }
+  }
+  candidates.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+  candidates.splice(4);
   for (const file of candidates) {
     try {
       const raw = await loadRawModlist(file);
@@ -331,6 +337,14 @@ export async function planUpdate({ directives, resolve, baseline, signal, onProg
   const bsaChanged = new Set(); // TempID des CreateBSA à reconstruire
   const tempFiles = [];
   const newOutputs = new Set();
+  // Même fichier final sous un autre chemin MO2 (mod renommé, déplacé) : reconnu par sa destination
+  const byOut = new Map();
+  if (baseline) {
+    for (const b of baseline.values()) {
+      const out = resolve({ To: b.to });
+      if (out && !byOut.has(lc(out))) byOut.set(lc(out), b);
+    }
+  }
   let n = 0;
   for (const d of directives) {
     if (signal?.aborted) throw new Error('Annulé');
@@ -344,7 +358,11 @@ export async function planUpdate({ directives, resolve, baseline, signal, onProg
     if (/remapped/i.test(d.$type || '')) { stats.changed++; continue; }
     let st = null;
     try { st = fs.statSync(out); if (!st.isFile()) st = null; } catch { /* absent */ }
-    const b = baseline?.get(key);
+    let b = baseline?.get(key);
+    if (baseline && (!b || b.hash !== d.Hash)) {
+      const alt = byOut.get(lc(out));
+      if (alt && alt.hash === d.Hash) b = alt;
+    }
     const markChanged = () => {
       if (st) stats.changed++; else stats.added++;
       if (/createbsa/i.test(d.$type || '') && d.TempID) bsaChanged.add(d.TempID);
