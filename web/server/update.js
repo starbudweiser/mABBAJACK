@@ -453,9 +453,10 @@ export function removeFiles(files, root) {
  * pour la mise à jour. `saved` = options enregistrées dans l'instantané ; sinon déduites du disque :
  * - mod optionnel installé si la majorité de ses fichiers propres (fournis par lui seul) sont présents ;
  * - choix exclusif : option dont les fichiers sont présents avec la taille attendue.
- * options = résultat de buildOptions ; resolve(d) → chemin absolu ou null.
+ * options = résultat de buildOptions ; resolve(d) → chemin absolu ou null ;
+ * previous = entrées du manifeste installé (instantané), pour les tailles des fichiers.
  */
-export function inferOptions({ raw, options, resolve, saved }) {
+export function inferOptions({ raw, options, resolve, saved, previous }) {
   const profiles = options?.profiles || [];
   const prof = (saved?.profile && profiles.find((p) => p.name === saved.profile)) || profiles.find((p) => p.isDefault) || profiles[0];
   if (!prof) return null;
@@ -489,7 +490,6 @@ export function inferOptions({ raw, options, resolve, saved }) {
   }
   const sample = (list) => list.length <= 200 ? list : list.filter((_, i) => i % Math.ceil(list.length / 200) === 0);
   const exists = (f) => { try { return fs.statSync(f).isFile(); } catch { return false; } };
-  const sizeOk = (f) => { try { return fs.statSync(f.out).size === f.size; } catch { return false; } };
 
   const enable = [];
   for (const [k, name] of optional) {
@@ -498,16 +498,41 @@ export function inferOptions({ raw, options, resolve, saved }) {
     const s = sample(own);
     if (s.filter((f) => exists(f.out)).length / s.length >= 0.5) enable.push(name);
   }
+  // Choix exclusifs : vote sur les fichiers qui diffèrent d'une option à l'autre (présents seulement
+  // pour certaines options, ou de taille différente) ; la taille sur disque désigne l'option installée.
+  // Tailles de la version installée si connue (previous), sinon de la nouvelle.
+  const entries = previous || manifestEntries(raw);
   const picked = {};
   for (const c of choices) {
-    const scores = c.options.map((o) => {
-      const fl = sample(o.mods.flatMap((m) => files.get(lc(m)) || []));
-      return fl.length ? fl.filter(sizeOk).length / fl.length : 0;
-    });
-    const best = Math.max(...scores);
-    const i = scores.indexOf(best);
-    // Option nettement reconnue, sinon valeur par défaut
-    if (best >= 0.5 && scores.filter((x) => x === best).length === 1) picked[c.id] = c.options[i].id;
+    const withMods = c.options.filter((o) => o.mods.length);
+    const prefixes = withMods.map((o) => [o.id, o.mods.map((m) => `mods/${lc(m)}/`)]);
+    const byDest = new Map();
+    for (const e of entries) {
+      const to = lc(e[0]);
+      if (!to.startsWith('mods/')) continue;
+      for (const [id, pre] of prefixes) {
+        if (!pre.some((x) => to.startsWith(x))) continue;
+        const out = resolve({ To: e[0] });
+        if (!out) continue;
+        if (!byDest.has(out)) byDest.set(out, []);
+        byDest.get(out).push({ id, size: e[3] });
+      }
+    }
+    const votes = new Map();
+    for (const [out, list] of byDest) {
+      let size;
+      try { size = fs.statSync(out).size; } catch { continue; }
+      const ids = new Set(list.map((x) => x.id));
+      for (const x of list) {
+        if (size !== x.size) continue;
+        const others = list.filter((y) => y.id !== x.id);
+        if (others.some((y) => y.size === x.size)) continue; // ne départage pas
+        if (ids.size < withMods.length || others.length) votes.set(x.id, (votes.get(x.id) || 0) + 1);
+      }
+    }
+    const ranked = [...votes.entries()].sort((x, y) => y[1] - x[1]);
+    // Option nettement majoritaire, sinon valeur par défaut
+    if (ranked.length && (ranked.length === 1 || ranked[0][1] >= 3 * ranked[1][1])) picked[c.id] = ranked[0][0];
   }
   return { profile: prof.name, enable, choices: picked, source: 'disk' };
 }

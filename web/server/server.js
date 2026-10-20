@@ -1705,7 +1705,8 @@ app.post('/api/wabbajack/compare-installed', async (req, res) => {
         const opts = await buildOptions(raw, (n) => readZipEntry(filePath, n));
         const dirs = (raw.Directives || raw.directives || []).map((d) => ({ To: String(d.To || '').replace(/\\/g, '/') }));
         setGameRootFolders(detectGameRootFolders(dirs));
-        r.previousOptions = inferOptions({ raw, options: opts, resolve: (d) => resolveDirectivePath(d.To, r.installed.dir), saved: readSnapshot(r.installed.dir)?.options || null });
+        const snap = readSnapshot(r.installed.dir);
+        r.previousOptions = inferOptions({ raw, options: opts, resolve: (d) => resolveDirectivePath(d.To, r.installed.dir), saved: snap?.options || null, previous: snap?.manifest || null });
       } catch { /* options non retrouvées : valeurs par défaut */ }
     }
     res.json(r);
