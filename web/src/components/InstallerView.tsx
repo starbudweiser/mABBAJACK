@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useI18n } from '../locales';
 import { INSTALLER_UI } from '../locales/uiExtra';
-import { ParsedWabbajackFile, NexusAccount, InstallOptions } from '../types/wabbajack';
+import { ParsedWabbajackFile, NexusAccount, InstallOptions, UpdateRequest } from '../types/wabbajack';
 import OptionalModsCard from './OptionalModsCard';
+import UpdateCard from './UpdateCard';
 import { pickNativeFolder, getNativeClipboard, getApiBaseUrl } from '../services/api';
 import { btn, btnFull, badge, card, sectionLabel, inputField, chip, FieldRow, ApiKeyRow, Divider } from '../design';
 
@@ -25,6 +26,8 @@ interface InstallerViewProps {
   isScanning: boolean;
   installOptions: InstallOptions;
   setInstallOptions: (o: InstallOptions) => void;
+  updateRequest: UpdateRequest | null;
+  setUpdateRequest: (u: UpdateRequest | null) => void;
 }
 
 function formatBytes(bytes: number, fr = true): string {
@@ -105,7 +108,7 @@ const SKYRIM_PRESETS = [
 export const InstallerView: React.FC<InstallerViewProps> = ({
   parsedFile, downloadsPath, setDownloadsPath, destPath, setDestPath, gamePath, setGamePath,
   onScanDownloads, onStartInstall, onOpenManualDownloads, onOpenPluginsTxt,
-  nexusApiKey, setNexusApiKey, onVerifyNexusKey, nexusAccount, isScanning, installOptions, setInstallOptions,
+  nexusApiKey, setNexusApiKey, onVerifyNexusKey, nexusAccount, isScanning, installOptions, setInstallOptions, updateRequest, setUpdateRequest,
 }) => {
   const { t, language } = useI18n();
   const ui = INSTALLER_UI[language] ?? INSTALLER_UI.fr;
@@ -250,6 +253,9 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             </div>
           )}
         </div>
+
+        {/* ── Liste déjà installée : nouvelle version, mise à jour ───── */}
+        <UpdateCard filePath={parsedFile?.localFilePath} destPath={destPath} value={updateRequest} onChange={setUpdateRequest} />
 
         {/* ── Mods optionnels (désactivés par défaut dans la modlist) ───── */}
         <OptionalModsCard filePath={parsedFile?.localFilePath} value={installOptions} onChange={setInstallOptions} />

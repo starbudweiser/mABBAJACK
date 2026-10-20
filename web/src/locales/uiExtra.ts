@@ -266,3 +266,79 @@ export const SCAN_UI: Record<Language, ScanUi> = {
     missingN: '{n} mancante/i', scanning: 'Scansione in corso…', showMore: 'Mostra altro', showLess: 'Riduci',
   },
 };
+
+export interface UpdateUi {
+  title: string; checking: string; error: string; installedIn: string;
+  same: string; update: string; unknown: string; sameVersionNumber: string;
+  baseSnapshot: string; basePrevious: string; baseDisk: string;
+  modsAdded: string; modsRemoved: string; modsChanged: string; modsUnchanged: string;
+  files: string; archives: string; toggle: string; toggleHint: string; repairHint: string;
+  pickPrevious: string; pickPreviousTitle: string; adopt: string; adoptHint: string; adopted: string; more: string;
+}
+
+export const UPDATE_UI: Record<Language, UpdateUi> = {
+  fr: {
+    title: 'Liste déjà installée', checking: 'Recherche d\'une installation existante…', error: 'Comparaison impossible : {msg}',
+    installedIn: 'Installée dans {dir}',
+    same: 'Cette version est déjà installée (v{v}).', update: 'Nouvelle version : v{old} → v{new}.', unknown: 'Installation existante (v{old}) sans état enregistré : version exacte inconnue.',
+    sameVersionNumber: 'Même numéro de version, contenu différent (nouvelle révision).',
+    baseSnapshot: 'Comparé à l\'état enregistré de l\'installation.', basePrevious: 'Comparé à la version précédente : {file}.',
+    baseDisk: 'La mise à jour comparera chaque fichier installé (taille puis hash) : première comparaison longue.',
+    modsAdded: 'Mods ajoutés ({n})', modsRemoved: 'Mods supprimés ({n})', modsChanged: 'Mods modifiés ({n})', modsUnchanged: '{n} mod(s) inchangé(s)',
+    files: 'Fichiers : +{a} ajoutés, −{r} supprimés, {c} modifiés, {u} inchangés',
+    archives: 'Archives : {a} nouvelle(s) à télécharger ({size}), {r} plus utilisée(s)',
+    toggle: 'Mettre à jour l\'installation existante', toggleHint: 'Seuls les fichiers nouveaux ou modifiés sont installés ; les fichiers retirés de la liste sont supprimés. Seules les archives nécessaires sont requises.',
+    repairHint: 'Réparation : seuls les fichiers absents ou modifiés sont réinstallés.',
+    pickPrevious: 'Choisir l\'ancienne version (.wabbajack)…', pickPreviousTitle: 'Ancienne version de la liste (.wabbajack)',
+    adopt: 'L\'installation correspond à ce fichier', adoptHint: 'Enregistre l\'état actuel comme installé depuis ce .wabbajack : les prochaines mises à jour seront rapides.',
+    adopted: 'État enregistré : {n} fichier(s).', more: '… et {n} autre(s)',
+  },
+  en: {
+    title: 'List already installed', checking: 'Looking for an existing installation…', error: 'Comparison failed: {msg}',
+    installedIn: 'Installed in {dir}',
+    same: 'This version is already installed (v{v}).', update: 'New version: v{old} → v{new}.', unknown: 'Existing installation (v{old}) without saved state: exact version unknown.',
+    sameVersionNumber: 'Same version number, different content (new revision).',
+    baseSnapshot: 'Compared with the saved installation state.', basePrevious: 'Compared with the previous version: {file}.',
+    baseDisk: 'The update will compare every installed file (size then hash): the first comparison is slow.',
+    modsAdded: 'Mods added ({n})', modsRemoved: 'Mods removed ({n})', modsChanged: 'Mods changed ({n})', modsUnchanged: '{n} mod(s) unchanged',
+    files: 'Files: +{a} added, −{r} removed, {c} changed, {u} unchanged',
+    archives: 'Archives: {a} new to download ({size}), {r} no longer used',
+    toggle: 'Update the existing installation', toggleHint: 'Only new or changed files are installed; files removed from the list are deleted. Only the needed archives are required.',
+    repairHint: 'Repair: only missing or modified files are reinstalled.',
+    pickPrevious: 'Choose the previous version (.wabbajack)…', pickPreviousTitle: 'Previous version of the list (.wabbajack)',
+    adopt: 'The installation matches this file', adoptHint: 'Saves the current state as installed from this .wabbajack: future updates will be fast.',
+    adopted: 'State saved: {n} file(s).', more: '… and {n} more',
+  },
+  es: {
+    title: 'Lista ya instalada', checking: 'Buscando una instalación existente…', error: 'Comparación imposible: {msg}',
+    installedIn: 'Instalada en {dir}',
+    same: 'Esta versión ya está instalada (v{v}).', update: 'Nueva versión: v{old} → v{new}.', unknown: 'Instalación existente (v{old}) sin estado guardado: versión exacta desconocida.',
+    sameVersionNumber: 'Mismo número de versión, contenido distinto (nueva revisión).',
+    baseSnapshot: 'Comparada con el estado guardado de la instalación.', basePrevious: 'Comparada con la versión anterior: {file}.',
+    baseDisk: 'La actualización comparará cada archivo instalado (tamaño y luego hash): la primera comparación es lenta.',
+    modsAdded: 'Mods añadidos ({n})', modsRemoved: 'Mods eliminados ({n})', modsChanged: 'Mods modificados ({n})', modsUnchanged: '{n} mod(s) sin cambios',
+    files: 'Archivos: +{a} añadidos, −{r} eliminados, {c} modificados, {u} sin cambios',
+    archives: 'Archivos comprimidos: {a} nuevo(s) por descargar ({size}), {r} ya no usado(s)',
+    toggle: 'Actualizar la instalación existente', toggleHint: 'Solo se instalan los archivos nuevos o modificados; los archivos retirados de la lista se eliminan. Solo se requieren los archivos comprimidos necesarios.',
+    repairHint: 'Reparación: solo se reinstalan los archivos ausentes o modificados.',
+    pickPrevious: 'Elegir la versión anterior (.wabbajack)…', pickPreviousTitle: 'Versión anterior de la lista (.wabbajack)',
+    adopt: 'La instalación corresponde a este archivo', adoptHint: 'Guarda el estado actual como instalado desde este .wabbajack: las próximas actualizaciones serán rápidas.',
+    adopted: 'Estado guardado: {n} archivo(s).', more: '… y {n} más',
+  },
+  it: {
+    title: 'Lista già installata', checking: 'Ricerca di un\'installazione esistente…', error: 'Confronto impossibile: {msg}',
+    installedIn: 'Installata in {dir}',
+    same: 'Questa versione è già installata (v{v}).', update: 'Nuova versione: v{old} → v{new}.', unknown: 'Installazione esistente (v{old}) senza stato salvato: versione esatta sconosciuta.',
+    sameVersionNumber: 'Stesso numero di versione, contenuto diverso (nuova revisione).',
+    baseSnapshot: 'Confrontata con lo stato salvato dell\'installazione.', basePrevious: 'Confrontata con la versione precedente: {file}.',
+    baseDisk: 'L\'aggiornamento confronterà ogni file installato (dimensione poi hash): il primo confronto è lento.',
+    modsAdded: 'Mod aggiunte ({n})', modsRemoved: 'Mod rimosse ({n})', modsChanged: 'Mod modificate ({n})', modsUnchanged: '{n} mod invariata/e',
+    files: 'File: +{a} aggiunti, −{r} rimossi, {c} modificati, {u} invariati',
+    archives: 'Archivi: {a} nuovo/i da scaricare ({size}), {r} non più usato/i',
+    toggle: 'Aggiorna l\'installazione esistente', toggleHint: 'Vengono installati solo i file nuovi o modificati; i file rimossi dalla lista vengono eliminati. Sono richiesti solo gli archivi necessari.',
+    repairHint: 'Riparazione: vengono reinstallati solo i file mancanti o modificati.',
+    pickPrevious: 'Scegli la versione precedente (.wabbajack)…', pickPreviousTitle: 'Versione precedente della lista (.wabbajack)',
+    adopt: 'L\'installazione corrisponde a questo file', adoptHint: 'Salva lo stato attuale come installato da questo .wabbajack: i prossimi aggiornamenti saranno rapidi.',
+    adopted: 'Stato salvato: {n} file.', more: '… e altri {n}',
+  },
+};

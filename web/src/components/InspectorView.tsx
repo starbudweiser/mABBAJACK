@@ -6,6 +6,7 @@ import { useTranslated } from '../hooks/useTranslated';
 import { INSPECTOR_UI, fmtBytes } from '../locales/uiScreens';
 import { SCAN_UI } from '../locales/uiExtra';
 import type { ScanProgress } from '../services/api';
+import UpdateCard from './UpdateCard';
 
 interface InspectorViewProps {
   parsedFile: ParsedWabbajackFile | null;
@@ -19,6 +20,8 @@ interface InspectorViewProps {
   isScanning?: boolean;
   scanProgress?: ScanProgress | null;
   downloadsPath?: string;
+  /** Dossier READY TO PLAY : détection d'une installation existante de la liste */
+  destPath?: string;
 }
 
 
@@ -51,6 +54,7 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
   isScanning = false,
   scanProgress = null,
   downloadsPath = '',
+  destPath = '',
 }) => {
   const { t, language } = useI18n();
   const ui = INSPECTOR_UI[language] ?? INSPECTOR_UI.fr;
@@ -278,6 +282,9 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
             </button>
           </div>
         )}
+        <div className="max-w-5xl">
+          <UpdateCard filePath={parsedFile.localFilePath} destPath={destPath} />
+        </div>
       </div>
 
       {/* ── Scan du dossier de téléchargement : progression visible tant qu'il tourne ── */}

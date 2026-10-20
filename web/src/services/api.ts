@@ -246,3 +246,25 @@ export async function scanDownloads(
   if (!result) throw new Error('Scan interrompu');
   return result;
 }
+
+export async function compareInstalled(filePath: string, destPath: string, previousFile?: string): Promise<import('../types/wabbajack').InstalledComparison> {
+  const res = await fetch(`${getApiBaseUrl()}/api/wabbajack/compare-installed`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filePath, destPath, previousFile }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+  return body;
+}
+
+export async function adoptInstalled(filePath: string, dir: string): Promise<{ files: number; total: number }> {
+  const res = await fetch(`${getApiBaseUrl()}/api/wabbajack/adopt-installed`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filePath, dir }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+  return body;
+}

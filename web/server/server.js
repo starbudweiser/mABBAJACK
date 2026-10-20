@@ -27,6 +27,7 @@ import { openLazyZip } from './lazyzip.js';
 import { HashCache, verifyArchive, verifyInstalledFiles, findStrayFiles, archiveSourceUrl, listDownloadDir, modOf } from './archivecheck.js';
 import { isTempPath, locateWabbajack } from './locate.js';
 import { resolveDirectivePath, detectGameRootFolders, setGameRootFolders, getGameRootFolders, KNOWN_GAME_ROOT_NAMES, BSA_STAGING_DIR } from './paths.js';
+import { installDirName, compareWithInstalled, readSnapshot, writeSnapshot, findPreviousWabbajack, manifestEntries, manifestArchives, manifestFingerprint, baselineFromSnapshot, baselineFromManifest, planUpdate, removeFiles } from './update.js';
 import { initLogger, writeLog, startInstallLog, endInstallLog, getLogInfo, tailLog } from './logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -675,6 +676,58 @@ function detectSkyrimAtPath(gamePath) {
 // ──────────────────────────────────────────────────────────
 
 // Résolution des destinations (directive.To → chemin installé) : voir paths.js
+
+/**
+ * Mise à jour d'une installation existante : base de comparaison (instantané, sinon ancien
+ * .wabbajack, sinon disque) puis plan (fichiers inchangés, retirés, archives nécessaires).
+ */
+async function prepareUpdate({ raw, wabbajackPath, selection, destRoot, previousFile, signal }) {
+  const posixTo = (t) => String(t || '').replace(/\\/g, '/');
+  let dirs = (raw.Directives || raw.directives || []).map((d) => ({
+    $type: d.$type || '', To: posixTo(d.To || d.to), Hash: d.Hash || '', Size: d.Size || 0,
+    TempID: d.TempID || '', ArchiveHash: (d.ArchiveHashPath || [])[0] || '',
+  }));
+  if (selection) dirs = dirs.filter((d) => selection.keep(d.To));
+  setGameRootFolders(detectGameRootFolders(dirs));
+  const resolve = (d) => resolveDirectivePath(d.To, destRoot);
+  if (selection && selection.priority.size > 0) dirs = dedupeByPriority(dirs, resolve, selection.priority).directives;
+
+  let baseline = null;
+  const snap = readSnapshot(destRoot);
+  if (snap) {
+    baseline = baselineFromSnapshot(snap);
+    broadcastLog('info', `🔄 Base de comparaison : état enregistré de l'installation (v${snap.version || '?'}, ${snap.files.length} fichier(s)).`);
+  } else {
+    const name = raw.Name || raw.name || '';
+    let prev = null;
+    if (previousFile && fs.existsSync(previousFile)) {
+      const r = await loadRawModlist(previousFile);
+      prev = { file: previousFile, entries: manifestEntries(r) };
+    } else if (wabbajackPath) {
+      const fp = await manifestFingerprint(manifestEntries(raw), manifestArchives(raw));
+      prev = await findPreviousWabbajack(wabbajackPath, name, fp);
+    }
+    if (prev) {
+      baseline = baselineFromManifest(prev.entries);
+      broadcastLog('info', `🔄 Base de comparaison : version précédente ${path.basename(prev.file)}.`);
+    } else {
+      broadcastLog('info', `🔄 Aucune version précédente connue : comparaison avec les fichiers présents (taille, puis hash Wabbajack). Cette première comparaison peut être longue.`);
+    }
+  }
+  let lastPct = -1;
+  const plan = await planUpdate({
+    directives: dirs, resolve, baseline, signal,
+    onProgress: (phase, done, total) => {
+      const pct = Math.floor((done / Math.max(1, total)) * 100);
+      if (pct === lastPct) return;
+      lastPct = pct;
+      broadcastProgress({ currentTask: phase === 'hash' ? `Comparaison des fichiers installés (hash) : ${pct} %` : `Comparaison des fichiers installés : ${done}/${total}` });
+    },
+  });
+  broadcastLog('info', `🔄 Comparaison : ${plan.added} fichier(s) absent(s) à installer, ${plan.changed} modifié(s), ${plan.unchanged} inchangé(s), ${plan.removed.length} à supprimer.`);
+  if (plan.hashed) broadcastLog('info', `  → ${plan.hashed} fichier(s) vérifié(s) par hash.`);
+  return plan;
+}
 
 /**
  * Process all directives from the parsed modlist.
@@ -1632,6 +1685,41 @@ app.post('/api/wabbajack/options', async (req, res) => {
   } catch (err) { res.status(500).json({ error: String(err.message || err) }); }
 });
 
+// Liste déjà installée ? Compare le .wabbajack chargé à l'installation trouvée dans READY TO PLAY.
+app.post('/api/wabbajack/compare-installed', async (req, res) => {
+  const { filePath, destPath, previousFile } = req.body || {};
+  if (typeof filePath !== 'string' || !/\.wabbajack$/i.test(filePath) || !fs.existsSync(filePath)) {
+    return res.status(400).json({ error: 'Fichier .wabbajack introuvable' });
+  }
+  if (typeof destPath !== 'string' || !destPath.trim()) return res.json({ status: 'not-installed', installed: null });
+  if (previousFile !== undefined && (typeof previousFile !== 'string' || !/\.wabbajack$/i.test(previousFile) || !fs.existsSync(previousFile))) {
+    return res.status(400).json({ error: 'Ancienne version .wabbajack introuvable' });
+  }
+  try {
+    res.json(await compareWithInstalled(filePath, path.resolve(destPath.trim()), { previousFile }));
+  } catch (err) { res.status(500).json({ error: String(err.message || err) }); }
+});
+
+// Installation antérieure à l'instantané : la déclarer comme installée depuis ce .wabbajack
+// (seuls les fichiers présents avec la taille attendue sont retenus).
+app.post('/api/wabbajack/adopt-installed', async (req, res) => {
+  const { filePath, dir } = req.body || {};
+  if (typeof filePath !== 'string' || !/\.wabbajack$/i.test(filePath) || !fs.existsSync(filePath)) {
+    return res.status(400).json({ error: 'Fichier .wabbajack introuvable' });
+  }
+  if (typeof dir !== 'string' || !fs.existsSync(path.join(dir, 'README_READY_TO_PLAY.txt'))) {
+    return res.status(400).json({ error: 'Installation introuvable' });
+  }
+  if (currentInstallJob.active) return res.status(409).json({ error: 'Une installation est en cours.' });
+  try {
+    const raw = await loadRawModlist(filePath);
+    const dirs = (raw.Directives || raw.directives || []).map((d) => ({ $type: d.$type || '', To: String(d.To || '').replace(/\\/g, '/'), Size: d.Size || 0 }));
+    setGameRootFolders(detectGameRootFolders(dirs));
+    const r = await writeSnapshot(dir, { raw, wabbajackPath: filePath, installed: dirs, resolve: (d) => resolveDirectivePath(d.To, dir) });
+    res.json({ ok: true, files: r.files, total: r.total });
+  } catch (err) { res.status(500).json({ error: String(err.message || err) }); }
+});
+
 // Download + parse a .wabbajack from a CDN URL (from gallery links.download)
 app.post('/api/wabbajack/install-from-url', async (req, res) => {
   const { url, title } = req.body || {};
@@ -2021,15 +2109,13 @@ app.post('/api/install/start', async (req, res) => {
 
   // Build the modlist-named subdirectory: UPPERCASE, filesystem-safe chars only
   // e.g. "Nordic Souls PBR" → destPath/NORDIC_SOULS_PBR/
-  const modlistDirName = (modlist.name || modlist.title || 'MODLIST')
-    .toUpperCase()
-    .replace(/[^A-Z0-9À-ÜÀÂÄÉÈÊËÎÏÔÙÛÜ _-]/gi, '')
-    .trim()
-    .replace(/\s+/g, '_')
-    .replace(/_+/g, '_')
-    .substring(0, 64);
-
   const baseDest     = path.resolve(destPath.trim());
+  // Mise à jour : dossier de l'installation existante (sous-dossier direct de READY TO PLAY)
+  const updateMode   = !!options?.update;
+  const updateDir    = updateMode && typeof options.update?.dir === 'string' ? path.resolve(options.update.dir) : null;
+  const modlistDirName = updateDir && path.dirname(updateDir) === baseDest
+    ? path.basename(updateDir)
+    : installDirName(modlist.name || modlist.title);
   const cleanDest    = path.join(baseDest, modlistDirName);
   const downloadsRoot = downloadsPath ? path.resolve(downloadsPath.trim()) : path.join(baseDest, 'DOWNLOADS');
   const cleanDownloads = resolveVortexDownloadDir(downloadsRoot, modlist.gameType);
@@ -2098,7 +2184,8 @@ app.post('/api/install/start', async (req, res) => {
       broadcastLog('success', `✓ Répertoire d'installation créé : "${cleanDest}"`);
 
       // Warn if READY TO PLAY already contains files (accumulated previous installs)
-      try {
+      if (updateMode) broadcastLog('info', `🔄 Mode mise à jour : seuls les fichiers nouveaux ou modifiés seront installés, les fichiers retirés de la liste seront supprimés.`);
+      else try {
         const existingEntries = fs.readdirSync(cleanDest);
         if (existingEntries.length > 0) {
           broadcastLog('warn', `⚠ READY TO PLAY contient déjà ${existingEntries.length} entrée(s) — les fichiers existants seront écrasés ou coexisteront.`);
@@ -2130,16 +2217,34 @@ app.post('/api/install/start', async (req, res) => {
         if (sel.skipHashes.size > 0) broadcastLog('info', `⏭ ${sel.skipHashes.size} archive(s) réservée(s) aux mods optionnels ignorées (non téléchargées).`);
       };
       const earlyFile = typeof modlist.localFilePath === 'string' && /\.wabbajack$/i.test(modlist.localFilePath) && fs.existsSync(modlist.localFilePath) ? modlist.localFilePath : null;
+      let manifestRaw = null; // manifeste complet : instantané de fin d'installation
       if (earlyFile) {
         try {
-          const rawModlist = await loadRawModlist(earlyFile);
-          selection = await buildSelection(rawModlist, (n) => readZipEntry(earlyFile, n), options || {});
+          manifestRaw = await loadRawModlist(earlyFile);
+          selection = await buildSelection(manifestRaw, (n) => readZipEntry(earlyFile, n), options || {});
           logSelection(selection);
         } catch (e) {
           broadcastLog('warn', `⚠ Options non appliquées : ${String(e.message || e).slice(0, 160)}`);
         }
       }
-      const notSkipped = (a) => !selection || !selection.skipHashes.has(a.Hash);
+      // ── Mise à jour : fichiers inchangés, fichiers retirés, archives réellement nécessaires ──
+      let updatePlan = null;
+      if (updateMode) {
+        if (!manifestRaw) broadcastLog('warn', `⚠ Mise à jour impossible sans fichier .wabbajack local : installation complète.`);
+        else {
+          try {
+            updatePlan = await prepareUpdate({ raw: manifestRaw, wabbajackPath: earlyFile, selection, destRoot: cleanDest, previousFile: options.update?.previousFile, signal });
+          } catch (e) {
+            if (signal.aborted) throw e;
+            broadcastLog('warn', `⚠ Comparaison avec l'installation existante impossible : ${String(e.message || e).slice(0, 160)} — installation complète.`);
+          }
+        }
+      }
+      const notSkipped = (a) => (!selection || !selection.skipHashes.has(a.Hash)) && (!updatePlan || updatePlan.neededArchives.has(a.Hash));
+      if (updatePlan) {
+        const unused = (modlist.archives || []).filter((a) => (!selection || !selection.skipHashes.has(a.Hash)) && !updatePlan.neededArchives.has(a.Hash)).length;
+        broadcastLog('info', `⏭ Mise à jour : ${unused} archive(s) inutile(s) (fichiers inchangés) — ni vérifiées ni téléchargées.`);
+      }
 
       const archives = (modlist.archives || []).filter(notSkipped);
       // Trust localPath already resolved by the client's verify-downloads scan.
@@ -2700,6 +2805,7 @@ app.post('/api/install/start', async (req, res) => {
                 };
               };
               modlist.directives = rawDirs.map(parseDirective);
+              manifestRaw ||= modlistJson;
               // Sélection non encore calculée (fichier téléchargé pendant l'installation)
               if (!selection) {
                 try {
@@ -2787,6 +2893,15 @@ app.post('/api/install/start', async (req, res) => {
         directives = dd.directives;
         if (dd.removed > 0) broadcastLog('info', `⚖ Priorités MO2 : ${dd.removed} fichier(s) en conflit résolus (le mod le plus prioritaire l'emporte).`);
       }
+      const installedDirectives = directives; // liste complète : instantané de fin d'installation
+      if (updatePlan) {
+        if (updatePlan.removed.length > 0) {
+          const n = removeFiles(updatePlan.removed, cleanDest);
+          broadcastLog('info', `🗑 ${n} fichier(s) retiré(s) de la liste supprimé(s).`);
+        }
+        directives = directives.filter((d) => !updatePlan.skip.has(String(d.To || '').replace(/\\/g, '/').toLowerCase()));
+        broadcastLog('info', `🔄 Mise à jour : ${directives.length} directive(s) à traiter, ${installedDirectives.length - directives.length} fichier(s) inchangé(s) conservé(s).`);
+      }
       let directivesProcessed = 0;
       let installCheck = null;
 
@@ -2871,10 +2986,27 @@ app.post('/api/install/start', async (req, res) => {
           if (signal.aborted) throw e;
           broadcastLog('warn', `⚠ Contrôle post-installation impossible : ${String(e.message || e).slice(0, 160)}`);
         }
+      } else if (updatePlan) {
+        broadcastLog('success', `✓ Aucun fichier à mettre à jour : l'installation est déjà à jour.`);
       } else {
         broadcastLog('warn', `⚠ Aucune directive — installation plugins.txt seulement.`);
       }
 
+      // ── Instantané de l'installation : base de comparaison des prochaines mises à jour ──
+      if (manifestRaw && installedDirectives.length > 0) {
+        broadcastProgress({ currentTask: 'Enregistrement de l\'état de l\'installation…' });
+        try {
+          const r = await writeSnapshot(cleanDest, {
+            raw: manifestRaw, wabbajackPath: earlyFile || '', installed: installedDirectives,
+            resolve: (d) => resolveDirectivePath(d.To, cleanDest), signal,
+            options: { profile: selection?.profile || null, enable: options?.enable || [], choices: options?.choices || {} },
+          });
+          broadcastLog('success', `✓ État de l'installation enregistré (${r.files} fichier(s)) : base des prochaines mises à jour.`);
+        } catch (e) {
+          if (signal.aborted) throw e;
+          broadcastLog('warn', `⚠ État de l'installation non enregistré : ${String(e.message || e).slice(0, 160)}`);
+        }
+      }
 
       // ── ÉTAPE 5 : plugins.txt & loadorder.txt ─────────────────────
       broadcastProgress({ stage: 'generating_mo2', stageName: 'Génération plugins.txt', overallPercent: 90, currentTask: 'Écriture des fichiers de configuration Skyrim...' });

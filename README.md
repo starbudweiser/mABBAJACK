@@ -15,6 +15,7 @@ Fonctionnalités :
 - Galerie des modlists officielles (≈ 226) avec filtres par jeu (SE, AE, VR, Enderal, « Autres jeux »), tags, recherche et tri (taille, nom, date).
 - Inspecteur de fichier `.wabbajack` (glisser-déposer).
 - Installation complète : extraction (7zz / unar, lecteur BSA natif), patchs OctoDiff, textures transformées converties avec texconv (DirectXTex natif), création de BSA native, fichiers originaux du jeu copiés sans décompression.
+- Mise à jour d'une liste déjà installée : au chargement d'une nouvelle version, mods ajoutés / supprimés / modifiés et archives à télécharger ; seuls les fichiers nouveaux ou modifiés sont réinstallés, les fichiers retirés sont supprimés (état de l'installation enregistré dans `.mabbajack/`).
 - Téléchargements Nexus automatiques (compte **Premium**) ou liens manuels (compte standard).
 - Organisation des téléchargements « à la Vortex » (`<dossier>/skyrimse`).
 - Détection automatique du jeu (Steam, CrossOver, Whisky, `/Volumes/*/GAMES`).
@@ -54,6 +55,7 @@ Features:
 - Gallery of official modlists (≈ 226) with game filters (SE, AE, VR, Enderal, "Other games"), tags, search and sorting (size, name, date).
 - `.wabbajack` file inspector (drag & drop).
 - Full install: extraction (7zz / unar, native BSA reader), OctoDiff patches, transformed textures converted with texconv (native DirectXTex), native BSA writer, original game files copied without decompression.
+- Updating an installed list: when a new version is loaded, mods added / removed / changed and archives to download are listed; only new or changed files are reinstalled, removed files are deleted (installation state saved in `.mabbajack/`).
 - Automatic Nexus downloads (**Premium** account) or manual links (free account).
 - Vortex-style download layout (`<folder>/skyrimse`).
 - Automatic game detection (Steam, CrossOver, Whisky, `/Volumes/*/GAMES`).

@@ -212,3 +212,24 @@ export interface ModlistOptions { profiles: ModlistOptionProfile[]; }
 
 /** Choix de l'utilisateur envoyés au serveur : profil + mods optionnels à installer */
 export interface InstallOptions { profile?: string; enable: string[]; choices?: Record<string, string>; }
+
+/** Comparaison d'un .wabbajack avec l'installation existante (POST /api/wabbajack/compare-installed) */
+export interface ModChange { name: string; added: number; removed: number; changed: number; archivesBefore: string[]; archivesAfter: string[]; }
+export interface InstalledComparison {
+  name: string; version: string; fingerprint: string; newModCount?: number;
+  status: 'not-installed' | 'same' | 'update' | 'unknown';
+  installed: null | { dir: string; hasSnapshot: boolean; version?: string; installedAt?: string; files?: number };
+  baseline?: 'snapshot' | 'previous-wabbajack' | 'disk';
+  previousFile?: string; previousVersion?: string;
+  diff?: {
+    mods: {
+      added: { name: string; files: number; size: number }[]; removed: { name: string; files: number }[]; changed: ModChange[];
+      addedCount: number; removedCount: number; changedCount: number; unchangedCount: number;
+    };
+    archives: { added: { hash: string; name: string; size: number }[]; removed: { hash: string; name: string; size: number }[]; addedCount: number; removedCount: number; downloadSize: number };
+    files: { added: number; removed: number; changed: number; unchanged: number };
+  };
+}
+
+/** Mise à jour d'une installation existante (options.update de /api/install/start) */
+export interface UpdateRequest { dir: string; previousFile?: string; }

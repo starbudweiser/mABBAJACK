@@ -13,6 +13,7 @@ import {
   SkyrimEnvironment,
   NexusAccount,
   InstallOptions,
+  UpdateRequest,
   InstallProgress,
   LogEntry,
   ModlistArchive,
@@ -252,6 +253,8 @@ export const App: React.FC = () => {
   const [importProgress, setImportProgress] = useState<ImportProgressState | null>(null);
   // Mods optionnels choisis (profil + mods désactivés par défaut à installer)
   const [installOptions, setInstallOptions] = useState<InstallOptions>({ enable: [] });
+  // Mise à jour d'une installation existante de la liste (null = installation complète)
+  const [updateRequest, setUpdateRequest] = useState<UpdateRequest | null>(null);
   const [downloadingGallery, setDownloadingGallery] = useState<{ title: string; pct: number; status: string } | null>(null);
 
   // Configuration Paths (strictly 2 directories: DOWNLOADS and READY TO PLAY)
@@ -687,7 +690,7 @@ export const App: React.FC = () => {
           destPath,
           gamePath,
           nexusApiKey,
-          options: installOptions,
+          options: { ...installOptions, update: updateRequest || undefined },
         }),
       });
 
@@ -715,7 +718,7 @@ export const App: React.FC = () => {
       addLog('error', `Erreur réseau : ${err.message || err}`);
       setActiveTab('inspector');
     }
-  }, [parsedFile, downloadsPath, destPath, gamePath, nexusApiKey, installOptions, addLog]);
+  }, [parsedFile, downloadsPath, destPath, gamePath, nexusApiKey, installOptions, updateRequest, addLog]);
 
 
   // 9. Gallery Modlist Selection — instantly builds a ParsedWabbajackFile from catalog metadata
@@ -912,6 +915,7 @@ export const App: React.FC = () => {
             isScanning={isScanning}
             scanProgress={scanProgress}
             downloadsPath={downloadsPath}
+            destPath={destPath}
           />
         )}
 
@@ -946,6 +950,8 @@ export const App: React.FC = () => {
             nexusAccount={nexusAccount}
             isScanning={isScanning}
             installOptions={installOptions}
+            updateRequest={updateRequest}
+            setUpdateRequest={setUpdateRequest}
             setInstallOptions={setInstallOptions}
           />
         )}
