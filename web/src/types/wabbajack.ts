@@ -166,6 +166,8 @@ export interface SkyrimEnvironment {
 
 export interface NexusAccount {
   valid: boolean;
+  /** Nexus injoignable : clé non vérifiée (ni valide ni invalide) */
+  offline?: boolean;
   name?: string;
   isPremium?: boolean;
   dailyLimit?: number;

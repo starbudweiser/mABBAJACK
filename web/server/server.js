@@ -2042,7 +2042,7 @@ app.post('/api/nexus/check-key', async (req, res) => {
     clearTimeout(t);
     if (r.ok) { const d = await r.json(); nexusPremiumCache.set(key.trim(), Boolean(d.is_premium)); return res.json({ valid: true, name: d.name, isPremium: Boolean(d.is_premium), dailyLimit: d.daily_limit, dailyRemaining: d.daily_remaining, hourlyLimit: d.hourly_limit, hourlyRemaining: d.hourly_remaining }); }
     res.json({ valid: false, error: `HTTP ${r.status}` });
-  } catch { res.json({ valid: key.length >= 16, name: 'Compte Nexus (hors ligne)', isPremium: key.length > 30, dailyLimit: 2500, dailyRemaining: 2400, hourlyLimit: 100, hourlyRemaining: 95 }); }
+  } catch { res.json({ valid: false, offline: true, error: 'Nexus injoignable' }); } // statut inconnu : rien d'inventé
 });
 
 app.get('/api/install/stream', (req, res) => {

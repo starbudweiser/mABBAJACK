@@ -433,27 +433,20 @@ export const App: React.FC = () => {
           setNexusAccount(acc);
           if (acc.valid) {
             addLog('success', `Compte Nexus vérifié : ${acc.name} (${acc.isPremium ? 'Premium ⭐' : 'Standard'})`);
+          } else if (acc.offline) {
+            addLog('warn', 'Nexus injoignable : clé non vérifiée.');
           } else {
             addLog('warn', 'Clé API Nexus invalide.');
           }
           return acc;
         }
       } catch {
-        // Fallback simulated verification
+        // Serveur local injoignable : statut inconnu
       }
 
-      const isPremium = key.length > 30;
-      const acc: NexusAccount = {
-        valid: key.length >= 16,
-        name: 'Dovahkiin_Mac',
-        isPremium,
-        dailyLimit: 2500,
-        dailyRemaining: 2450,
-        hourlyLimit: 100,
-        hourlyRemaining: 98,
-      };
+      const acc: NexusAccount = { valid: false, offline: true };
       setNexusAccount(acc);
-      addLog('success', `Compte Nexus validé : ${acc.name} (${isPremium ? 'Premium ⭐' : 'Standard'})`);
+      addLog('warn', 'Nexus injoignable : clé non vérifiée.');
       return acc;
     },
     [addLog]

@@ -67,6 +67,8 @@ const ENTRIES: Entry[] = [
   ['Compte Nexus vérifié : {0} ({1})', 'Nexus account verified: {0} ({1})', 'Cuenta Nexus verificada: {0} ({1})', 'Account Nexus verificato: {0} ({1})'],
   ['Compte Nexus validé : {0} ({1})', 'Nexus account validated: {0} ({1})', 'Cuenta Nexus validada: {0} ({1})', 'Account Nexus convalidato: {0} ({1})'],
   ['Clé API Nexus invalide.', 'Invalid Nexus API key.', 'Clave API de Nexus no válida.', 'Chiave API Nexus non valida.'],
+  ['Nexus injoignable : clé non vérifiée.', 'Nexus unreachable: key not verified.', 'Nexus inaccesible: clave no verificada.', 'Nexus irraggiungibile: chiave non verificata.'],
+  ['Nexus injoignable', 'Nexus unreachable', 'Nexus inaccesible', 'Nexus irraggiungibile'],
   ['Inspection directe de : {0}...', 'Direct inspection of: {0}...', 'Inspección directa de: {0}...', 'Ispezione diretta di: {0}...'],
   ['Modlist "{0}" analysé : {1} archives, {2} plugins.', 'Modlist "{0}" analyzed: {1} archives, {2} plugins.', 'Modlist "{0}" analizada: {1} archivos, {2} plugins.', 'Modlist "{0}" analizzata: {1} archivi, {2} plugin.'],
   ['Modlist "{0}" analysé : {1} archives.', 'Modlist "{0}" analyzed: {1} archives.', 'Modlist "{0}" analizada: {1} archivos.', 'Modlist "{0}" analizzata: {1} archivi.'],

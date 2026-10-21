@@ -10,7 +10,7 @@ export interface InstallerUi {
   previewOpenBtn: string; downloadsTitle: string; downloadsHint: string; downloadsSelect: string;
   cache: string; archivesReady: string; missing: string; allPresent: string; destTitle: string; destBadge: string;
   destHint: string; destSelect: string; nexusInfoPremium: string; nexusInfoStandard: string; pasteKeyPrompt: string;
-  keyPasted: string; keyInvalid: string; keyError: string; premiumAuto: string; standardManual: string;
+  keyPasted: string; keyInvalid: string; keyError: string; keyOffline: string; premiumAuto: string; standardManual: string;
   blockedTitle: string; blockedBody: string; launch: string; footer: string; pathPrompt: string; pastePrompt: string;
 }
 
@@ -37,7 +37,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     destHint: 'Les fichiers seront extraits ici selon les directives Wabbajack. Copiez ensuite dans votre Skyrim/Data.',
     destSelect: 'Sélectionnez le dossier READY TO PLAY',
     nexusInfoPremium: 'Compte Premium : téléchargements automatiques.', nexusInfoStandard: 'Compte Standard : URLs manuelles générées dans le journal.',
-    pasteKeyPrompt: 'Collez votre clé API Nexus Mods :', keyPasted: '✓ Clé collée', keyInvalid: '✕ Clé invalide', keyError: '✕ Erreur de validation',
+    pasteKeyPrompt: 'Collez votre clé API Nexus Mods :', keyPasted: '✓ Clé collée', keyInvalid: '✕ Clé invalide', keyError: '✕ Erreur de validation', keyOffline: '⚠ Nexus injoignable : clé non vérifiée',
     premiumAuto: 'Premium ⭐ (téléchargements automatiques)', standardManual: 'Standard (URLs manuelles générées)',
     blockedTitle: '⛔ Installation bloquée',
     blockedBody: 'Aucun fichier .wabbajack réel chargé. Chargez d\'abord le vrai fichier pour débloquer l\'installation.',
@@ -61,7 +61,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     destHint: 'Files are extracted here following Wabbajack directives. Then copy them into your Skyrim/Data.',
     destSelect: 'Select the READY TO PLAY folder',
     nexusInfoPremium: 'Premium account: automatic downloads.', nexusInfoStandard: 'Standard account: manual URLs listed in the log.',
-    pasteKeyPrompt: 'Paste your Nexus Mods API key:', keyPasted: '✓ Key pasted', keyInvalid: '✕ Invalid key', keyError: '✕ Validation error',
+    pasteKeyPrompt: 'Paste your Nexus Mods API key:', keyPasted: '✓ Key pasted', keyInvalid: '✕ Invalid key', keyError: '✕ Validation error', keyOffline: '⚠ Nexus unreachable: key not verified',
     premiumAuto: 'Premium ⭐ (automatic downloads)', standardManual: 'Standard (manual URLs generated)',
     blockedTitle: '⛔ Installation blocked',
     blockedBody: 'No real .wabbajack file loaded. Load the actual file first to unlock the installation.',
@@ -85,7 +85,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     destHint: 'Los archivos se extraen aquí según las directivas de Wabbajack. Luego cópielos en su Skyrim/Data.',
     destSelect: 'Seleccione la carpeta READY TO PLAY',
     nexusInfoPremium: 'Cuenta Premium: descargas automáticas.', nexusInfoStandard: 'Cuenta Standard: URL manuales indicadas en el registro.',
-    pasteKeyPrompt: 'Pegue su clave API de Nexus Mods:', keyPasted: '✓ Clave pegada', keyInvalid: '✕ Clave no válida', keyError: '✕ Error de validación',
+    pasteKeyPrompt: 'Pegue su clave API de Nexus Mods:', keyPasted: '✓ Clave pegada', keyInvalid: '✕ Clave no válida', keyError: '✕ Error de validación', keyOffline: '⚠ Nexus inaccesible: clave no verificada',
     premiumAuto: 'Premium ⭐ (descargas automáticas)', standardManual: 'Standard (URL manuales generadas)',
     blockedTitle: '⛔ Instalación bloqueada',
     blockedBody: 'No se ha cargado ningún archivo .wabbajack real. Cargue primero el archivo real para desbloquear la instalación.',
@@ -109,7 +109,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     destHint: 'I file vengono estratti qui secondo le direttive Wabbajack. Copiarli poi in Skyrim/Data.',
     destSelect: 'Seleziona la cartella READY TO PLAY',
     nexusInfoPremium: 'Account Premium: download automatici.', nexusInfoStandard: 'Account Standard: URL manuali indicati nel registro.',
-    pasteKeyPrompt: 'Incollare la chiave API di Nexus Mods:', keyPasted: '✓ Chiave incollata', keyInvalid: '✕ Chiave non valida', keyError: '✕ Errore di convalida',
+    pasteKeyPrompt: 'Incollare la chiave API di Nexus Mods:', keyPasted: '✓ Chiave incollata', keyInvalid: '✕ Chiave non valida', keyError: '✕ Errore di convalida', keyOffline: '⚠ Nexus irraggiungibile: chiave non verificata',
     premiumAuto: 'Premium ⭐ (download automatici)', standardManual: 'Standard (URL manuali generati)',
     blockedTitle: '⛔ Installazione bloccata',
     blockedBody: 'Nessun vero file .wabbajack caricato. Caricare prima il file reale per sbloccare l\'installazione.',

@@ -159,7 +159,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
       setNexusApiKey(apiKeyInput.trim()); localStorage.setItem('mabbajack_nexus_key', apiKeyInput.trim());
       setKeyMsg(acc.valid
         ? `✓ ${acc.name} — ${acc.isPremium ? ui.premiumAuto : ui.standardManual}`
-        : ui.keyInvalid);
+        : acc.offline ? ui.keyOffline : ui.keyInvalid);
     } catch { setKeyMsg(ui.keyError); }
     finally { setIsVerifyingKey(false); }
   };

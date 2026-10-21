@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useI18n } from '../locales';
+import { INSTALLER_UI } from '../locales/uiExtra';
 import { NexusAccount } from '../types/wabbajack';
 import { pickNativeFolder, getNativeClipboard } from '../services/api';
 import { SETTINGS_UI } from '../locales/uiScreens';
@@ -105,7 +106,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       if (acc.valid) {
         setVerifyMessage(`✓ ${t.settings.keyValid} ${acc.name} (${acc.isPremium ? 'Premium ⭐' : 'Standard'})`);
       } else {
-        setVerifyMessage(`✕ ${t.settings.keyInvalid}`);
+        setVerifyMessage(acc.offline ? INSTALLER_UI[language]?.keyOffline ?? INSTALLER_UI.fr.keyOffline : `✕ ${t.settings.keyInvalid}`);
       }
     } catch {
       setVerifyMessage(`✕ ${t.settings.keyInvalid}`);
