@@ -72,7 +72,7 @@ mkdir -p "$APP/Contents/Resources"
 cp -R "$PAYLOAD" "$APP/Contents/Resources/payload"
 
 echo "▶ Signature (certificat local stable)"
-"$(cd "$ROOT/.." && pwd)/_tools/sign_app.sh" "$APP"
+"$(cd "$ROOT/.." && pwd)/_tools/sign_app.sh" "$APP" 1.0.0
 
 mv "$APP" "$ROOT/$APP_NAME"
 echo "OK : $ROOT/$APP_NAME ($(du -sh "$ROOT/$APP_NAME" | cut -f1))"
