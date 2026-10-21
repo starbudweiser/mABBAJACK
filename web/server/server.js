@@ -18,7 +18,7 @@ import { createBsa } from './bsawriter.js';
 import { patchFile } from './octodiff.js';
 import { findTexconv, TextureQueue } from './textures.js';
 import { remapMagicStrings } from './remap.js';
-import { downloadWabbajackCdn, downloadGoogleDrive } from './downloaders.js';
+import { downloadWabbajackCdn, downloadGoogleDrive, downloadHttp } from './downloaders.js';
 import { buildOptions, buildSelection, dedupeByPriority, renderModlistTxt, loadRawModlist, readZipEntry } from './modprofile.js';
 import { checkDiskSpace, fmtBytes } from './diskspace.js';
 import { inspectWabbajack as inspectWabbajackRaw } from './inspect.js';
@@ -378,61 +378,14 @@ function extract7zSingleFile(sevenZipBin, archivePath, sourcePath, outputFile) {
 // ──────────────────────────────────────────────────────────
 // Download helper
 // ──────────────────────────────────────────────────────────
-function downloadFile(url, destPath, onProgress, signal) {
-  return new Promise((resolve, reject) => {
-    let totalBytes = 0, receivedBytes = 0, lastSpeedTime = Date.now(), lastSpeedBytes = 0, lastSpeed = 0;
-
-    const doRequest = (requestUrl, redirects = 0) => {
-      if (signal?.aborted) return reject(new Error('Annulé'));
-      if (redirects > 8) return reject(new Error('Trop de redirections'));
-      let parsedUrl;
-      try { parsedUrl = new URL(requestUrl); } catch { return reject(new Error(`URL invalide : ${requestUrl}`)); }
-
-      const reqProto = parsedUrl.protocol === 'https:' ? https : http;
-      const req = reqProto.get(requestUrl, { headers: { 'User-Agent': 'mAbbajack-macOS/2.1' } }, (res) => {
-        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-          const loc = res.headers.location;
-          res.resume();
-          return doRequest(loc.startsWith('http') ? loc : `${parsedUrl.origin}${loc}`, redirects + 1);
-        }
-        if (res.statusCode === 403) { res.resume(); return reject(new Error('HTTP 403 — Compte Nexus Standard ou clé API invalide')); }
-        if (res.statusCode !== 200) { res.resume(); return reject(new Error(`HTTP ${res.statusCode}`)); }
-
-        totalBytes = parseInt(res.headers['content-length'] || '0', 10);
-        const fileStream = createWriteStream(destPath);
-        const onPause = () => { res.unpipe(fileStream); res.pause(); };
-        const onResume = () => { res.pipe(fileStream); res.resume(); };
-        jobControl.events.on('pause', onPause);
-        jobControl.events.on('resume', onResume);
-        if (jobControl.paused) res.pause();
-        const cleanup = () => { jobControl.events.off('pause', onPause); jobControl.events.off('resume', onResume); };
-        if (signal) signal.addEventListener('abort', () => {
-          cleanup();
-          res.destroy();
-          fileStream.destroy();
-          try { fs.unlinkSync(destPath); } catch { /**/ }
-        }, { once: true });
-        res.on('data', (chunk) => {
-          receivedBytes += chunk.length;
-          const now = Date.now();
-          if (now - lastSpeedTime >= 500) { lastSpeed = (receivedBytes - lastSpeedBytes) / ((now - lastSpeedTime) / 1000); lastSpeedTime = now; lastSpeedBytes = receivedBytes; }
-          if (onProgress) onProgress(receivedBytes, totalBytes, Math.round(lastSpeed));
-        });
-        res.pipe(fileStream);
-        fileStream.on('finish', () => { cleanup(); fileStream.close(); resolve({ receivedBytes, totalBytes }); });
-        fileStream.on('error', (e) => { cleanup(); try { fs.unlinkSync(destPath); } catch { /**/ } reject(e); });
-      });
-      req.on('error', (e) => { try { if (fs.existsSync(destPath)) fs.unlinkSync(destPath); } catch { /**/ } reject(e); });
-      if (signal) signal.addEventListener('abort', () => { req.destroy(); reject(new Error('Annulé')); }, { once: true });
-    };
-    doRequest(url);
-  });
-}
+const downloadFile = downloadHttp; // reprise (.part + Range) et nouvelles tentatives : downloaders.js
 
 // ──────────────────────────────────────────────────────────
 // Nexus Mods helpers
 // ──────────────────────────────────────────────────────────
-async function nexusFetch(endpoint, apiKey) {
+const NEXUS_RETRIES = 4;
+
+async function nexusFetchOnce(endpoint, apiKey) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 15000);
   try {
@@ -440,17 +393,44 @@ async function nexusFetch(endpoint, apiKey) {
       headers: { apikey: apiKey, 'Application-Name': 'mAbbajack-macOS', 'Application-Version': '2.1.0' },
       signal: ctrl.signal,
     });
-    clearTimeout(t);
-    if (!res.ok) throw new Error(`Nexus API ${res.status}`);
+    if (!res.ok) {
+      const err = new Error(`Nexus API ${res.status}`);
+      err.status = res.status;
+      err.retryAfter = Number(res.headers.get('retry-after')) || 0;
+      throw err;
+    }
     return await res.json();
-  } catch (e) { clearTimeout(t); throw e; }
+  } finally { clearTimeout(t); }
+}
+
+/** Appel API Nexus ; réessaie sur limite de débit (429), erreur serveur (5xx) ou coupure réseau. */
+async function nexusFetch(endpoint, apiKey) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await nexusFetchOnce(endpoint, apiKey);
+    } catch (e) {
+      const retryable = !e.status || e.status === 429 || e.status >= 500;
+      if (!retryable || attempt >= NEXUS_RETRIES) throw e;
+      const wait = e.retryAfter ? e.retryAfter * 1000 : 2000 * 2 ** attempt;
+      await new Promise((r) => setTimeout(r, Math.min(wait, 60000)));
+    }
+  }
+}
+
+// Statut Premium par clé : une seule vérification par session au lieu d'une par archive
+const nexusPremiumCache = new Map();
+async function isNexusPremium(apiKey) {
+  if (!nexusPremiumCache.has(apiKey)) {
+    const validate = await nexusFetch('/v1/users/validate.json', apiKey);
+    nexusPremiumCache.set(apiKey, !!validate.is_premium);
+  }
+  return nexusPremiumCache.get(apiKey);
 }
 
 async function getNexusDownloadUrl(gameName, modId, fileId, apiKey) {
   if (!apiKey || !modId || !fileId) return { url: null, requiresManual: true };
   try {
-    const validate = await nexusFetch('/v1/users/validate.json', apiKey);
-    if (!validate.is_premium) {
+    if (!(await isNexusPremium(apiKey))) {
       return { url: null, requiresManual: true, isPremium: false, manualUrl: `https://www.nexusmods.com/${gameName}/mods/${modId}?tab=files&file_id=${fileId}` };
     }
     const links = await nexusFetch(`/v1/games/${gameName}/mods/${modId}/files/${fileId}/download_link.json`, apiKey);
@@ -2059,7 +2039,7 @@ app.post('/api/nexus/check-key', async (req, res) => {
       headers: { apikey: key.trim(), 'Application-Name': 'mAbbajack-macOS', 'Application-Version': '3.0.0' }, signal: ctrl.signal,
     });
     clearTimeout(t);
-    if (r.ok) { const d = await r.json(); return res.json({ valid: true, name: d.name, isPremium: Boolean(d.is_premium), dailyLimit: d.daily_limit, dailyRemaining: d.daily_remaining, hourlyLimit: d.hourly_limit, hourlyRemaining: d.hourly_remaining }); }
+    if (r.ok) { const d = await r.json(); nexusPremiumCache.set(key.trim(), Boolean(d.is_premium)); return res.json({ valid: true, name: d.name, isPremium: Boolean(d.is_premium), dailyLimit: d.daily_limit, dailyRemaining: d.daily_remaining, hourlyLimit: d.hourly_limit, hourlyRemaining: d.hourly_remaining }); }
     res.json({ valid: false, error: `HTTP ${r.status}` });
   } catch { res.json({ valid: key.length >= 16, name: 'Compte Nexus (hors ligne)', isPremium: key.length > 30, dailyLimit: 2500, dailyRemaining: 2400, hourlyLimit: 100, hourlyRemaining: 95 }); }
 });

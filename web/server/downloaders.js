@@ -5,6 +5,8 @@ import fs from 'node:fs';
 import zlib from 'node:zlib';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
+import http from 'node:http';
+import https from 'node:https';
 import { jobControl } from './jobcontrol.js';
 
 const UA = 'mAbbajack-macOS/3.0';
@@ -159,5 +161,102 @@ export async function downloadGoogleDrive(fileId, destPath, onProgress, signal, 
   } finally {
     jobControl.events.off('pause', onPause);
     jobControl.events.off('resume', onResume);
+  }
+}
+
+const HTTP_RETRIES = 5;
+const HTTP_STALL_MS = 60000;
+
+/** Erreur définitive (inutile de réessayer) : 4xx hors 408/429. */
+class FatalHttpError extends Error {}
+
+/** Une tentative : reprend « tmp » à partir de sa taille actuelle (en-tête Range). */
+function httpAttempt(url, tmp, signal, onProgress) {
+  return new Promise((resolve, reject) => {
+    const doRequest = (requestUrl, redirects = 0) => {
+      if (signal?.aborted) return reject(abortError());
+      if (redirects > 8) return reject(new FatalHttpError('Trop de redirections'));
+      let parsed;
+      try { parsed = new URL(requestUrl); } catch { return reject(new FatalHttpError(`URL invalide : ${requestUrl}`)); }
+      const startAt = fs.existsSync(tmp) ? fs.statSync(tmp).size : 0;
+      const headers = { 'User-Agent': UA };
+      if (startAt > 0) headers.Range = `bytes=${startAt}-`;
+      const proto = parsed.protocol === 'https:' ? https : http;
+      const req = proto.get(requestUrl, { headers }, (res) => {
+        const code = res.statusCode;
+        if (code >= 300 && code < 400 && res.headers.location) {
+          res.resume();
+          return doRequest(new URL(res.headers.location, parsed).href, redirects + 1);
+        }
+        // Partie déjà complète (ou serveur incohérent) : on repart de zéro au prochain essai
+        if (code === 416) { res.resume(); safeUnlink(tmp); return reject(new Error('HTTP 416')); }
+        if (code === 403) { res.resume(); return reject(new FatalHttpError('HTTP 403 — Compte Nexus Standard ou clé API invalide')); }
+        if (code !== 200 && code !== 206) {
+          res.resume();
+          const Err = code >= 400 && code < 500 && code !== 408 && code !== 429 ? FatalHttpError : Error;
+          return reject(new Err(`HTTP ${code}`));
+        }
+        const resumed = code === 206;
+        const offset = resumed ? startAt : 0;
+        const len = parseInt(res.headers['content-length'] || '0', 10);
+        const total = len ? offset + len : 0;
+        const out = fs.createWriteStream(tmp, { flags: resumed ? 'a' : 'w' });
+        let written = offset;
+        const onPause = () => { res.unpipe(out); res.pause(); };
+        const onResume = () => { res.pipe(out); res.resume(); };
+        jobControl.events.on('pause', onPause);
+        jobControl.events.on('resume', onResume);
+        if (jobControl.paused) res.pause();
+        let settled = false;
+        const finish = (err) => {
+          if (settled) return;
+          settled = true;
+          jobControl.events.off('pause', onPause);
+          jobControl.events.off('resume', onResume);
+          if (err) { res.destroy(); out.destroy(); reject(err); } else resolve({ received: written, total });
+        };
+        res.on('data', (chunk) => { written += chunk.length; onProgress?.(written, total); });
+        res.on('aborted', () => finish(new Error('Connexion interrompue')));
+        res.on('error', (e) => finish(e));
+        out.on('error', (e) => finish(e));
+        out.on('finish', () => {
+          if (total && written !== total) return finish(new Error(`Téléchargement incomplet (${written}/${total} octets)`));
+          finish(null);
+        });
+        res.pipe(out);
+      });
+      // Connexion figée : on coupe, la tentative suivante reprendra (sauf pendant une pause volontaire)
+      req.setTimeout(HTTP_STALL_MS, () => { if (!jobControl.paused) req.destroy(new Error('Délai dépassé')); });
+      req.on('error', (e) => reject(e));
+      signal?.addEventListener('abort', () => { req.destroy(); reject(abortError()); }, { once: true });
+    };
+    doRequest(url);
+  });
+}
+
+/**
+ * Téléchargement HTTP(S) générique (Nexus, liens directs) : écrit dans « <dest>.part », reprend un
+ * « .part » existant (Range) et réessaie en cas de coupure ; renomme à la fin.
+ * Le « .part » est conservé après une annulation ou un échec : le prochain lancement repart de là.
+ */
+export async function downloadHttp(url, destPath, onProgress, signal) {
+  const tmp = `${destPath}.part`;
+  let lastT = Date.now(), lastB = fs.existsSync(tmp) ? fs.statSync(tmp).size : 0, speed = 0;
+  const progress = (received, total) => {
+    const now = Date.now();
+    if (now - lastT >= 500) { speed = Math.max(0, (received - lastB) / ((now - lastT) / 1000)); lastT = now; lastB = received; }
+    onProgress?.(received, total, Math.round(speed));
+  };
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await jobControl.waitIfPaused(signal);
+      const { received, total } = await httpAttempt(url, tmp, signal, progress);
+      fs.renameSync(tmp, destPath);
+      return { receivedBytes: received, totalBytes: total || received };
+    } catch (e) {
+      if (signal?.aborted) throw abortError();
+      if (e instanceof FatalHttpError || attempt >= HTTP_RETRIES) throw e;
+      await new Promise((r) => setTimeout(r, Math.min(30000, 1000 * 2 ** attempt)));
+    }
   }
 }
