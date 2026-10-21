@@ -2201,6 +2201,7 @@ app.post('/api/install/start', async (req, res) => {
 
   (async () => {
     const { signal } = abortController;
+    let wabbajackTempPath = null; // hors du try : nettoyé aussi en cas d'erreur (catch)
     try {
       await new Promise((r) => setTimeout(r, 400));
 
@@ -2595,7 +2596,6 @@ app.post('/api/install/start', async (req, res) => {
 
       let wabbajackZip = null;
       let droppedDirectives = []; // directives des mods désactivés (profil, options)
-      let wabbajackTempPath = null;
       const rawWabbajackRef = modlist.localFilePath;
       const CDN_PAGE_HOST = 'authored-files.wabbajack.org';
 
