@@ -63,12 +63,62 @@ Made by [b]Stephan Le Gac Savoye (Starbudweiser)[/b] with [b]Claude Code[/b]. MI
 [line]
 
 [size=5][b]🇫🇷 Version française[/b][/size]
-[b]mABBAJACK[/b] installe les modlists Wabbajack nativement sur Mac (Apple Silicon), sans machine virtuelle Windows : galerie officielle, inspecteur .wabbajack, téléchargements Nexus automatiques (Premium, 3 en parallèle, reprise après coupure), mise à jour et réparation d'une installation, nettoyage des téléchargements inutilisés, détection du jeu, journal en direct, notification de fin, interface en français, anglais, espagnol et italien.
+[i]Ni machine virtuelle Windows, ni installateur enveloppé dans Wine : une appli macOS native (Apple Silicon) qui installe les modlists Wabbajack.[/i]
+[i]Fait partie du [url=https://www.nexusmods.com/skyrimspecialedition/mods/196272]Skyrim Mac Toolkit[/url], des outils de modding natifs pour Skyrim SE sur macOS. Publié sur sa propre page à cause de sa taille.[/i]
 
-[b]Prérequis[/b] : Mac Apple Silicon sous macOS 13.5 ou plus récent, copie légitime du jeu, clé API Nexus Mods (compte Premium fortement conseillé), beaucoup d'espace disque, et CrossOver ou Whisky pour jouer.
+[size=4][b]Qu'est-ce que c'est ?[/b][/size]
+Wabbajack ne fonctionne que sous Windows. [b]mABBAJACK[/b] est une réimplémentation non officielle pour macOS du processus d'[b]installation[/b] des modlists : parcourez la galerie officielle, choisissez une liste et installez-la en un clic. La liste installée se joue ensuite via une couche de compatibilité Windows (CrossOver, Whisky…).
 
-[b]Installation[/b] : placez mABBAJACK.app dans Applications. L'appli n'est pas notariée : au premier lancement, ouvrez Réglages Système > Confidentialité et sécurité > « Ouvrir quand même » (ou lancez [font=Courier New]xattr -dr com.apple.quarantine /Applications/mABBAJACK.app[/font] dans le Terminal). Renseignez ensuite la clé API et les dossiers dans les Paramètres.
+[size=4][b]Fonctions[/b][/size]
+[list]
+[*][b]Galerie officielle[/b] (~226 modlists) : Skyrim SE / AE / VR, Enderal et d'autres jeux, avec tags, recherche et tri.
+[*][b]Inspecteur .wabbajack[/b] : glissez-déposez un fichier pour voir ses archives, sa taille et ses prérequis.
+[*][b]Chaîne d'installation complète[/b] : FromArchive, InlineFile, PatchedFromArchive (OctoDiff), CreateBSA (écriture native), TransformedTexture (texconv natif), Stock Game / fichiers originaux du jeu.
+[*][b]Téléchargements Nexus[/b] : automatiques avec un compte Premium (3 en parallèle), liens manuels avec un compte gratuit.
+[*][b]Téléchargements avec reprise[/b] : un téléchargement interrompu reprend là où il s'était arrêté ; nouvelles tentatives automatiques en cas d'erreur réseau ou de limite de requêtes Nexus.
+[*][b]Mise à jour et réparation[/b] : réinstallez la même version pour vérifier et réparer une installation ; seuls les fichiers modifiés sont réécrits.
+[*][b]Nettoyage des téléchargements[/b] : repère les archives qu'aucune liste installée n'utilise plus et les place dans la Corbeille.
+[*][b]Détection du jeu[/b] : Steam, CrossOver, Whisky, disques externes.
+[*][b]Journal en direct[/b] avec filtres, enregistré dans ~/Library/Logs/mABBAJACK/ ; plugins.txt et loadorder.txt générés.
+[*][b]Notification macOS[/b] à la fin d'une installation (réussite ou échec).
+[*][b]Interface en français, anglais, espagnol et italien.[/b]
+[*][b]Appli autonome[/b] : Node.js, 7-Zip, unar et texconv embarqués, rien d'autre à installer.
+[/list]
 
-Fait partie du [url=https://www.nexusmods.com/skyrimspecialedition/mods/196272]Skyrim Mac Toolkit[/url] (outils de modding natifs pour Skyrim SE sur macOS), publié sur sa propre page à cause de sa taille.
+[size=4][b]Prérequis[/b][/size]
+[list]
+[*]Un Mac [b]Apple Silicon[/b] (M1 ou plus récent) sous [b]macOS 13.5 Ventura ou plus récent[/b].
+[*]Une [b]copie légitime du jeu[/b], installée sur le Mac (Steam, CrossOver ou Whisky).
+[*]Une [b]clé API Nexus Mods[/b] (compte Nexus > Site preferences > API Keys). Un compte [b]Premium[/b] est fortement conseillé : sans lui, Nexus n'autorise pas les téléchargements automatiques et chaque archive doit être téléchargée à la main.
+[*][b]Espace disque[/b] : les modlists demandent souvent 40 à 700 Go (téléchargements + liste installée). L'appli vérifie l'espace avant de commencer.
+[*]Une couche de compatibilité Windows (CrossOver, Whisky…) pour jouer à la liste installée.
+[/list]
 
-Outil non officiel, sans lien avec l'équipe Wabbajack : signalez les problèmes dans l'onglet Bugs de cette page.
+[size=4][b]Installation[/b][/size]
+[list=1]
+[*]Décompressez l'archive et placez [b]mABBAJACK.app[/b] dans votre dossier Applications.
+[*]L'appli n'est [b]pas notariée[/b] par Apple, macOS bloque donc le premier lancement. Ouvrez-la une fois, puis allez dans [b]Réglages Système > Confidentialité et sécurité[/b] et cliquez sur [b]Ouvrir quand même[/b]. Ou, dans le Terminal :
+[code]xattr -dr com.apple.quarantine /Applications/mABBAJACK.app[/code]
+[*]Ouvrez les [b]Paramètres[/b] : saisissez votre clé API Nexus et choisissez les dossiers [b]DOWNLOADS[/b] et [b]READY TO PLAY[/b].
+[*]Choisissez une modlist, vérifiez le dossier du jeu dans l'onglet [b]Installation[/b], puis lancez.
+[/list]
+
+[size=4][b]Confidentialité et sécurité[/b][/size]
+[list]
+[*]Votre clé API reste sur votre Mac et n'est jamais écrite dans les journaux.
+[*]Le serveur local de l'appli n'écoute que sur 127.0.0.1 et refuse les requêtes venant de pages web.
+[*]Rien n'est jamais supprimé définitivement : le nettoyage des téléchargements passe par la Corbeille de macOS.
+[/list]
+
+[size=4][b]Limites connues[/b][/size]
+[list]
+[*]Non officiel : sans lien avec l'équipe Wabbajack et non pris en charge par elle. Merci de ne pas signaler les problèmes de mABBAJACK à Wabbajack ni aux auteurs des modlists ; utilisez l'onglet Bugs de cette page.
+[*]Les archives BSA recréées ne sont pas compressées (plus volumineuses, mais elles se chargent de la même façon).
+[*]Les caches MO2 de Wabbajack (cache de shaders, moteur Nemesis…) sont volontairement ignorés.
+[*]L'installation des très grosses listes peut prendre plusieurs heures.
+[*]Apple Silicon uniquement (pas de version Intel).
+[/list]
+
+[size=4][b]Crédits[/b][/size]
+L'équipe Wabbajack, pour le format et l'écosystème des modlists ; tous les auteurs de modlists et de mods.
+Réalisé par [b]Stephan Le Gac Savoye (Starbudweiser)[/b] avec [b]Claude Code[/b]. Licence MIT ; les composants embarqués sont listés dans THIRD_PARTY_NOTICES.md.
