@@ -35,7 +35,23 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-app.use(cors());
+const HOST = '127.0.0.1';
+
+// Serveur local uniquement : refuse les pages d'autres sites (CSRF, lecture du presse-papiers…)
+// et le « DNS rebinding » (en-tête Host étranger). Le dev Vite (localhost:5173) reste autorisé.
+const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]']);
+const isLocalOrigin = (origin) => {
+  try { return LOCAL_HOSTNAMES.has(new URL(origin).hostname); } catch { return false; }
+};
+app.use((req, res, next) => {
+  const host = String(req.headers.host || '').replace(/:\d+$/, '');
+  const origin = req.headers.origin;
+  if (!LOCAL_HOSTNAMES.has(host) || (origin && !isLocalOrigin(origin)) || req.headers['sec-fetch-site'] === 'cross-site') {
+    return res.status(403).json({ error: 'Origine refusée' });
+  }
+  next();
+});
+app.use(cors({ origin: (origin, cb) => cb(null, !origin || isLocalOrigin(origin)) }));
 app.use(express.json({ limit: '100mb' }));
 
 // ──────────────────────────────────────────────────────────
@@ -3225,7 +3241,7 @@ if (fs.existsSync(distDir)) {
   });
 }
 
-const httpServer = app.listen(PORT, () => console.log(`[mABBAJACK Server] v3.0 (Directive Engine) actif sur http://localhost:${PORT}`));
+const httpServer = app.listen(PORT, HOST, () => console.log(`[mABBAJACK Server] v3.0 (Directive Engine) actif sur http://${HOST}:${PORT}`));
 // Envoi d'un .wabbajack de plusieurs Go (navigateur sans chemin de fichier) : pas de délai de 300 s par requête.
 httpServer.requestTimeout = 0;
 httpServer.timeout = 0;

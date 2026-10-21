@@ -2,14 +2,15 @@
   "name": "mabbajack",
   "version": "1.0.0",
   "description": "Portage macOS et installateur automatisé de modlists Wabbajack pour Skyrim",
-  "author": "Antigravity & Stephan",
+  "author": "Claude Code & Stephan Le Gac Savoye aka Starbudweiser",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "server": "node server/server.js",
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "test": "node ../scripts/run-tests.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",

@@ -8,10 +8,10 @@ export function getApiBaseUrl(): string {
     // Dev (Vite 5173) ou file:// → backend sur le port 3000.
     // Servi par le serveur Node (quel que soit son port, ex. application autonome) → même origine.
     if (window.location.protocol === 'file:') {
-      return 'http://localhost:3000';
+      return 'http://127.0.0.1:3000';
     }
     if (window.location.port === '5173') {
-      return 'http://localhost:3000';
+      return 'http://127.0.0.1:3000';
     }
   }
   return '';
