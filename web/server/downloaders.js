@@ -8,8 +8,9 @@ import { pipeline } from 'node:stream/promises';
 import http from 'node:http';
 import https from 'node:https';
 import { jobControl } from './jobcontrol.js';
+import { APP_VERSION } from './version.js';
 
-const UA = 'mAbbajack-macOS/3.0';
+const UA = `mABBAJACK/${APP_VERSION} (macOS)`;
 const CDN_HOST = 'authored-files.wabbajack.org';
 const PART_RETRIES = 3;
 const PART_CONCURRENCY = 3;

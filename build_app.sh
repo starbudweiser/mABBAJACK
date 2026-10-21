@@ -3,7 +3,8 @@
 #   - fenêtre native (pywebview/WKWebView) : aucun navigateur
 #   - Node.js, 7zz, unar et texconv (textures transformées) embarqués : aucune installation requise sur la machine cible
 # Usage : ./build_app.sh        → produit ./mABBAJACK.app à la racine du projet
-# Prérequis de COMPILATION : python3, npm, 7zz et unar (Homebrew), accès réseau.
+# Prérequis de COMPILATION : python3, npm, Xcode, accès réseau. 7zz et unar sont compilés pour macOS 13+
+# par scripts/build_portable_tools.sh (les binaires Homebrew ne tournent que sur la version de macOS de la machine).
 # Tous les fichiers temporaires (venv, cache, __pycache__) sont supprimés en fin de build ; dist/ est conservé (preview Vite).
 set -euo pipefail
 
@@ -24,9 +25,9 @@ cleanup() {
 }
 trap cleanup EXIT
 
-SEVENZ="$(command -v 7zz || true)"; [ -n "$SEVENZ" ] || { echo "7zz introuvable (brew install sevenzip)"; exit 1; }
-UNAR="$(command -v unar || true)";  [ -n "$UNAR" ]   || { echo "unar introuvable (brew install unar)"; exit 1; }
-SEVENZ="$(readlink -f "$SEVENZ")"; UNAR="$(readlink -f "$UNAR")"
+PORTABLE="$(cd "$ROOT/.." && pwd)/_tools/portable"
+[ -x "$PORTABLE/7zz" ] && [ -x "$PORTABLE/unar" ] || "$ROOT/scripts/build_portable_tools.sh"
+SEVENZ="$PORTABLE/7zz"; UNAR="$PORTABLE/unar"
 TEXCONV="$(cd "$ROOT/.." && pwd)/_tools/texconv/texconv-mac"   # recompilation : _tools/texconv/build.sh
 [ -x "$TEXCONV" ] || echo "⚠ texconv-mac introuvable ($TEXCONV) : textures transformées copiées sans conversion"
 
@@ -53,6 +54,9 @@ cp "$SEVENZ" "$PAYLOAD/bin/7zz"
 cp "$UNAR" "$PAYLOAD/bin/unar"
 [ -x "$TEXCONV" ] && cp "$TEXCONV" "$PAYLOAD/bin/texconv"
 chmod 755 "$PAYLOAD/bin/"*
+mkdir -p "$PAYLOAD/licenses"
+cp "$ROOT/LICENSE" "$ROOT/THIRD_PARTY_NOTICES.md" "$PORTABLE/7zz-License.txt" "$PAYLOAD/licenses/"
+[ -f "$PORTABLE/unar-License.txt" ] && cp "$PORTABLE/unar-License.txt" "$PAYLOAD/licenses/"
 
 echo "▶ Serveur + interface + dépendances de production"
 cp -R web/server web/package.json web/package-lock.json "$PAYLOAD/"
@@ -71,8 +75,15 @@ APP="$BUILD/dist/$APP_NAME"
 mkdir -p "$APP/Contents/Resources"
 cp -R "$PAYLOAD" "$APP/Contents/Resources/payload"
 
+VERSION="$(node -p "require('$ROOT/web/package.json').version")"
+PLIST="$APP/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Delete :LSMinimumSystemVersion" "$PLIST" 2>/dev/null || true
+/usr/libexec/PlistBuddy -c "Add :LSMinimumSystemVersion string 13.5" "$PLIST"   # Node 24 : macOS 13.5+
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST"
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $VERSION" "$PLIST"
+
 echo "▶ Signature (certificat local stable)"
-"$(cd "$ROOT/.." && pwd)/_tools/sign_app.sh" "$APP" 1.0.0
+"$(cd "$ROOT/.." && pwd)/_tools/sign_app.sh" "$APP" "$VERSION"
 
 mv "$APP" "$ROOT/$APP_NAME"
 echo "OK : $ROOT/$APP_NAME ($(du -sh "$ROOT/$APP_NAME" | cut -f1))"

@@ -1,0 +1,71 @@
+[size=5][b]mABBAJACK — Wabbajack modlists, natively on your Mac[/b][/size]
+[i]No Windows VM, no Wine-wrapped installer: a native macOS app (Apple Silicon) that installs Wabbajack modlists.[/i]
+[i](Version française plus bas.)[/i]
+
+[size=4][b]What is it?[/b][/size]
+Wabbajack only runs on Windows. [b]mABBAJACK[/b] is an unofficial macOS reimplementation of the modlist [b]installation[/b] process: browse the official gallery, pick a list, and install it with one click. The installed list is then played through a Windows compatibility layer (CrossOver, Whisky…).
+
+[size=4][b]Features[/b][/size]
+[list]
+[*][b]Official gallery[/b] (~226 modlists): Skyrim SE / AE / VR, Enderal and other games, with tags, search and sorting.
+[*][b].wabbajack inspector[/b]: drag and drop a file to see its archives, size and requirements.
+[*][b]Complete install pipeline[/b]: FromArchive, InlineFile, PatchedFromArchive (OctoDiff), CreateBSA (native writer), TransformedTexture (native texconv), Stock Game / original game files.
+[*][b]Nexus downloads[/b]: automatic with a Premium account (3 in parallel), manual links with a free account.
+[*][b]Resumable downloads[/b]: an interrupted download restarts where it stopped; automatic retries on network errors and Nexus rate limits.
+[*][b]Update and repair[/b]: reinstall the same version to check and repair an install; only changed files are rewritten.
+[*][b]Download cleanup[/b]: finds the archives no installed list uses any more and moves them to the Trash.
+[*][b]Game detection[/b]: Steam, CrossOver, Whisky, external drives.
+[*][b]Live log[/b] with filters, saved to ~/Library/Logs/mABBAJACK/; plugins.txt and loadorder.txt generated.
+[*][b]macOS notification[/b] when an install ends (success or failure).
+[*][b]Interface in English, French, Spanish and Italian.[/b]
+[*][b]Standalone app[/b]: Node.js, 7-Zip, unar and texconv bundled, nothing else to install.
+[/list]
+
+[size=4][b]Requirements[/b][/size]
+[list]
+[*]A Mac with [b]Apple Silicon[/b] (M1 or later) and [b]macOS 13.5 Ventura or later[/b].
+[*]A [b]legitimate copy of the game[/b], installed on the Mac (Steam, CrossOver or Whisky).
+[*]A [b]Nexus Mods API key[/b] (Nexus account > Site preferences > API Keys). A [b]Premium[/b] account is strongly recommended: without it, Nexus does not allow automatic downloads and each archive must be downloaded by hand.
+[*][b]Disk space[/b]: modlists often need 40–700 GB (downloads + installed list). The app checks the space before starting.
+[*]A Windows compatibility layer (CrossOver, Whisky…) to play the installed list.
+[/list]
+
+[size=4][b]Installation[/b][/size]
+[list=1]
+[*]Unzip the archive and move [b]mABBAJACK.app[/b] to your Applications folder.
+[*]The app is [b]not notarized[/b] by Apple, so macOS blocks the first launch. Open it once, then go to [b]System Settings > Privacy & Security[/b] and click [b]Open Anyway[/b]. Or, in Terminal:
+[code]xattr -dr com.apple.quarantine /Applications/mABBAJACK.app[/code]
+[*]Open [b]Settings[/b]: enter your Nexus API key and choose the [b]DOWNLOADS[/b] and [b]READY TO PLAY[/b] folders.
+[*]Pick a modlist, check the game folder in the [b]Install[/b] tab, and start.
+[/list]
+
+[size=4][b]Privacy and security[/b][/size]
+[list]
+[*]Your API key stays on your Mac and is never written to the logs.
+[*]The app's local server only listens on 127.0.0.1 and refuses requests coming from web pages.
+[*]Nothing is ever deleted permanently: the download cleanup uses the macOS Trash.
+[/list]
+
+[size=4][b]Known limitations[/b][/size]
+[list]
+[*]Unofficial: not affiliated with or supported by the Wabbajack team. Please do not report mABBAJACK problems to Wabbajack or to modlist authors; use the Bugs tab of this page.
+[*]Recreated BSA archives are uncompressed (larger, but they load the same).
+[*]Wabbajack MO2 caches (shader cache, Nemesis engine…) are intentionally skipped.
+[*]Very large lists can take several hours to install.
+[*]Apple Silicon only (no Intel build).
+[/list]
+
+[size=4][b]Credits[/b][/size]
+The Wabbajack team, for the format and the modlist ecosystem; every modlist and mod author.
+Made by [b]Stephan Le Gac Savoye (Starbudweiser)[/b] with [b]Claude Code[/b]. MIT License; bundled components are listed in THIRD_PARTY_NOTICES.md.
+
+[line]
+
+[size=5][b]🇫🇷 Version française[/b][/size]
+[b]mABBAJACK[/b] installe les modlists Wabbajack nativement sur Mac (Apple Silicon), sans machine virtuelle Windows : galerie officielle, inspecteur .wabbajack, téléchargements Nexus automatiques (Premium, 3 en parallèle, reprise après coupure), mise à jour et réparation d'une installation, nettoyage des téléchargements inutilisés, détection du jeu, journal en direct, notification de fin, interface en français, anglais, espagnol et italien.
+
+[b]Prérequis[/b] : Mac Apple Silicon sous macOS 13.5 ou plus récent, copie légitime du jeu, clé API Nexus Mods (compte Premium fortement conseillé), beaucoup d'espace disque, et CrossOver ou Whisky pour jouer.
+
+[b]Installation[/b] : placez mABBAJACK.app dans Applications. L'appli n'est pas notariée : au premier lancement, ouvrez Réglages Système > Confidentialité et sécurité > « Ouvrir quand même » (ou lancez [font=Courier New]xattr -dr com.apple.quarantine /Applications/mABBAJACK.app[/font] dans le Terminal). Renseignez ensuite la clé API et les dossiers dans les Paramètres.
+
+Outil non officiel, sans lien avec l'équipe Wabbajack : signalez les problèmes dans l'onglet Bugs de cette page.

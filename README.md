@@ -67,7 +67,7 @@ Features:
 Wabbajack only runs on Windows. Mac users had to rely on a heavy, slow VM. mABBAJACK provides a native, simple, VM-free install producing files ready to use (e.g. through CrossOver or Whisky).
 
 ### Quick start
-1. Open `mABBAJACK.app` (first launch: right-click → **Open**).
+1. Open `mABBAJACK.app` (not notarized — first launch: **System Settings → Privacy & Security → Open Anyway**, or `xattr -dr com.apple.quarantine /Applications/mABBAJACK.app`).
 2. **Settings**: enter your Nexus API key and pick the *DOWNLOADS* and *READY TO PLAY* folders.
 3. Pick a modlist in the **gallery** (or drop a `.wabbajack` file).
 4. **Install** tab: check the 3 folders and the game folder (auto-detected).

@@ -3,6 +3,8 @@
 // ──────────────────────────────────────────────────────────
 // Nexus Mods helpers
 // ──────────────────────────────────────────────────────────
+import { NEXUS_APP_HEADERS } from './version.js';
+
 export const NEXUS_RETRIES = 4;
 
 export async function nexusFetchOnce(endpoint, apiKey) {
@@ -10,7 +12,7 @@ export async function nexusFetchOnce(endpoint, apiKey) {
   const t = setTimeout(() => ctrl.abort(), 15000);
   try {
     const res = await fetch(`https://api.nexusmods.com${endpoint}`, {
-      headers: { apikey: apiKey, 'Application-Name': 'mAbbajack-macOS', 'Application-Version': '2.1.0' },
+      headers: { apikey: apiKey, ...NEXUS_APP_HEADERS },
       signal: ctrl.signal,
     });
     if (!res.ok) {

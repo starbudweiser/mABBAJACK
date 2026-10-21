@@ -21,6 +21,7 @@ import { getExpectedSkyrimVersion, isGameFileArchive, isIgnorableGameFile, resol
 import { nexusPremiumCache } from './nexus.js';
 import { find7z } from './tools.js';
 import { startInstall } from './install.js';
+import { APP_VERSION, NEXUS_APP_HEADERS } from './version.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -119,7 +120,7 @@ const translateCache = new Map();
 // ──────────────────────────────────────────────────────────
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', uptime: process.uptime(), platform: process.platform, arch: process.arch, version: '3.0.0', sevenZip: find7z() || 'NOT FOUND — brew install sevenzip' });
+  res.json({ status: 'ok', uptime: process.uptime(), platform: process.platform, arch: process.arch, version: APP_VERSION, sevenZip: find7z() || 'NOT FOUND — brew install sevenzip' });
 });
 
 app.post('/api/system/pick-folder', (req, res) => {
@@ -761,7 +762,7 @@ app.post('/api/nexus/check-key', async (req, res) => {
   try {
     const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 8000);
     const r = await fetch('https://api.nexusmods.com/v1/users/validate.json', {
-      headers: { apikey: key.trim(), 'Application-Name': 'mAbbajack-macOS', 'Application-Version': '3.0.0' }, signal: ctrl.signal,
+      headers: { apikey: key.trim(), ...NEXUS_APP_HEADERS }, signal: ctrl.signal,
     });
     clearTimeout(t);
     if (r.ok) { const d = await r.json(); nexusPremiumCache.set(key.trim(), Boolean(d.is_premium)); return res.json({ valid: true, name: d.name, isPremium: Boolean(d.is_premium), dailyLimit: d.daily_limit, dailyRemaining: d.daily_remaining, hourlyLimit: d.hourly_limit, hourlyRemaining: d.hourly_remaining }); }

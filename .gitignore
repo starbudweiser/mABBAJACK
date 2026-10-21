@@ -27,3 +27,6 @@ dist/
 
 # Modlists de test (plusieurs Go)
 *.wabbajack
+
+# Paquets de publication (scripts/package_release.sh)
+/release/
