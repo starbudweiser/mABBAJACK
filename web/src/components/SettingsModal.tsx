@@ -4,6 +4,7 @@ import { INSTALLER_UI } from '../locales/uiExtra';
 import { NexusAccount } from '../types/wabbajack';
 import { pickNativeFolder, getNativeClipboard } from '../services/api';
 import { SETTINGS_UI } from '../locales/uiScreens';
+import { DownloadsCleanup } from './DownloadsCleanup';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -313,6 +314,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </button>
               </div>
             </div>
+          </div>
+
+          <div className="pt-3 border-t border-[#2e2e2e]">
+            <DownloadsCleanup downloadsPath={downloadsInput} destPath={destInput} />
           </div>
 
           {/* Section 3: Performance */}

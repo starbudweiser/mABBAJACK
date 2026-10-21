@@ -347,3 +347,44 @@ export const UPDATE_UI: Record<Language, UpdateUi> = {
     adopted: 'Stato salvato: {n} file.', more: '… e altri {n}',
   },
 };
+
+// ── Nettoyage du dossier DOWNLOADS (Paramètres) ──────────────────────────────
+export interface CleanupUi {
+  title: string; hint: string; scan: string; scanning: string; none: string; found: string; lists: string;
+  noInstall: string; legacy: string; trash: string; cancel: string; trashing: string; moved: string; confirm: string; error: string; more: string;
+}
+
+export const CLEANUP_UI: Record<Language, CleanupUi> = {
+  fr: {
+    title: 'Nettoyage des téléchargements', hint: 'Archives de DOWNLOADS qu\'aucune liste installée dans READY TO PLAY n\'utilise. Elles partent à la Corbeille (récupérables).',
+    scan: 'Analyser', scanning: 'Analyse…', none: 'Aucune archive inutilisée.', found: '{n} archive(s) inutilisée(s) — {size}', lists: 'Listes prises en compte : {names}',
+    noInstall: 'Aucune liste installée trouvée dans READY TO PLAY : rien n\'est proposé.',
+    legacy: 'Installation sans état enregistré : {dirs}. Rechargez son .wabbajack et utilisez « L\'installation correspond à ce fichier » avant de nettoyer.',
+    trash: 'Mettre {n} archive(s) à la Corbeille', trashing: 'Déplacement…', cancel: 'Annuler', moved: '✓ {n} fichier(s) placé(s) dans la Corbeille.',
+    confirm: 'Mettre {n} archive(s) ({size}) à la Corbeille ?\nVérifiez qu\'aucun autre outil (Vortex, MO2) ne les utilise.', error: 'Erreur : {msg}', more: '… et {n} autre(s)',
+  },
+  en: {
+    title: 'Downloads cleanup', hint: 'Archives in DOWNLOADS that no list installed in READY TO PLAY uses. They are moved to the Trash (recoverable).',
+    scan: 'Scan', scanning: 'Scanning…', none: 'No unused archive.', found: '{n} unused archive(s) — {size}', lists: 'Lists taken into account: {names}',
+    noInstall: 'No installed list found in READY TO PLAY: nothing is proposed.',
+    legacy: 'Installation without saved state: {dirs}. Reload its .wabbajack and use "The installation matches this file" before cleaning up.',
+    trash: 'Move {n} archive(s) to the Trash', trashing: 'Moving…', cancel: 'Cancel', moved: '✓ {n} file(s) moved to the Trash.',
+    confirm: 'Move {n} archive(s) ({size}) to the Trash?\nMake sure no other tool (Vortex, MO2) uses them.', error: 'Error: {msg}', more: '… and {n} more',
+  },
+  es: {
+    title: 'Limpieza de descargas', hint: 'Archivos de DOWNLOADS que ninguna lista instalada en READY TO PLAY utiliza. Se mueven a la Papelera (recuperables).',
+    scan: 'Analizar', scanning: 'Analizando…', none: 'Ningún archivo sin usar.', found: '{n} archivo(s) sin usar — {size}', lists: 'Listas consideradas: {names}',
+    noInstall: 'No se encontró ninguna lista instalada en READY TO PLAY: no se propone nada.',
+    legacy: 'Instalación sin estado guardado: {dirs}. Vuelva a cargar su .wabbajack y use «La instalación corresponde a este archivo» antes de limpiar.',
+    trash: 'Mover {n} archivo(s) a la Papelera', trashing: 'Moviendo…', cancel: 'Cancelar', moved: '✓ {n} archivo(s) movido(s) a la Papelera.',
+    confirm: '¿Mover {n} archivo(s) ({size}) a la Papelera?\nCompruebe que ninguna otra herramienta (Vortex, MO2) los utiliza.', error: 'Error: {msg}', more: '… y {n} más',
+  },
+  it: {
+    title: 'Pulizia dei download', hint: 'Archivi di DOWNLOADS che nessuna lista installata in READY TO PLAY utilizza. Vengono spostati nel Cestino (recuperabili).',
+    scan: 'Analizza', scanning: 'Analisi…', none: 'Nessun archivio inutilizzato.', found: '{n} archivio/i inutilizzato/i — {size}', lists: 'Liste considerate: {names}',
+    noInstall: 'Nessuna lista installata trovata in READY TO PLAY: non viene proposto nulla.',
+    legacy: 'Installazione senza stato salvato: {dirs}. Ricarica il suo .wabbajack e usa «L\'installazione corrisponde a questo file» prima di pulire.',
+    trash: 'Sposta {n} archivio/i nel Cestino', trashing: 'Spostamento…', cancel: 'Annulla', moved: '✓ {n} file spostato/i nel Cestino.',
+    confirm: 'Spostare {n} archivio/i ({size}) nel Cestino?\nVerifica che nessun altro strumento (Vortex, MO2) li utilizzi.', error: 'Errore: {msg}', more: '… e altri {n}',
+  },
+};

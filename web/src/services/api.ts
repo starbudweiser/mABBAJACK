@@ -268,3 +268,33 @@ export async function adoptInstalled(filePath: string, dir: string): Promise<{ f
   if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
   return body;
 }
+
+export interface UnusedDownloads {
+  installs: { dir: string; name: string; version: string; archives: number }[];
+  legacy: string[];
+  unused: { path: string; name: string; size: number; meta: string | null }[];
+  totalSize: number;
+  blocked?: 'no-install' | 'legacy';
+}
+
+export async function findUnusedDownloads(downloadsPath: string, destPath: string): Promise<UnusedDownloads> {
+  const res = await fetch(`${getApiBaseUrl()}/api/downloads/unused`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ downloadsPath, destPath }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+  return body;
+}
+
+export async function trashDownloads(paths: string[]): Promise<{ moved: number }> {
+  const res = await fetch(`${getApiBaseUrl()}/api/downloads/trash`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paths }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+  return body;
+}

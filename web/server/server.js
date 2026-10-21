@@ -28,6 +28,7 @@ import { HashCache, verifyArchive, verifyInstalledFiles, findStrayFiles, archive
 import { isTempPath, locateWabbajack } from './locate.js';
 import { resolveDirectivePath, detectGameRootFolders, setGameRootFolders, getGameRootFolders, KNOWN_GAME_ROOT_NAMES, BSA_STAGING_DIR } from './paths.js';
 import { installDirName, compareWithInstalled, readSnapshot, writeSnapshot, findPreviousWabbajack, manifestEntries, manifestArchives, manifestFingerprint, baselineFromSnapshot, baselineFromManifest, planUpdate, removeFiles, inferOptions } from './update.js';
+import { findUnusedDownloads, moveToTrash } from './cleanup.js';
 import { initLogger, writeLog, startInstallLog, endInstallLog, getLogInfo, tailLog } from './logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -2029,6 +2030,30 @@ app.post('/api/wabbajack/verify-downloads', async (req, res) => {
   const result = { archives: updated, readyCount, missingCount: archives.length - readyCount, totalScanned: allFiles.length, sizeMismatches: sizeMismatchCount, gameFiles };
   if (stream) { emit({ type: 'result', ...result }); return res.end(); }
   res.json(result);
+});
+
+// ── Nettoyage de DOWNLOADS : archives inutilisées par les listes installées ─────
+// Seuls les fichiers du dernier examen peuvent partir à la Corbeille (pas de chemin arbitraire).
+let lastUnusedScan = new Set();
+app.post('/api/downloads/unused', (req, res) => {
+  const { downloadsPath, destPath } = req.body || {};
+  if (typeof downloadsPath !== 'string' || !fs.existsSync(downloadsPath)) return res.status(400).json({ error: 'Dossier DOWNLOADS introuvable' });
+  if (typeof destPath !== 'string' || !fs.existsSync(destPath)) return res.status(400).json({ error: 'Dossier READY TO PLAY introuvable' });
+  const r = findUnusedDownloads(path.resolve(downloadsPath), path.resolve(destPath));
+  // Sans liste connue, ou avec une installation sans état enregistré, tout paraîtrait inutilisé : rien n'est proposé
+  if (!r.installs.length || r.legacy.length) { r.blocked = r.installs.length ? 'legacy' : 'no-install'; r.unused = []; r.totalSize = 0; }
+  lastUnusedScan = new Set(r.unused.flatMap((u) => (u.meta ? [u.path, u.meta] : [u.path])));
+  res.json(r);
+});
+app.post('/api/downloads/trash', async (req, res) => {
+  const paths = Array.isArray(req.body?.paths) ? req.body.paths.filter((p) => lastUnusedScan.has(p)) : [];
+  if (!paths.length) return res.status(400).json({ error: 'Aucun fichier à déplacer' });
+  try {
+    await moveToTrash(paths);
+    for (const p of paths) lastUnusedScan.delete(p);
+    writeLog({ level: 'info', message: `Nettoyage DOWNLOADS : ${paths.length} fichier(s) placé(s) dans la Corbeille`, details: paths.join('\n') });
+    res.json({ moved: paths.length });
+  } catch (err) { res.status(500).json({ error: String(err.message || err) }); }
 });
 
 app.post('/api/nexus/check-key', async (req, res) => {
