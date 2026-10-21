@@ -683,6 +683,7 @@ export const App: React.FC = () => {
           destPath,
           gamePath,
           nexusApiKey,
+          uiLanguage: language,
           options: { ...installOptions, update: updateRequest || undefined },
         }),
       });
@@ -711,7 +712,7 @@ export const App: React.FC = () => {
       addLog('error', `Erreur réseau : ${err.message || err}`);
       setActiveTab('inspector');
     }
-  }, [parsedFile, downloadsPath, destPath, gamePath, nexusApiKey, installOptions, updateRequest, addLog]);
+  }, [parsedFile, downloadsPath, destPath, gamePath, nexusApiKey, installOptions, updateRequest, addLog, language]);
 
 
   // 9. Gallery Modlist Selection — instantly builds a ParsedWabbajackFile from catalog metadata

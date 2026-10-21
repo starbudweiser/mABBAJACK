@@ -2113,8 +2113,21 @@ function resolveVortexDownloadDir(root, gameType) {
   } catch { /* dossier absent ou illisible → racine */ }
   return root;
 }
+// Notification macOS de fin d'installation (l'installation dure des heures : fenêtre souvent en arrière-plan)
+const NOTIFY_TEXT = {
+  fr: { done: (n) => `« ${n} » est installée.`, failed: (n) => `Échec de l'installation de « ${n} ».` },
+  en: { done: (n) => `"${n}" is installed.`, failed: (n) => `Installing "${n}" failed.` },
+  es: { done: (n) => `«${n}» está instalada.`, failed: (n) => `La instalación de «${n}» ha fallado.` },
+  it: { done: (n) => `«${n}» è installata.`, failed: (n) => `Installazione di «${n}» non riuscita.` },
+};
+function notifyMac(lang, kind, name) {
+  const text = (NOTIFY_TEXT[lang] || NOTIFY_TEXT.fr)[kind](name || 'modlist');
+  // Texte passé en argument (argv) : aucun risque d'injection AppleScript
+  execFile('/usr/bin/osascript', ['-e', 'on run argv', '-e', 'display notification (item 2 of argv) with title (item 1 of argv) sound name "Glass"', '-e', 'end run', 'mABBAJACK', text], () => {});
+}
+
 app.post('/api/install/start', async (req, res) => {
-  const { modlist, downloadsPath, destPath, nexusApiKey, gamePath, options } = req.body;
+  const { modlist, downloadsPath, destPath, nexusApiKey, gamePath, options, uiLanguage } = req.body;
   if (!modlist || !destPath) return res.status(400).json({ error: 'Modlist et dossier READY TO PLAY requis.' });
 
   // Build the modlist-named subdirectory: UPPERCASE, filesystem-safe chars only
@@ -3189,6 +3202,7 @@ app.post('/api/install/start', async (req, res) => {
       }
       broadcastLog('success', `═══════════════════════════════════════════════════`);
       currentInstallJob.active = false;
+      notifyMac(uiLanguage, 'done', modlist.name);
 
     } catch (err) {
       const msg = err.message || String(err);
@@ -3203,6 +3217,7 @@ app.post('/api/install/start', async (req, res) => {
         broadcastProgress({ stage: 'error', stageName: "Erreur d'installation", overallPercent: currentInstallJob.progress.overallPercent || 5, hasError: true, errorMessage: msg, currentTask: `Échec : ${msg}` });
         broadcastLog('error', `❌ ${msg}`);
         writeLog({ level: 'debug', message: 'Pile de l\'erreur fatale', details: err?.stack || null });
+        notifyMac(uiLanguage, 'failed', modlist.name);
       }
       currentInstallJob.active = false;
     } finally {
