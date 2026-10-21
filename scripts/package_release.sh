@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Paquet de publication (Nexus Mods, GitHub) : release/mABBAJACK-<version>-macOS-arm64.zip
+# Paquet de publication (Nexus Mods, GitHub) : nEXUSTOOLS/nexus/files/mABBAJACK_<version>_macOS_arm64.zip
 # Contient l'appli compilée (build_all.sh), un LISEZMOI d'installation et les licences.
 # Usage : package_release.sh [chemin/vers/mABBAJACK.app]
 set -euo pipefail
@@ -17,14 +17,15 @@ for b in "$APP/Contents/Resources/payload/bin/"*; do
 done
 codesign --verify --deep --strict "$APP"
 
-NAME="mABBAJACK-$VERSION-macOS-arm64"
+NAME="mABBAJACK_${VERSION}_macOS_arm64"
+OUT="$(cd "$ROOT/.." && pwd)/nEXUSTOOLS/nexus/files"   # dossier commun des archives Nexus
 STAGE="$ROOT/release/$NAME"
-rm -rf "$STAGE" "$ROOT/release/$NAME.zip"
-mkdir -p "$STAGE"
+rm -rf "$STAGE" "$OUT/$NAME.zip"
+mkdir -p "$STAGE" "$OUT"
 ditto "$APP" "$STAGE/mABBAJACK.app"
 cp "$ROOT/LICENSE" "$ROOT/THIRD_PARTY_NOTICES.md" "$STAGE/"
 cp "$ROOT/docs/release/READ_ME_FIRST.txt" "$STAGE/"
-( cd "$ROOT/release" && ditto -c -k --sequesterRsrc --keepParent "$NAME" "$NAME.zip" )
+( cd "$ROOT/release" && ditto -c -k --sequesterRsrc --keepParent "$NAME" "$OUT/$NAME.zip" )
 rm -rf "$STAGE"
-shasum -a 256 "$ROOT/release/$NAME.zip" | tee "$ROOT/release/$NAME.zip.sha256"
-echo "OK : $ROOT/release/$NAME.zip ($(du -h "$ROOT/release/$NAME.zip" | cut -f1))"
+( cd "$OUT" && shasum -a 256 "$NAME.zip" | tee "$NAME.zip.sha256" )
+echo "OK : $OUT/$NAME.zip ($(du -h "$OUT/$NAME.zip" | cut -f1))"
