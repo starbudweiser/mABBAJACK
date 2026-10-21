@@ -384,6 +384,7 @@ const downloadFile = downloadHttp; // reprise (.part + Range) et nouvelles tenta
 // Nexus Mods helpers
 // ──────────────────────────────────────────────────────────
 const NEXUS_RETRIES = 4;
+const DOWNLOAD_CONCURRENCY = 3; // archives téléchargées en même temps
 
 async function nexusFetchOnce(endpoint, apiKey) {
   const ctrl = new AbortController();
@@ -2445,11 +2446,15 @@ app.post('/api/install/start', async (req, res) => {
       if (missingCount > 0) {
         broadcastProgress({ stage: 'downloading_archives', stageName: `Téléchargements`, overallPercent: 12, processedItems: readyCount, totalItems: archives.length, currentTask: `${missingCount} archive(s) à télécharger...` });
 
-        for (const arc of archiveStatuses) {
+        // Plusieurs archives à la fois : le débit Nexus / CDN est mieux exploité
+        const queue = archiveStatuses.filter((a) => a.status !== 'ready');
+        const missingBytes = queue.reduce((s, a) => s + (a.Size || 0), 0);
+        const received = new Map(); // archive → octets reçus (progression globale)
+        let active = 0;
+        const downloadOne = async (arc) => {
           await jobControl.waitIfPaused(signal);
-          if (arc.status === 'ready') continue;
           // Fichier original du jeu : aucune source de téléchargement (voir rapport final)
-          if (isGameFileArchive(arc)) { skippedManual++; continue; }
+          if (isGameFileArchive(arc)) { skippedManual++; return; }
 
           const archiveName = arc.Name || 'inconnu';
           const sizeMo = arc.Size ? `${(arc.Size / 1048576).toFixed(1)} Mo` : '? Mo';
@@ -2481,15 +2486,20 @@ app.post('/api/install/start', async (req, res) => {
             const copyDir = arc.wrongVersion ? dedicatedDir : cleanDownloads;
             if (manualUrl) { manualUrls.set(archiveName, manualUrl); broadcastLog('warn', `  → Manuel : ${manualUrl}`); broadcastLog('warn', `  → Copiez "${archiveName}" dans : ${copyDir}`); }
             else broadcastLog('warn', `  → Source inconnue — copiez manuellement "${archiveName}" dans : ${copyDir}`);
-            continue;
+            return;
           }
 
+          active++;
           try {
-            arc._lastReceived = 0;
+            let lastRecv = null; // 1er appel : base (un .part repris ne compte pas dans la vitesse)
             const dlProgress = (recv, total, speed) => {
-              const delta = recv - (arc._lastReceived || 0); arc._lastReceived = recv; globalBytes += delta;
+              if (lastRecv !== null) globalBytes += recv - lastRecv;
+              lastRecv = recv;
+              received.set(arc, recv);
               const elap = (Date.now() - globalStart) / 1000;
-              broadcastProgress({ currentTask: `⬇ ${archiveName} — ${(recv / 1048576).toFixed(1)} / ${total > 0 ? (total / 1048576).toFixed(1) : '?'} Mo`, speedBytesPerSec: Math.round(elap > 0 ? globalBytes / elap : speed), stagePercent: total > 0 ? Math.round((recv / total) * 100) : 0 });
+              let done = 0; for (const n of received.values()) done += n;
+              const others = active > 1 ? ` (+${active - 1} en cours)` : '';
+              broadcastProgress({ currentTask: `⬇ ${archiveName} — ${(recv / 1048576).toFixed(1)} / ${total > 0 ? (total / 1048576).toFixed(1) : '?'} Mo${others}`, speedBytesPerSec: Math.round(elap > 0 ? globalBytes / elap : speed), stagePercent: missingBytes > 0 ? Math.min(100, Math.round((done / missingBytes) * 100)) : 0 });
             };
             // Une autre version porte déjà ce nom dans le cache commun : on ne l'écrase pas.
             const destDir = arc.wrongVersion ? dedicatedDir : cleanDownloads;
@@ -2507,13 +2517,16 @@ app.post('/api/install/start', async (req, res) => {
             broadcastProgress({ overallPercent: Math.min(35, 12 + Math.round(((downloadedCount + skippedManual) / missingCount) * 23)), processedItems: readyCount + downloadedCount });
           } catch (dlErr) {
             if (signal.aborted) throw new Error('Annulé');
-            broadcastLog('error', `  ✗ Échec : ${dlErr.message}`);
+            broadcastLog('error', `  ✗ Échec : ${archiveName} — ${dlErr.message}`);
             const src = archiveSourceUrl(arc);
             if (src) { manualUrls.set(archiveName, src); broadcastLog('warn', `  → Manuel : ${src}`); }
             broadcastLog('warn', `  → Copiez manuellement "${archiveName}" dans : ${arc.wrongVersion ? dedicatedDir : cleanDownloads}`);
             skippedManual++;
           }
-        }
+          finally { active--; }
+        };
+        const worker = async () => { while (queue.length) await downloadOne(queue.shift()); };
+        await Promise.all(Array.from({ length: Math.min(DOWNLOAD_CONCURRENCY, queue.length) }, worker));
 
         if (downloadedCount > 0) broadcastLog('success', `✓ ${downloadedCount} archive(s) téléchargée(s).`);
       }
