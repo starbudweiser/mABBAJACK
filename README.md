@@ -41,6 +41,7 @@ Wabbajack est uniquement disponible sous Windows. Les utilisateurs de Mac devaie
 ### Limites
 - Projet non affilié à Wabbajack. Une copie légale du jeu est requise.
 - Les BSA recréés (`CreateBSA`) ne sont pas compressés.
+- Skyrim SE ne lit pas les fichiers rangés au-delà de 2 Go dans un BSA : ceux d'un BSA recréé plus gros sont installés en fichiers libres à côté de l'archive (prioritaires sur les BSA).
 - Modlists volumineuses (40 à 65 Go chacune).
 - Les masters du Stock Game peuvent différer du manifeste (conservés avec avertissement).
 
@@ -79,5 +80,6 @@ Wabbajack only runs on Windows. Mac users had to rely on a heavy, slow VM. mABBA
 ### Limitations
 - Not affiliated with Wabbajack. A legitimate copy of the game is required.
 - Recreated BSAs (`CreateBSA`) are uncompressed.
+- Skyrim SE cannot read files stored past 2 GB inside a BSA: in a larger recreated BSA, those files are installed as loose files next to the archive (they override BSAs).
 - Large modlists (40–65 GB each).
 - Stock Game masters may differ from the manifest (kept with a warning).

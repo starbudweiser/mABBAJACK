@@ -48,7 +48,7 @@ Wabbajack is Windows-only. **mABBAJACK** is an unofficial macOS port of the modl
 
 ## Known limitations
 - Unofficial, not affiliated with Wabbajack.
-- Recreated BSAs are uncompressed.
+- Recreated BSAs are uncompressed. In a BSA larger than 2 GB, files stored past the 2 GB mark (unreadable by Skyrim SE) are installed as loose files instead.
 - Stock Game masters may differ from the manifest (kept with a warning).
 - Wabbajack MO2 caches (shadercache, nemesis_engine…) are intentionally skipped.
 - Very large installs can take hours.

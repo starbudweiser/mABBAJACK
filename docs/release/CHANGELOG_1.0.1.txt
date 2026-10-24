@@ -1,0 +1,5 @@
+1.0.1
+- Fix: BSA archives recreated larger than 2 GB. Skyrim SE cannot read files stored past 2 GB inside a BSA, so they loaded as empty (black PBR objects, missing textures). These files are now installed as loose files next to the archive (an existing loose file is kept).
+
+1.0.1 (FR)
+- Correctif : BSA recréés de plus de 2 Go. Skyrim SE ne lit pas les fichiers rangés au-delà de 2 Go dans un BSA ; ils se chargeaient vides (objets PBR noirs, textures absentes). Ces fichiers sont désormais installés en fichiers libres à côté de l'archive (un fichier libre déjà présent est conservé).
