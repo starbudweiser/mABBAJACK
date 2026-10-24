@@ -6,6 +6,11 @@
  * l'archive est simplement plus volumineuse). Les bits « compressé » (0x4) et
  * « noms embarqués » (0x100) des ArchiveFlags sont donc retirés.
  *
+ * Limite des 2 Go : Skyrim SE lit les décalages en 31 bits ; un fichier rangé
+ * au-delà de 2 Go dans l'archive est lu comme vide (textures noires, cf.
+ * « Faultier's PBR Clutter - Textures.bsa », 3 Go). Ces fichiers sont laissés
+ * hors de l'archive (`overflow`) pour être installés en fichiers libres.
+ *
  * Format :
  *   Header (36) | Folder records | [Folder block : nom + file records] × N | Noms de fichiers | Données
  *   Records triés par hash croissant (u64).
@@ -18,6 +23,8 @@ const FLAG_FILE_NAMES = 0x2;
 const FLAG_COMPRESSED = 0x4;
 const FLAG_EMBED_NAMES = 0x100;
 const MAX_U32 = 0xFFFFFFFF;
+/** Fin maximale des données d'un fichier lisible par le jeu (décalage signé 32 bits). */
+export const BSA_GAME_LIMIT = 0x7FFFFFFF;
 
 const EXT_FLAGS = {
   '.kf': 0x80,
@@ -68,9 +75,12 @@ function cmpBig(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
  * @param {string} outFile     BSA à écrire
  * @param {{ Version:number, ArchiveFlags:number, FileFlags:number }} state  État issu du .wabbajack
  * @param {string[]} [relPaths] chemins relatifs à empaqueter (sinon : parcours complet du dossier)
- * @returns {{ files:number, bytes:number, skipped:string[] }}
+ * @param {{ maxEnd?:number }} [opts] fin maximale des données dans l'archive (défaut : limite du jeu)
+ * @returns {{ files:number, bytes:number, skipped:string[], overflow:{ rel:string, abs:string, size:number }[] }}
+ *   `overflow` : fichiers au-delà de la limite, NON empaquetés (à installer en libres)
  */
-export function createBsa(srcDir, outFile, state, relPaths) {
+export function createBsa(srcDir, outFile, state, relPaths, opts = {}) {
+  const maxEnd = Number(opts.maxEnd) > 0 ? Number(opts.maxEnd) : BSA_GAME_LIMIT;
   const version = Number(state?.Version);
   if (version !== 104 && version !== 105) throw new Error(`Version BSA non supportée : ${state?.Version}`);
 
@@ -103,11 +113,11 @@ export function createBsa(srcDir, outFile, state, relPaths) {
     if (!fileName || folderName.length > 254 || fileName.length > 254) { skipped.push(raw); continue; }
     let f = folders.get(folderName);
     if (!f) { f = { name: folderName, hash: tes5Hash(folderName, true), files: [] }; folders.set(folderName, f); }
-    f.files.push({ name: fileName, hash: tes5Hash(fileName, false), abs, size: st.size });
+    f.files.push({ name: fileName, hash: tes5Hash(fileName, false), abs, size: st.size, raw });
   }
   if (folders.size === 0) throw new Error('Aucun fichier à empaqueter');
 
-  const folderList = [...folders.values()].sort((a, b) => cmpBig(a.hash, b.hash));
+  let folderList = [...folders.values()].sort((a, b) => cmpBig(a.hash, b.hash));
   for (const f of folderList) f.files.sort((a, b) => cmpBig(a.hash, b.hash));
 
   const archiveFlags = ((Number(state.ArchiveFlags) | FLAG_DIR_NAMES | FLAG_FILE_NAMES)
@@ -115,19 +125,32 @@ export function createBsa(srcDir, outFile, state, relPaths) {
   const fileFlags = Number(state.FileFlags) >>> 0;
 
   const folderRecSize = version === 105 ? 24 : 16;
-  const fileCount = folderList.reduce((n, f) => n + f.files.length, 0);
-  const totalFolderNameLen = folderList.reduce((n, f) => n + f.name.length + 1, 0);
-  const totalFileNameLen = folderList.reduce((n, f) => n + f.files.reduce((m, x) => m + x.name.length + 1, 0), 0);
-
   const folderRecsStart = 36;
-  const blocksStart = folderRecsStart + folderList.length * folderRecSize;
-  const blocksLen = folderList.reduce((n, f) => n + 1 + f.name.length + 1 + f.files.length * 16, 0);
-  const namesStart = blocksStart + blocksLen;
-  const dataStart = namesStart + totalFileNameLen;
+  const overflow = [];
+  let fileCount, totalFolderNameLen, totalFileNameLen, blocksStart, namesStart, dataStart, cursor;
+  // Retirer un fichier ne fait que raccourcir l'en-tête : la boucle converge en 2 passes.
+  for (;;) {
+    fileCount = folderList.reduce((n, f) => n + f.files.length, 0);
+    totalFolderNameLen = folderList.reduce((n, f) => n + f.name.length + 1, 0);
+    totalFileNameLen = folderList.reduce((n, f) => n + f.files.reduce((m, x) => m + x.name.length + 1, 0), 0);
+    blocksStart = folderRecsStart + folderList.length * folderRecSize;
+    const blocksLen = folderList.reduce((n, f) => n + 1 + f.name.length + 1 + f.files.length * 16, 0);
+    namesStart = blocksStart + blocksLen;
+    dataStart = namesStart + totalFileNameLen;
 
-  // Offsets des données
-  let cursor = dataStart;
-  for (const f of folderList) for (const x of f.files) { x.offset = cursor; cursor += x.size; }
+    // Offsets des données ; les fichiers qui finiraient au-delà de la limite sortent de l'archive
+    cursor = dataStart;
+    let moved = false;
+    for (const f of folderList) {
+      f.files = f.files.filter((x) => {
+        if (cursor + x.size > maxEnd) { overflow.push({ rel: x.raw, abs: x.abs, size: x.size }); moved = true; return false; }
+        x.offset = cursor; cursor += x.size; return true;
+      });
+    }
+    if (!moved) break;
+    folderList = folderList.filter((f) => f.files.length > 0);
+    if (folderList.length === 0) throw new Error('Aucun fichier ne tient sous la limite de taille du BSA');
+  }
   if (cursor > MAX_U32) throw new Error('BSA > 4 Go : non supporté par le format');
 
   const head = Buffer.alloc(dataStart);
@@ -189,5 +212,27 @@ export function createBsa(srcDir, outFile, state, relPaths) {
   }
   fs.closeSync(fd);
   fs.renameSync(tmpOut, outFile);
-  return { files: fileCount, bytes: cursor, skipped };
+  return { files: fileCount, bytes: cursor, skipped, overflow };
+}
+
+/**
+ * Installe en fichiers libres, à côté du BSA, les fichiers laissés hors de l'archive
+ * (`overflow` de createBsa). Les fichiers sont déplacés depuis le staging (copie si
+ * le déplacement échoue). Un fichier libre déjà présent est conservé : il prime déjà
+ * sur le contenu des BSA.
+ * @param {{ rel:string, abs:string }[]} overflow
+ * @param {string} rootDir dossier contenant le BSA (Data ou dossier du mod)
+ * @returns {{ placed:number, existing:number }}
+ */
+export function installBsaOverflow(overflow, rootDir) {
+  let placed = 0, existing = 0;
+  for (const f of overflow) {
+    const dest = path.join(rootDir, ...f.rel.split(/[\\/]/).filter(Boolean));
+    if (!dest.startsWith(rootDir + path.sep)) continue;
+    if (fs.existsSync(dest)) { existing++; continue; }
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    try { fs.renameSync(f.abs, dest); } catch { fs.copyFileSync(f.abs, dest); }
+    placed++;
+  }
+  return { placed, existing };
 }

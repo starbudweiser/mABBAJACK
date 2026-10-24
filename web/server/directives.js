@@ -8,7 +8,7 @@ import { jobControl, trackedSpawn as spawn } from './jobcontrol.js';
 import { broadcastLog, broadcastProgress, debugLog } from './events.js';
 import { openBsa } from './bsa.js';
 import { looksLikeBsa, extractNestedArchive } from './nested.js';
-import { createBsa } from './bsawriter.js';
+import { createBsa, installBsaOverflow } from './bsawriter.js';
 import { patchFile } from './octodiff.js';
 import { TextureQueue } from './textures.js';
 import { remapMagicStrings } from './remap.js';
@@ -713,6 +713,11 @@ export async function processDirectives({ directives, archiveStatuses, destRoot,
         const rels = Array.isArray(d.FileStates) ? d.FileStates.map((f) => f.Path).filter(Boolean) : undefined;
         const r = createBsa(srcDir, outFile, d.State || {}, rels && rels.length ? rels : undefined);
         broadcastLog('success', `  ✓ BSA créé : ${bsaName} (${r.files} fichiers)`);
+        if (r.overflow.length > 0) {
+          const loose = installBsaOverflow(r.overflow, path.dirname(outFile));
+          broadcastLog('warn', `  ⚠ BSA ${bsaName} > 2 Go : ${r.overflow.length} fichier(s) au-delà de la limite lue par le jeu installé(s) en fichiers libres (${loose.placed} placé(s), ${loose.existing} déjà présent(s)).`);
+          debugLog(`CreateBSA ${d.To} : fichiers libres hors archive`, r.overflow.map((f) => f.rel).join('\n'));
+        }
         if (r.skipped.length > 0) broadcastLog('warn', `  ⚠ BSA ${bsaName} : ${r.skipped.length} fichier(s) manquant(s) ignoré(s)`);
         processed++;
       } catch (e) {
