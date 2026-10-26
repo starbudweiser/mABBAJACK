@@ -23,6 +23,7 @@ import threading
 import time
 from pathlib import Path
 
+import update_check
 import webview
 
 APP_NAME = "mABBAJACK"
@@ -301,6 +302,7 @@ def main() -> None:
             return
         window.load_url(f"http://127.0.0.1:{backend.port}")
         nxm.ready(backend.port)
+        update_check.start_webview(window, APP_NAME, page="https://www.nexusmods.com/skyrimspecialedition/mods/196281?tab=files")
 
     def launcher_log(msg: str) -> None:
         try:
