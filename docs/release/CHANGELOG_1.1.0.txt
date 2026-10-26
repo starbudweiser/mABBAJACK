@@ -1,0 +1,33 @@
+mABBAJACK 1.1.0
+
+EN
+- Your Nexus API key is now stored in the macOS Keychain instead of the app's web storage (an existing key is moved automatically).
+- Free Nexus accounts: click "Mod Manager Download" on the Nexus page and mABBAJACK receives the nxm:// link and downloads the file into DOWNLOADS. The manual download window warns you if another app (Vortex, mORTEX...) receives Nexus links and offers to switch.
+- zEdit merges (MergedPatch directives) are now created. They used to be skipped without a message.
+- Fix: MediaFire and ModDB downloads fetched the web page instead of the file. The real link is now read from the page (ModDB mirrors are tried from the least to the most loaded).
+- New: Mega downloads.
+- New-version notice: the app checks the latest GitHub release once a day and offers to open the Nexus page, remind you later or skip that version. Nothing is downloaded or installed.
+
+FR
+- La clé API Nexus est désormais rangée dans le trousseau macOS et non plus dans le stockage web de l'appli (une clé existante est déplacée automatiquement).
+- Comptes Nexus gratuits : cliquez sur « Mod Manager Download » sur la page Nexus, mABBAJACK reçoit le lien nxm:// et télécharge le fichier dans DOWNLOADS. La fenêtre des téléchargements manuels prévient si une autre appli (Vortex, mORTEX…) reçoit les liens Nexus et propose de basculer.
+- Les fusions zEdit (directives MergedPatch) sont maintenant créées. Elles étaient ignorées sans message.
+- Correctif : les téléchargements MediaFire et ModDB récupéraient la page web au lieu du fichier. Le vrai lien est maintenant lu dans la page (miroirs ModDB essayés du moins chargé au plus chargé).
+- Nouveau : téléchargements Mega.
+- Avertissement de nouvelle version : l'appli consulte la dernière release GitHub une fois par jour et propose d'ouvrir la page Nexus, de rappeler plus tard ou d'ignorer cette version. Rien n'est téléchargé ni installé.
+
+IT
+- La chiave API di Nexus è ora salvata nel Portachiavi di macOS invece che nell'archivio web dell'app (una chiave esistente viene spostata automaticamente).
+- Account Nexus gratuiti: fai clic su «Mod Manager Download» nella pagina Nexus e mABBAJACK riceve il link nxm:// e scarica il file in DOWNLOADS. La finestra dei download manuali avvisa se un'altra app (Vortex, mORTEX…) riceve i link Nexus e propone di cambiare.
+- Le fusioni zEdit (direttive MergedPatch) ora vengono create. Prima venivano ignorate senza alcun messaggio.
+- Correzione: i download da MediaFire e ModDB scaricavano la pagina web invece del file. Il vero link viene ora letto dalla pagina (i mirror di ModDB sono provati dal meno al più carico).
+- Novità: download da Mega.
+- Avviso di nuova versione: l'app controlla l'ultima release su GitHub una volta al giorno e propone di aprire la pagina Nexus, di ricordarlo più tardi o di ignorare quella versione. Non viene scaricato né installato nulla.
+
+ES
+- La clave API de Nexus ahora se guarda en el Llavero de macOS y no en el almacenamiento web de la app (una clave existente se mueve automáticamente).
+- Cuentas gratuitas de Nexus: pulsa «Mod Manager Download» en la página de Nexus y mABBAJACK recibe el enlace nxm:// y descarga el archivo en DOWNLOADS. La ventana de descargas manuales avisa si otra app (Vortex, mORTEX…) recibe los enlaces de Nexus y ofrece cambiarlo.
+- Las fusiones de zEdit (directivas MergedPatch) ahora se crean. Antes se omitían sin ningún mensaje.
+- Corrección: las descargas de MediaFire y ModDB traían la página web en lugar del archivo. El enlace real ahora se lee de la página (los espejos de ModDB se prueban del menos al más cargado).
+- Novedad: descargas de Mega.
+- Aviso de nueva versión: la app consulta la última release de GitHub una vez al día y ofrece abrir la página de Nexus, recordarlo más tarde u omitir esa versión. No se descarga ni instala nada.
