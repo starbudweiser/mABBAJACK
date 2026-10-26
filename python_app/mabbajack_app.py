@@ -217,6 +217,71 @@ def build_menu():
     ]
 
 
+
+class NxmRouter:
+    """Liens nxm:// (bouton « Mod Manager Download » de Nexus) : macOS les envoie à l'appli par un
+    événement Apple « GURL » ; on les transmet au serveur local, qui télécharge le fichier."""
+
+    GURL = int.from_bytes(b"GURL", "big")  # classe et identifiant de l'événement « ouvrir une URL »
+
+    def __init__(self, log) -> None:
+        self.log = log
+        self.port: int | None = None
+        self.pending: list[str] = []
+        self.lock = threading.Lock()
+        self.handler = None
+
+    def register(self) -> None:
+        try:
+            from Foundation import NSAppleEventManager, NSObject
+            import objc
+        except ImportError as exc:
+            self.log(f"liens nxm indisponibles : {exc!r}")
+            return
+        router = self
+        if self.handler is None:
+            class _Handler(NSObject):
+                def handleURL_withReply_(self, event, _reply):
+                    url = event.paramDescriptorForKeyword_(int.from_bytes(b"----", "big")).stringValue()
+                    router.receive(str(url or ""))
+                handleURL_withReply_ = objc.selector(handleURL_withReply_, signature=b"v@:@@")
+            self.handler = _Handler.alloc().init()
+        NSAppleEventManager.sharedAppleEventManager().setEventHandler_andSelector_forEventClass_andEventID_(
+            self.handler, "handleURL:withReply:", self.GURL, self.GURL)
+
+    def receive(self, url: str) -> None:
+        if not url.lower().startswith("nxm://"):
+            return
+        self.log("lien nxm reçu")
+        with self.lock:
+            if self.port is None:
+                self.pending.append(url)
+                return
+        threading.Thread(target=self._send, args=(url,), daemon=True).start()
+
+    def ready(self, port: int) -> None:
+        with self.lock:
+            self.port, urls, self.pending = port, self.pending, []
+        for url in urls:
+            threading.Thread(target=self._send, args=(url,), daemon=True).start()
+
+    def _send(self, url: str) -> None:
+        import urllib.request
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{self.port}/api/nexus/nxm", data=json.dumps({"url": url}).encode(),
+            headers={"Content-Type": "application/json"}, method="POST")
+        for _ in range(20):  # le serveur peut encore démarrer
+            try:
+                urllib.request.urlopen(req, timeout=5).close()
+                return
+            except urllib.error.HTTPError as exc:
+                self.log(f"lien nxm refusé : HTTP {exc.code}")
+                return
+            except OSError:
+                time.sleep(0.5)
+        self.log("lien nxm : serveur injoignable")
+
+
 def main() -> None:
     root = payload_dir()
     backend = Backend(root)
@@ -235,6 +300,7 @@ def main() -> None:
                              .replace('<div class="d"></div>', ""))
             return
         window.load_url(f"http://127.0.0.1:{backend.port}")
+        nxm.ready(backend.port)
 
     def launcher_log(msg: str) -> None:
         try:
@@ -270,6 +336,8 @@ def main() -> None:
         except Exception as exc:  # repli : le serveur retrouve le fichier par nom et taille
             launcher_log(f"écouteur de dépôt indisponible : {exc!r}")
 
+    nxm = NxmRouter(launcher_log)
+    nxm.register()
     window.events.loaded += bind_drop
     window.events.closed += backend.stop
     atexit.register(backend.stop)
@@ -277,7 +345,16 @@ def main() -> None:
         signal.signal(sig, lambda *_: (backend.stop(), os._exit(0)))
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     try:
-        webview.start(boot, private_mode=False, storage_path=str(DATA_DIR), menu=build_menu(), localization=MENU_FR)
+        def start() -> None:
+            # AppKit peut remplacer le gestionnaire au lancement : on le remet une fois l'appli démarrée.
+            try:
+                from PyObjCTools import AppHelper
+                AppHelper.callAfter(nxm.register)
+            except ImportError:
+                pass
+            boot()
+
+        webview.start(start, private_mode=False, storage_path=str(DATA_DIR), menu=build_menu(), localization=MENU_FR)
     finally:
         backend.stop()
 

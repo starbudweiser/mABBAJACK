@@ -18,6 +18,7 @@ export interface ManualUi {
   title: string; missingCount: string; subtitle: string; search: string; scanning: string; verify: string;
   copyPath: string; pathCopied: string; allReady: string; noMatch: string; author: string; googleSearch: string;
   footer: string; close: string; gameFile: string; gameFileHint: string; expectedAt: string;
+  nxmHint: string; nxmDownloading: string; nxmDone: string; nxmError: string; nxmOther: string; nxmClaim: string;
 }
 
 export const INSTALLER_UI: Record<Language, InstallerUi> = {
@@ -121,6 +122,8 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
 
 export const MANUAL_UI: Record<Language, ManualUi> = {
   fr: {
+    nxmHint: 'Compte gratuit : sur la page Nexus, cliquez sur « Mod Manager Download » puis « Slow download ». mABBAJACK reçoit le fichier et le range tout seul dans DOWNLOADS.', nxmDownloading: 'Réception de {name}…', nxmDone: '{name} reçu.', nxmError: 'Échec du lien Nexus : {error}',
+    nxmOther: 'Les liens Nexus s\'ouvrent pour l\'instant dans {app} : mABBAJACK ne recevra pas les fichiers.', nxmClaim: 'Utiliser mABBAJACK pour les liens Nexus',
     title: 'Téléchargement manuel d\'archives', missingCount: '{n} manquantes ({size})',
     subtitle: 'Téléchargez les archives de mods et déposez-les dans votre dossier DOWNLOADS. Les fichiers du jeu, eux, sont lus dans le dossier du jeu.',
     search: 'Rechercher une archive manquante…', scanning: 'Scan en cours…', verify: 'Vérifier les fichiers',
@@ -131,6 +134,8 @@ export const MANUAL_UI: Record<Language, ManualUi> = {
     gameFile: 'Fichier du jeu', gameFileHint: 'Non téléchargeable : renseignez « Dossier du jeu Skyrim ».', expectedAt: 'Attendu :',
   },
   en: {
+    nxmHint: 'Free account: on the Nexus page, click “Mod Manager Download”, then “Slow download”. mABBAJACK receives the file and puts it in DOWNLOADS by itself.', nxmDownloading: 'Receiving {name}…', nxmDone: '{name} received.', nxmError: 'Nexus link failed: {error}',
+    nxmOther: 'Nexus links currently open in {app}: mABBAJACK will not receive the files.', nxmClaim: 'Use mABBAJACK for Nexus links',
     title: 'Manual archive download', missingCount: '{n} missing ({size})',
     subtitle: 'Download the mod archives and drop them into your DOWNLOADS folder. Game files are read from the game folder instead.',
     search: 'Search a missing archive…', scanning: 'Scanning…', verify: 'Verify files',
@@ -141,6 +146,8 @@ export const MANUAL_UI: Record<Language, ManualUi> = {
     gameFile: 'Game file', gameFileHint: 'Not downloadable: fill in "Skyrim game folder".', expectedAt: 'Expected at:',
   },
   es: {
+    nxmHint: 'Cuenta gratuita: en la página de Nexus, pulsa «Mod Manager Download» y luego «Slow download». mABBAJACK recibe el archivo y lo guarda solo en DOWNLOADS.', nxmDownloading: 'Recibiendo {name}…', nxmDone: '{name} recibido.', nxmError: 'Fallo del enlace de Nexus: {error}',
+    nxmOther: 'Los enlaces de Nexus se abren ahora en {app}: mABBAJACK no recibirá los archivos.', nxmClaim: 'Usar mABBAJACK para los enlaces de Nexus',
     title: 'Descarga manual de archivos', missingCount: '{n} faltantes ({size})',
     subtitle: 'Descargue los archivos de mods y colóquelos en su carpeta DOWNLOADS. Los archivos del juego se leen desde la carpeta del juego.',
     search: 'Buscar un archivo faltante…', scanning: 'Escaneando…', verify: 'Verificar archivos',
@@ -151,6 +158,8 @@ export const MANUAL_UI: Record<Language, ManualUi> = {
     gameFile: 'Archivo del juego', gameFileHint: 'No descargable: indique «Carpeta del juego Skyrim».', expectedAt: 'Esperado en:',
   },
   it: {
+    nxmHint: 'Account gratuito: nella pagina Nexus, fai clic su «Mod Manager Download» e poi su «Slow download». mABBAJACK riceve il file e lo mette da solo in DOWNLOADS.', nxmDownloading: 'Ricezione di {name}…', nxmDone: '{name} ricevuto.', nxmError: 'Link Nexus non riuscito: {error}',
+    nxmOther: 'Al momento i link Nexus si aprono in {app}: mABBAJACK non riceverà i file.', nxmClaim: 'Usa mABBAJACK per i link Nexus',
     title: 'Download manuale degli archivi', missingCount: '{n} mancanti ({size})',
     subtitle: 'Scaricare gli archivi delle mod e metterli nella cartella DOWNLOADS. I file del gioco vengono invece letti dalla cartella del gioco.',
     search: 'Cerca un archivio mancante…', scanning: 'Scansione in corso…', verify: 'Verifica file',

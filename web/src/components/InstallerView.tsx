@@ -156,7 +156,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
     setIsVerifyingKey(true); setKeyMsg(null);
     try {
       const acc = await onVerifyNexusKey(apiKeyInput.trim());
-      setNexusApiKey(apiKeyInput.trim()); localStorage.setItem('mabbajack_nexus_key', apiKeyInput.trim());
+      setNexusApiKey(apiKeyInput.trim());
       setKeyMsg(acc.valid
         ? `✓ ${acc.name} — ${acc.isPremium ? ui.premiumAuto : ui.standardManual}`
         : acc.offline ? ui.keyOffline : ui.keyInvalid);
@@ -357,13 +357,13 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
           </p>
           <ApiKeyRow
             value={apiKeyInput}
-            onChange={(v) => { setApiKeyInput(v); setNexusApiKey(v); localStorage.setItem('mabbajack_nexus_key', v); }}
+            onChange={(v) => { setApiKeyInput(v); setNexusApiKey(v); }}
             onPaste={async () => {
               let text = await getNativeClipboard();
               if (!text?.trim()) { const fb = prompt(ui.pasteKeyPrompt); if (fb !== null) text = fb; }
               if (text?.trim()) {
                 const key = text.trim();
-                setApiKeyInput(key); setNexusApiKey(key); localStorage.setItem('mabbajack_nexus_key', key);
+                setApiKeyInput(key); setNexusApiKey(key);
                 setKeyMsg(`${ui.keyPasted} (${key.slice(0, 8)}… · ${key.length})`);
               }
             }}

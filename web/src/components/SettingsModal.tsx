@@ -91,7 +91,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       const key = pastedText.trim();
       setKeyInput(key);
       setNexusApiKey(key);
-      localStorage.setItem('mabbajack_nexus_key', key);
       setVerifyMessage(`${ui.keyPasted} (${key.slice(0, 8)}… · ${key.length})`);
     }
   };
@@ -103,7 +102,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     try {
       const acc = await onVerifyNexusKey(keyInput.trim());
       setNexusApiKey(keyInput.trim());
-      localStorage.setItem('mabbajack_nexus_key', keyInput.trim());
       if (acc.valid) {
         setVerifyMessage(`✓ ${t.settings.keyValid} ${acc.name} (${acc.isPremium ? 'Premium ⭐' : 'Standard'})`);
       } else {
@@ -119,7 +117,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const handleSave = () => {
     const trimmedKey = keyInput.trim();
     setNexusApiKey(trimmedKey);
-    localStorage.setItem('mabbajack_nexus_key', trimmedKey);
 
     const trimmedDownloads = downloadsInput.trim();
     setDefaultDownloadsPath(trimmedDownloads);
@@ -178,7 +175,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     const clean = text.trim();
                     setKeyInput(clean);
                     setNexusApiKey(clean);
-                    localStorage.setItem('mabbajack_nexus_key', clean);
                     setVerifyMessage(`${ui.keyPasted} (${clean.slice(0, 8)}… · ${clean.length})`);
                   }
                 }}

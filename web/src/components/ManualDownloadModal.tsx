@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getApiBaseUrl } from '../services/api';
 import { useI18n } from '../locales';
 import { MANUAL_UI } from '../locales/uiExtra';
 import { ModlistArchive } from '../types/wabbajack';
@@ -33,6 +34,34 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
   const ui = MANUAL_UI[language] ?? MANUAL_UI.fr;
   const isFr = language === 'fr';
   const [search, setSearch] = useState('');
+  const [nxmStatus, setNxmStatus] = useState<{ kind: 'info' | 'success' | 'error'; text: string } | null>(null);
+
+  // Appli qui reçoit les liens nxm:// sur ce Mac : prévenir si ce n'est pas mABBAJACK
+  const [nxmOwner, setNxmOwner] = useState<{ isDefault: boolean; current: string } | null>(null);
+  useEffect(() => {
+    if (!isOpen) return;
+    fetch(`${getApiBaseUrl()}/api/nexus/nxm-handler`).then((r) => r.json()).then(setNxmOwner).catch(() => setNxmOwner(null));
+  }, [isOpen]);
+  const claimNxm = async () => {
+    try { setNxmOwner(await (await fetch(`${getApiBaseUrl()}/api/nexus/nxm-handler`, { method: 'POST' })).json()); } catch { /* rien */ }
+  };
+
+  // Fichiers reçus par les liens nxm:// pendant que la fenêtre est ouverte : nouvelle vérification à chaque arrivée.
+  useEffect(() => {
+    if (!isOpen) return;
+    const sse = new EventSource(`${getApiBaseUrl()}/api/install/stream`);
+    sse.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type !== 'nxm') return;
+        const { status, name = '', error = '' } = data.nxm || {};
+        if (status === 'downloading') setNxmStatus({ kind: 'info', text: ui.nxmDownloading.replace('{name}', name) });
+        else if (status === 'done') { setNxmStatus({ kind: 'success', text: ui.nxmDone.replace('{name}', name) }); onScanDownloads(); }
+        else if (status === 'error') setNxmStatus({ kind: 'error', text: ui.nxmError.replace('{error}', error) });
+      } catch { /* message d'un autre type */ }
+    };
+    return () => sse.close();
+  }, [isOpen, ui, onScanDownloads]);
 
   if (!isOpen) return null;
 
@@ -52,7 +81,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
 
     if (state.ModID && state.FileID) {
       const game = state.GameName || 'skyrimspecialedition';
-      return `https://www.nexusmods.com/${game}/mods/${state.ModID}?tab=files&file_id=${state.FileID}`;
+      return `https://www.nexusmods.com/${game}/mods/${state.ModID}?tab=files&file_id=${state.FileID}&nmm=1`;
     }
 
     if (state.ModID) {
@@ -92,6 +121,16 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                 </span>
               </h2>
               <p className="text-meta text-[#8f8f8f]">{ui.subtitle}</p>
+              <p className="text-meta text-[#8f8f8f] mt-1">{ui.nxmHint}</p>
+              {nxmOwner && !nxmOwner.isDefault && (
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <p className="text-meta text-[#f59e0b]">{ui.nxmOther.replace('{app}', nxmOwner.current || '?')}</p>
+                  <button onClick={claimNxm} className="text-meta px-2 py-0.5 rounded border border-[#f59e0b] text-[#f59e0b] hover:bg-[#f59e0b]/10">{ui.nxmClaim}</button>
+                </div>
+              )}
+              {nxmStatus && (
+                <p className={`text-meta mt-1 ${nxmStatus.kind === 'error' ? 'text-[#f87171]' : nxmStatus.kind === 'success' ? 'text-[#4ade80]' : 'text-[#0ea5e9]'}`}>{nxmStatus.text}</p>
+              )}
             </div>
           </div>
 

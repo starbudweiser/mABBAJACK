@@ -22,6 +22,8 @@ import { nexusPremiumCache } from './nexus.js';
 import { find7z } from './tools.js';
 import { startInstall } from './install.js';
 import { APP_VERSION, NEXUS_APP_HEADERS } from './version.js';
+import { readKey, saveKey, deleteKey } from './keychain.js';
+import { handleNxm, parseNxm, setNxmTarget, nxmHandler, claimNxmHandler } from './nxm.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -755,6 +757,29 @@ app.post('/api/downloads/trash', async (req, res) => {
     res.json({ moved: paths.length });
   } catch (err) { res.status(500).json({ error: String(err.message || err) }); }
 });
+
+// Clé Nexus : rangée dans le trousseau macOS (l'interface ne la garde plus dans son stockage local).
+app.get('/api/nexus/key', async (_req, res) => res.json({ key: await readKey() }));
+app.put('/api/nexus/key', async (req, res) => {
+  const key = String(req.body?.key || '').trim();
+  try { await (key ? saveKey(key) : deleteKey()); res.json({ ok: true }); }
+  catch (err) { res.status(400).json({ ok: false, error: String(err.message || err) }); }
+});
+
+// Liens nxm:// transmis par l'application (gestionnaire de liens macOS) ; le téléchargement continue en tâche de fond.
+app.post('/api/nexus/nxm', async (req, res) => {
+  const url = String(req.body?.url || '');
+  if (!parseNxm(url)) return res.status(400).json({ ok: false, error: 'Lien nxm invalide' });
+  // Au premier lancement après la mise à jour, l'interface déplace encore l'ancienne clé dans le trousseau
+  let key = await readKey();
+  for (let i = 0; !key && i < 10; i++) { await new Promise((r) => setTimeout(r, 500)); key = await readKey(); }
+  if (!key) { broadcastLog('warn', '⚠ Lien nxm reçu, mais aucune clé API Nexus n\'est enregistrée'); return res.status(400).json({ ok: false, error: 'Clé API Nexus absente' }); }
+  res.status(202).json({ ok: true });
+  handleNxm(url, key).catch(() => { /* déjà signalé dans le journal */ });
+});
+app.get('/api/nexus/nxm-handler', async (_req, res) => res.json(await nxmHandler()));
+app.post('/api/nexus/nxm-handler', async (_req, res) => res.json(await claimNxmHandler()));
+app.put('/api/nexus/nxm-target', (req, res) => { setNxmTarget(String(req.body?.downloadsPath || '')); res.json({ ok: true }); });
 
 app.post('/api/nexus/check-key', async (req, res) => {
   const { key } = req.body;

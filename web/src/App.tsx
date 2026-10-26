@@ -22,6 +22,7 @@ import {
 } from './types/wabbajack';
 import JSZip from 'jszip';
 import { getApiBaseUrl, locateWabbajack, pickNativeFile, openFolderInFinder, uploadWabbajack, scanDownloads, ScanProgress } from './services/api';
+import { loadNexusKey, storeNexusKey } from './services/nexusKey';
 import ImportProgress, { ImportProgressState } from './components/ImportProgress';
 import { sendClientLog } from './services/clientLog';
 import { useI18n } from './locales';
@@ -274,9 +275,7 @@ export const App: React.FC = () => {
   });
 
   // Nexus Status
-  const [nexusApiKey, setNexusApiKey] = useState<string>(() => {
-    return localStorage.getItem('mabbajack_nexus_key') || '';
-  });
+  const [nexusApiKey, setNexusApiKey] = useState<string>('');
   const [nexusAccount, setNexusAccount] = useState<NexusAccount | null>(null);
 
   // Installation & Tracking
@@ -825,12 +824,22 @@ export const App: React.FC = () => {
     };
   }, []);
 
+  // Dossier où mABBAJACK range les fichiers reçus par les liens nxm:// de Nexus
+  useEffect(() => {
+    if (!downloadsPath) return;
+    fetch(`${getApiBaseUrl()}/api/nexus/nxm-target`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ downloadsPath }),
+    }).catch(() => { /* serveur pas encore prêt : réessayé au prochain changement */ });
+  }, [downloadsPath]);
+
   // Initialize data on mount
   useEffect(() => {
     fetchModlists();
-    if (nexusApiKey) {
-      handleVerifyNexusKey(nexusApiKey);
-    }
+    loadNexusKey().then((k) => {
+      if (!k) return;
+      setNexusApiKey(k);
+      handleVerifyNexusKey(k);
+    });
   }, []);
 
   return (
@@ -938,7 +947,7 @@ export const App: React.FC = () => {
             nexusApiKey={nexusApiKey}
             setNexusApiKey={(k: string) => {
               setNexusApiKey(k);
-              localStorage.setItem('mabbajack_nexus_key', k);
+              storeNexusKey(k);
             }}
             onVerifyNexusKey={handleVerifyNexusKey}
             nexusAccount={nexusAccount}
@@ -993,7 +1002,7 @@ export const App: React.FC = () => {
         nexusApiKey={nexusApiKey}
         setNexusApiKey={(k: string) => {
           setNexusApiKey(k);
-          localStorage.setItem('mabbajack_nexus_key', k);
+          storeNexusKey(k);
         }}
         onVerifyNexusKey={handleVerifyNexusKey}
         nexusAccount={nexusAccount}

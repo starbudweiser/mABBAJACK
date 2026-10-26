@@ -81,6 +81,13 @@ PLIST="$APP/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Add :LSMinimumSystemVersion string 13.5" "$PLIST"   # Node 24 : macOS 13.5+
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $VERSION" "$PLIST"
+# Liens nxm:// (bouton « Mod Manager Download » de Nexus) : mABBAJACK les reçoit
+/usr/libexec/PlistBuddy -c "Delete :CFBundleURLTypes" "$PLIST" 2>/dev/null || true
+/usr/libexec/PlistBuddy -c "Add :CFBundleURLTypes array" \
+  -c "Add :CFBundleURLTypes:0 dict" \
+  -c "Add :CFBundleURLTypes:0:CFBundleURLName string com.mabbajack.nxm" \
+  -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes array" \
+  -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes:0 string nxm" "$PLIST"
 
 echo "▶ Signature (certificat local stable)"
 "$(cd "$ROOT/.." && pwd)/_tools/sign_app.sh" "$APP" "$VERSION"
