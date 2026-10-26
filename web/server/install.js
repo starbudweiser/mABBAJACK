@@ -21,6 +21,7 @@ import { getExpectedSkyrimVersion, isGameFileArchive, isIgnorableGameFile, gameF
 import { getNexusDownloadUrl, nexusFetch } from './nexus.js';
 import { makeDirResilient, testWriteAccess, find7z, findUnar, findTexconvBin } from './tools.js';
 import { prepareUpdate, processDirectives } from './directives.js';
+import { resolveMediaFire, resolveModDB, downloadFromMirrors, downloadMega } from './mirrors.js';
 
 const DOWNLOAD_CONCURRENCY = 3; // archives téléchargées en même temps
 const downloadFile = downloadHttp; // reprise (.part + Range) et nouvelles tentatives : downloaders.js
@@ -420,11 +421,15 @@ export async function startInstall(req, res) {
           let url = null;
           let requiresManual = false, manualUrl = null;
 
-          let cdnUrl = null, driveId = null;
+          let cdnUrl = null, driveId = null, hosted = null;
           const stateType = String(state.$type || '');
 
           if (/WabbajackCDN/i.test(stateType) && state.Url) { cdnUrl = state.Url; url = state.Url; }
           else if (/GoogleDrive/i.test(stateType) && state.Id) { driveId = state.Id; url = 'gdrive'; }
+          // Pages d'hébergeurs : le vrai lien est trouvé au moment du téléchargement (mirrors.js)
+          else if (/MediaFire/i.test(stateType) && state.Url) { hosted = 'mediafire'; url = state.Url; }
+          else if (/ModDB/i.test(stateType) && state.Url) { hosted = 'moddb'; url = state.Url; }
+          else if (/^Mega/i.test(stateType) && state.Url) { hosted = 'mega'; url = state.Url; }
           else if (state.Url?.startsWith('http')) { url = state.Url; }
           else if (state.GameName && (state.ModID || state.NexusFileID) && nexusApiKey) {
             const modId = state.ModID || state.NexusFileID;
@@ -463,6 +468,9 @@ export async function startInstall(req, res) {
             const destFile = path.join(destDir, archiveName);
             if (cdnUrl) await downloadWabbajackCdn(cdnUrl, destFile, dlProgress, signal, arc.Size || 0);
             else if (driveId) await downloadGoogleDrive(driveId, destFile, dlProgress, signal, arc.Size || 0);
+            else if (hosted === 'mega') await downloadMega(url, destFile, dlProgress, signal);
+            else if (hosted === 'mediafire') await downloadFile(await resolveMediaFire(url, signal), destFile, dlProgress, signal);
+            else if (hosted === 'moddb') await downloadFromMirrors(await resolveModDB(url, signal), destFile, dlProgress, signal, downloadFile);
             else await downloadFile(url, destFile, dlProgress, signal);
             const check = await verifyArchive(arc, destFile, { cache: hashCache, signal });
             hashCache.save();

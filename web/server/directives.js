@@ -17,6 +17,7 @@ import { resolveDirectivePath, detectGameRootFolders, setGameRootFolders, BSA_ST
 import { readSnapshot, findPreviousWabbajack, manifestEntries, manifestArchives, manifestFingerprint, baselineFromSnapshot, baselineFromManifest, planUpdate } from './update.js';
 import { isGameFileArchive, isIgnorableGameFile } from './gamefiles.js';
 import { makeDirResilient, purgeMwabTmpDirs } from './tools.js';
+import { buildMergedPatch } from './mergedpatch.js';
 
 // ──────────────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════
@@ -723,6 +724,19 @@ export async function processDirectives({ directives, archiveStatuses, destRoot,
       } catch (e) {
         broadcastLog('warn', `  ⚠ CreateBSA échoué (${bsaName} : ${String(e.message || e).slice(0, 160)})`);
         debugLog(`CreateBSA échoué : ${d.To}`, e?.stack || e?.message);
+        errors++;
+      }
+      continue;
+    }
+    if (type.includes('mergedpatch')) {
+      const mergeName = path.basename((d.To || '').replace(/\\/g, '/'));
+      try {
+        const r = buildMergedPatch(d, destRoot, await loadPatch(d));
+        broadcastLog('success', `  ✓ Fusion zEdit créée : ${mergeName} (${r.sources} source(s))`);
+        processed++;
+      } catch (e) {
+        broadcastLog('warn', `  ⚠ Fusion zEdit échouée (${mergeName} : ${String(e.message || e).slice(0, 160)})`);
+        debugLog(`MergedPatch échoué : ${d.To}`, e?.stack || e?.message);
         errors++;
       }
       continue;
