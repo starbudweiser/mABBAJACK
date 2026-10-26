@@ -76,7 +76,7 @@ Ce sont des fichiers inline contenant des chemins absolus à remplacer (`%%GAME_
 | 6 | **Volumétrie des patchs** | 47 335 `PatchedFromArchive` (18,6 Go) : déjà OctoDiff ; ajouter statistiques de fallback dans le résumé final. |
 | 7 | **Création de dossiers** | Chemins très longs MO2 (`mods/<nom très long>/…`) : tronquage non nécessaire sur APFS, mais vérifier la limite de 255 octets par composant. |
 | 8 | **Post-install MO2** | Fichiers `ModOrganizer.ini` + `profiles/<nom>/` : s'assurer que `modlist.txt`, `plugins.txt`, `loadorder.txt`, `lockedorder.txt`, `settings.ini`, `Skyrim*.ini` sont écrits tels quels (ils sont tous `InlineFile`). Les copies datées (`*.2026_09_xx`) peuvent être ignorées (≈ 20 fichiers inutiles). |
-| 9 | **Outils Windows** | `tools/` (5 412 fichiers : BodySlide, Pandora, Reqtificator, Synthesis, DynDOLOD, NPC Plugin Chooser…) s'exécute **dans CrossOver/Whisky** ; prévoir un guide post-installation Mac et la détection « bouteille ». |
+| 9 | **Outils Windows** | `tools/` (5 412 fichiers : BodySlide, Pandora, Reqtificator, Synthesis, DynDOLOD, NPC Plugin Chooser…) s'exécute **dans CrossOver ; prévoir un guide post-installation Mac et la détection « bouteille ». |
 | 10 | **Prérequis de la modlist** | Parser le README pour afficher (Skyrim AE, Creation Kit, SSD, langue, VRAMr) dans la console avant l'installation. |
 
 ## 5. Points sans changement

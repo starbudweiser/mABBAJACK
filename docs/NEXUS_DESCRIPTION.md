@@ -19,7 +19,7 @@ Wabbajack is Windows-only. **mABBAJACK** is an unofficial macOS port of the modl
 - Complete install pipeline: FromArchive, InlineFile, PatchedFromArchive (OctoDiff), CreateBSA (native writer, uncompressed), Stock Game / original game files.
 - Automatic Nexus downloads (Premium) or manual links (free account).
 - Vortex-style download folder (`<DOWNLOADS>/skyrimse`).
-- Game auto-detection: Steam, CrossOver, Whisky, `/Volumes/*/GAMES`.
+- Game auto-detection: Steam, CrossOver, `/Volumes/*/GAMES`.
 - Live operation log with filters, saved to `~/Library/Logs/mABBAJACK/`; `plugins.txt` and `loadorder.txt` generated.
 - UI in English, French, Spanish, Italian.
 - Standalone `.app`: native window, Node, 7zz and unar bundled.
@@ -33,18 +33,17 @@ Wabbajack is Windows-only. **mABBAJACK** is an unofficial macOS port of the modl
 ## Requirements (Mac)
 - **macOS 13.5 or later on Apple Silicon** (M1 or later, arm64 only).
 - **Nothing else to install** for the standalone app (no Node, 7zz or unar needed).
-- A **legitimate copy of the game** installed on the Mac (Steam, CrossOver or Whisky).
+- A **legitimate copy of the game** installed on the Mac (Steam, CrossOver).
 - A **Nexus Mods API key**; **Premium account** recommended (free accounts get manual download links).
 - **Disk space**: tens of GB for DOWNLOADS + READY TO PLAY (modlists are often 40–65 GB each).
 - Internet connection.
-- Running the resulting game requires a Windows compatibility layer (CrossOver, Whisky…).
+- Running the resulting game requires a Windows compatibility layer (CrossOver…).
 - Building from source only: python3, npm, Xcode (7zz and unar are compiled by `scripts/build_portable_tools.sh`).
 
 ## Installation
 1. Download and unzip `mABBAJACK.app`, place it in Applications.
-2. The app is **not notarized**: open it once, then **System Settings → Privacy & Security → Open Anyway**, or run `xattr -dr com.apple.quarantine /Applications/mABBAJACK.app`.
-3. Open **Settings**: Nexus API key, DOWNLOADS and READY TO PLAY folders.
-4. Pick a modlist, check the game folder in the **Install** tab, start.
+2. Open **Settings**: Nexus API key, DOWNLOADS and READY TO PLAY folders.
+3. Pick a modlist, check the game folder in the **Install** tab, start.
 
 ## Known limitations
 - Unofficial, not affiliated with Wabbajack.
@@ -61,6 +60,6 @@ Wabbajack team and modlist authors. Local server on port 38300; your API key is 
 # 🇫🇷 Version française
 **mABBAJACK** installe les modlists Wabbajack nativement sur Mac, sans VM Windows. Galerie officielle, inspecteur `.wabbajack`, téléchargements Nexus automatiques (Premium), détection du jeu, journal en direct, interface FR/EN/ES/IT.
 
-**Pré-requis Mac** : macOS 13.5+ sur Apple Silicon, copie légale du jeu (Steam/CrossOver/Whisky), clé API Nexus (Premium recommandé), plusieurs dizaines de Go libres, couche de compatibilité Windows pour lancer le jeu. Au premier lancement (app non notariée) : Réglages Système → Confidentialité et sécurité → « Ouvrir quand même », ou `xattr -dr com.apple.quarantine /Applications/mABBAJACK.app`.
+**Pré-requis Mac** : macOS 13.5+ sur Apple Silicon, copie légale du jeu (Steam/CrossOver), clé API Nexus (Premium recommandé), plusieurs dizaines de Go libres, couche de compatibilité Windows pour lancer le jeu.
 
 **Installation** : ouvrez `mABBAJACK.app` → Paramètres (clé Nexus, dossiers) → choisissez une modlist → onglet Installation → lancez.

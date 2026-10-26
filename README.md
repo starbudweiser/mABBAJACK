@@ -20,7 +20,7 @@ Fonctionnalités :
 - Clé API Nexus rangée dans le **trousseau macOS**.
 - Fusions zEdit (`MergedPatch`) créées.
 - Organisation des téléchargements « à la Vortex » (`<dossier>/skyrimse`).
-- Détection automatique du jeu (Steam, CrossOver, Whisky, `/Volumes/*/GAMES`).
+- Détection automatique du jeu (Steam, CrossOver, `/Volumes/*/GAMES`).
 - Journal en direct (filtres Tous / Avertissements / Erreurs), journaux enregistrés dans `~/Library/Logs/mABBAJACK/`.
 - Interface en 4 langues : français, anglais, espagnol, italien.
 - Application autonome : fenêtre native, Node, 7zz, unar et texconv embarqués.
@@ -36,7 +36,7 @@ Fonctionnalités :
 - Avertissement de nouvelle version (GitHub, une fois par jour). Historique : [CHANGELOG.md](CHANGELOG.md).
 
 ### Pourquoi cette application ?
-Wabbajack est uniquement disponible sous Windows. Les utilisateurs de Mac devaient passer par une VM lourde et lente. mABBAJACK a été créé pour offrir une installation native, simple, sans VM, avec des fichiers directement utilisables (par exemple via CrossOver ou Whisky).
+Wabbajack est uniquement disponible sous Windows. Les utilisateurs de Mac devaient passer par une VM lourde et lente. mABBAJACK a été créé pour offrir une installation native, simple, sans VM, avec des fichiers directement utilisables (par exemple via CrossOver).
 
 ### Mode d'emploi rapide
 1. Ouvrez `mABBAJACK.app` (premier lancement : clic droit → **Ouvrir**).
@@ -71,7 +71,7 @@ Features:
 - Nexus API key stored in the **macOS Keychain**.
 - zEdit merges (`MergedPatch`) are created.
 - Vortex-style download layout (`<folder>/skyrimse`).
-- Automatic game detection (Steam, CrossOver, Whisky, `/Volumes/*/GAMES`).
+- Automatic game detection (Steam, CrossOver, `/Volumes/*/GAMES`).
 - Live log (All / Warnings / Errors filters); logs saved in `~/Library/Logs/mABBAJACK/`.
 - 4 UI languages: French, English, Spanish, Italian.
 - Standalone app: native window, bundled Node, 7zz, unar and texconv.
@@ -85,10 +85,10 @@ Features:
 - New-version notice (GitHub, once a day). History: [CHANGELOG.md](CHANGELOG.md).
 
 ### Why?
-Wabbajack only runs on Windows. Mac users had to rely on a heavy, slow VM. mABBAJACK provides a native, simple, VM-free install producing files ready to use (e.g. through CrossOver or Whisky).
+Wabbajack only runs on Windows. Mac users had to rely on a heavy, slow VM. mABBAJACK provides a native, simple, VM-free install producing files ready to use (e.g. through CrossOver).
 
 ### Quick start
-1. Open `mABBAJACK.app` (not notarized — first launch: **System Settings → Privacy & Security → Open Anyway**, or `xattr -dr com.apple.quarantine /Applications/mABBAJACK.app`).
+1. Open `mABBAJACK.app`.
 2. **Settings**: enter your Nexus API key and pick the *DOWNLOADS* and *READY TO PLAY* folders.
 3. Pick a modlist in the **gallery** (or drop a `.wabbajack` file).
 4. **Install** tab: check the 3 folders and the game folder (auto-detected).

@@ -6,7 +6,7 @@
 //   *_DOUBLE_BACK  → chemin Windows échappé (JSON/INI)     (Z:\\Volumes\\X)
 //   *_FORWARD      → chemin avec slashs                    (Z:/Volumes/X)
 //
-// Les chemins macOS sont exposés à Wine/CrossOver/Whisky sous la lettre Z: (racine « / »).
+// Les chemins macOS sont exposés à Wine/CrossOver sous la lettre Z: (racine « / »).
 
 const MAGIC_RE = /\{--\|\|(MO2|GAME|DOWNLOAD)_PATH_MAGIC_(DOUBLE_BACK|BACK|FORWARD)\|\|--\}/g;
 

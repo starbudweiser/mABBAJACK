@@ -1,4 +1,4 @@
-// Fichiers originaux du jeu : détection des dossiers du jeu (Steam, CrossOver, Whisky, volumes) et
+// Fichiers originaux du jeu : détection des dossiers du jeu (Steam, CrossOver, volumes) et
 // localisation des archives « fichier du jeu » du manifeste.
 
 import fs from 'fs';

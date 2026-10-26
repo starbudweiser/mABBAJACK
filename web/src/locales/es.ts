@@ -112,7 +112,7 @@ export const es: Translations = {
     modeMo2Desc: 'Organiza los mods en una estructura aislada MO2 (mods/, profiles/, overwrite/).',
     gamePathOptional: 'Opcional: No se requiere verificación del juego. La instalación continúa libremente.',
     gameFolderTitle: '3. Carpeta del juego Skyrim',
-    gameFolderHint: 'Carpeta que contiene Data/. Algunas modlists reutilizan archivos ORIGINALES del juego (p. ej. «Skyrim - Animations.bsa»): no se descargan, se leen desde aquí. Vacío = detección automática (Steam, CrossOver, Whisky, /Volumes/*/GAMES).',
+    gameFolderHint: 'Carpeta que contiene Data/. Algunas modlists reutilizan archivos ORIGINALES del juego (p. ej. «Skyrim - Animations.bsa»): no se descargan, se leen desde aquí. Vacío = detección automática (Steam, CrossOver, /Volumes/*/GAMES).',
     gameFolderSelect: 'Seleccione la carpeta del juego Skyrim',
     gameFilesMissing: '{n} archivo(s) original(es) del juego no encontrado(s):',
     gameFilesFound: '✓ Archivos originales del juego encontrados',
