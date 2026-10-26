@@ -16,7 +16,9 @@ Fonctionnalités :
 - Inspecteur de fichier `.wabbajack` (glisser-déposer).
 - Installation complète : extraction (7zz / unar, lecteur BSA natif), patchs OctoDiff, textures transformées converties avec texconv (DirectXTex natif), création de BSA native, fichiers originaux du jeu copiés sans décompression.
 - Mise à jour d'une liste déjà installée : au chargement d'une nouvelle version, mods ajoutés / supprimés / modifiés et archives à télécharger ; seuls les fichiers nouveaux ou modifiés sont réinstallés, les fichiers retirés sont supprimés (état de l'installation enregistré dans `.mabbajack/`).
-- Téléchargements Nexus automatiques (compte **Premium**) ou liens manuels (compte standard).
+- Téléchargements Nexus automatiques (compte **Premium**) ; avec un compte gratuit, le bouton **Mod Manager Download** de Nexus envoie le fichier directement à mABBAJACK (liens `nxm://`). Sources Wabbajack CDN, Google Drive, MediaFire, ModDB et Mega prises en charge.
+- Clé API Nexus rangée dans le **trousseau macOS**.
+- Fusions zEdit (`MergedPatch`) créées.
 - Organisation des téléchargements « à la Vortex » (`<dossier>/skyrimse`).
 - Détection automatique du jeu (Steam, CrossOver, Whisky, `/Volumes/*/GAMES`).
 - Journal en direct (filtres Tous / Avertissements / Erreurs), journaux enregistrés dans `~/Library/Logs/mABBAJACK/`.
@@ -24,6 +26,14 @@ Fonctionnalités :
 - Application autonome : fenêtre native, Node, 7zz, unar et texconv embarqués.
 
 ![Galerie](docs/screenshots/gallery.png)
+
+### Nouveautés de la 1.1.0
+
+- Clé API Nexus dans le trousseau macOS (l'ancienne clé est déplacée automatiquement).
+- Comptes gratuits : liens `nxm://` (Mod Manager Download). La fenêtre des téléchargements manuels prévient si une autre appli (Vortex, mORTEX…) reçoit les liens Nexus.
+- Fusions zEdit (`MergedPatch`) maintenant créées ; elles étaient ignorées sans message.
+- Correctif : MediaFire et ModDB téléchargeaient la page web au lieu du fichier. Nouveau : Mega.
+- Avertissement de nouvelle version (GitHub, une fois par jour). Historique : [CHANGELOG.md](CHANGELOG.md).
 
 ### Pourquoi cette application ?
 Wabbajack est uniquement disponible sous Windows. Les utilisateurs de Mac devaient passer par une VM lourde et lente. mABBAJACK a été créé pour offrir une installation native, simple, sans VM, avec des fichiers directement utilisables (par exemple via CrossOver ou Whisky).
@@ -57,12 +67,22 @@ Features:
 - `.wabbajack` file inspector (drag & drop).
 - Full install: extraction (7zz / unar, native BSA reader), OctoDiff patches, transformed textures converted with texconv (native DirectXTex), native BSA writer, original game files copied without decompression.
 - Updating an installed list: when a new version is loaded, mods added / removed / changed and archives to download are listed; only new or changed files are reinstalled, removed files are deleted (installation state saved in `.mabbajack/`).
-- Automatic Nexus downloads (**Premium** account) or manual links (free account).
+- Automatic Nexus downloads (**Premium** account); with a free account, Nexus's **Mod Manager Download** button sends the file straight to mABBAJACK (`nxm://` links). Wabbajack CDN, Google Drive, MediaFire, ModDB and Mega sources are supported.
+- Nexus API key stored in the **macOS Keychain**.
+- zEdit merges (`MergedPatch`) are created.
 - Vortex-style download layout (`<folder>/skyrimse`).
 - Automatic game detection (Steam, CrossOver, Whisky, `/Volumes/*/GAMES`).
 - Live log (All / Warnings / Errors filters); logs saved in `~/Library/Logs/mABBAJACK/`.
 - 4 UI languages: French, English, Spanish, Italian.
 - Standalone app: native window, bundled Node, 7zz, unar and texconv.
+
+### What's new in 1.1.0
+
+- Nexus API key stored in the macOS Keychain (an existing key is moved automatically).
+- Free accounts: `nxm://` links (Mod Manager Download). The manual download window warns you if another app (Vortex, mORTEX…) receives Nexus links.
+- zEdit merges (`MergedPatch`) are now created; they used to be skipped without a message.
+- Fix: MediaFire and ModDB downloaded the web page instead of the file. New: Mega.
+- New-version notice (GitHub, once a day). History: [CHANGELOG.md](CHANGELOG.md).
 
 ### Why?
 Wabbajack only runs on Windows. Mac users had to rely on a heavy, slow VM. mABBAJACK provides a native, simple, VM-free install producing files ready to use (e.g. through CrossOver or Whisky).

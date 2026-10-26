@@ -3,6 +3,20 @@
 [i]Part of the [url=https://www.nexusmods.com/skyrimspecialedition/mods/196272]Skyrim Mac Toolkit[/url], native modding tools for Skyrim SE on macOS. Published on its own page because of its size.[/i]
 [i](Version française plus bas : cliquez sur « Show » pour la déplier.)[/i]
 
+[size=4][b][color=#0ea5e9]Why mABBAJACK?[/color][/b][/size]
+[list]
+[*][b]An installer, not a new ecosystem[/b]: it installs the list into a plain folder that you then play with CrossOver, Whisky or your own Wine setup. No launcher to adopt, no second mod manager, no Wine/Steam environment imposed on you.
+[*][b]Look before you commit[/b]: the inspector shows a .wabbajack file's archives, size and requirements before anything is downloaded, and the free disk space is checked first.
+[*][b]Made for 100+ GB lists[/b]: resumable downloads, automatic retries on network errors and Nexus limits, three downloads at a time, and every archive is verified against the list's hashes.
+[*][b]Updates that don't start over[/b]: install a newer version of a list and only the changed files are rewritten. The same function verifies and repairs an existing install.
+[*][b]Free accounts welcome[/b]: click [i]Mod Manager Download[/i] on Nexus and mABBAJACK receives the file by itself (nxm:// link). Premium accounts download everything automatically.
+[*][b]Handles the awkward cases[/b]: BSA files over 2 GB (which Skyrim SE reads as empty) are installed as loose files; zEdit merges and MediaFire, ModDB and Mega sources are supported.
+[*][b]Tidy afterwards[/b]: finds the archives no installed list uses any more and moves them to the Trash. Nothing is ever deleted for good.
+[*][b]Safe by design[/b]: your API key lives in the macOS Keychain, and the local server only answers on 127.0.0.1.
+[*][b]Speaks your language[/b]: full interface in English, French, Spanish and Italian.
+[/list]
+[i]Other Mac approaches exist, such as all-in-one launchers like SkyrimMT that bring their own Wine setup and mod manager. mABBAJACK does one job, installing Wabbajack lists, and fits the setup you already have.[/i]
+
 [size=4][b][color=#0ea5e9]What is it?[/color][/b][/size]
 Wabbajack only runs on Windows. [b]mABBAJACK[/b] is an unofficial macOS reimplementation of the modlist [b]installation[/b] process: browse the official gallery, pick a list, and install it with one click. The installed list is then played through a Windows compatibility layer (CrossOver, Whisky…).
 
@@ -10,8 +24,8 @@ Wabbajack only runs on Windows. [b]mABBAJACK[/b] is an unofficial macOS reimplem
 [list]
 [*][b]Official gallery[/b] (~226 modlists): Skyrim SE / AE / VR, Enderal and other games, with tags, search and sorting.
 [*][b].wabbajack inspector[/b]: drag and drop a file to see its archives, size and requirements.
-[*][b]Complete install pipeline[/b]: FromArchive, InlineFile, PatchedFromArchive (OctoDiff), CreateBSA (native writer), TransformedTexture (native texconv), Stock Game / original game files.
-[*][b]Nexus downloads[/b]: automatic with a Premium account (3 in parallel), manual links with a free account.
+[*][b]Complete install pipeline[/b]: FromArchive, InlineFile, PatchedFromArchive (OctoDiff), CreateBSA (native writer), TransformedTexture (native texconv), MergedPatch (zEdit merges), Stock Game / original game files.
+[*][b]Downloads[/b]: Nexus (automatic with a Premium account, 3 in parallel; free accounts use the Mod Manager Download button, or manual links), Wabbajack CDN, Google Drive, MediaFire, ModDB and Mega.
 [*][b]Resumable downloads[/b]: an interrupted download restarts where it stopped; automatic retries on network errors and Nexus rate limits.
 [*][b]Update and repair[/b]: reinstall the same version to check and repair an install; only changed files are rewritten.
 [*][b]Download cleanup[/b]: finds the archives no installed list uses any more and moves them to the Trash.
@@ -42,7 +56,7 @@ Wabbajack only runs on Windows. [b]mABBAJACK[/b] is an unofficial macOS reimplem
 
 [size=4][b][color=#0ea5e9]Privacy and security[/color][/b][/size]
 [list]
-[*]Your API key stays on your Mac and is never written to the logs.
+[*]Your API key is stored in the macOS Keychain, stays on your Mac and is never written to the logs.
 [*]The app's local server only listens on 127.0.0.1 and refuses requests coming from web pages.
 [*]Nothing is ever deleted permanently: the download cleanup uses the macOS Trash.
 [/list]
@@ -68,6 +82,20 @@ Made by [b]Stephan Le Gac Savoye (Starbudweiser)[/b] with [b]Claude Code[/b]. MI
 [i]Ni machine virtuelle Windows, ni installateur enveloppé dans Wine : une appli macOS native (Apple Silicon) qui installe les modlists Wabbajack.[/i]
 [i]Fait partie du [url=https://www.nexusmods.com/skyrimspecialedition/mods/196272]Skyrim Mac Toolkit[/url], des outils de modding natifs pour Skyrim SE sur macOS. Publié sur sa propre page à cause de sa taille.[/i]
 
+[size=4][b][color=#0ea5e9]Pourquoi mABBAJACK ?[/color][/b][/size]
+[list]
+[*][b]Un installateur, pas un nouvel écosystème[/b] : il installe la liste dans un dossier ordinaire que vous jouez ensuite avec CrossOver, Whisky ou votre propre configuration Wine. Pas de lanceur à adopter, pas de second gestionnaire de mods, pas d'environnement Wine/Steam imposé.
+[*][b]Regarder avant de s'engager[/b] : l'inspecteur montre les archives, la taille et les prérequis d'un fichier .wabbajack avant tout téléchargement, et l'espace disque libre est vérifié d'abord.
+[*][b]Pensé pour les listes de 100 Go et plus[/b] : téléchargements avec reprise, nouvelles tentatives automatiques en cas d'erreur réseau ou de limite Nexus, trois téléchargements à la fois, et chaque archive est vérifiée avec les empreintes de la liste.
+[*][b]Des mises à jour sans tout recommencer[/b] : installez une version plus récente d'une liste et seuls les fichiers modifiés sont réécrits. La même fonction vérifie et répare une installation existante.
+[*][b]Les comptes gratuits sont bienvenus[/b] : cliquez sur [i]Mod Manager Download[/i] sur Nexus et mABBAJACK reçoit le fichier tout seul (lien nxm://). Les comptes Premium téléchargent tout automatiquement.
+[*][b]Les cas difficiles sont gérés[/b] : les BSA de plus de 2 Go (que Skyrim SE lit comme vides) sont installés en fichiers libres ; les fusions zEdit et les sources MediaFire, ModDB et Mega sont prises en charge.
+[*][b]Rangé après coup[/b] : repère les archives qu'aucune liste installée n'utilise plus et les place dans la Corbeille. Rien n'est jamais supprimé définitivement.
+[*][b]Sûr par conception[/b] : votre clé API est rangée dans le trousseau macOS, et le serveur local ne répond que sur 127.0.0.1.
+[*][b]Parle votre langue[/b] : interface complète en français, anglais, espagnol et italien.
+[/list]
+[i]D'autres approches existent sur Mac, comme les lanceurs tout-en-un tel SkyrimMT, qui apportent leur propre configuration Wine et leur gestionnaire de mods. mABBAJACK fait un seul travail, installer les listes Wabbajack, et s'adapte à la configuration que vous avez déjà.[/i]
+
 [size=4][b][color=#0ea5e9]Qu'est-ce que c'est ?[/color][/b][/size]
 Wabbajack ne fonctionne que sous Windows. [b]mABBAJACK[/b] est une réimplémentation non officielle pour macOS du processus d'[b]installation[/b] des modlists : parcourez la galerie officielle, choisissez une liste et installez-la en un clic. La liste installée se joue ensuite via une couche de compatibilité Windows (CrossOver, Whisky…).
 
@@ -75,8 +103,8 @@ Wabbajack ne fonctionne que sous Windows. [b]mABBAJACK[/b] est une réimplément
 [list]
 [*][b]Galerie officielle[/b] (~226 modlists) : Skyrim SE / AE / VR, Enderal et d'autres jeux, avec tags, recherche et tri.
 [*][b]Inspecteur .wabbajack[/b] : glissez-déposez un fichier pour voir ses archives, sa taille et ses prérequis.
-[*][b]Chaîne d'installation complète[/b] : FromArchive, InlineFile, PatchedFromArchive (OctoDiff), CreateBSA (écriture native), TransformedTexture (texconv natif), Stock Game / fichiers originaux du jeu.
-[*][b]Téléchargements Nexus[/b] : automatiques avec un compte Premium (3 en parallèle), liens manuels avec un compte gratuit.
+[*][b]Chaîne d'installation complète[/b] : FromArchive, InlineFile, PatchedFromArchive (OctoDiff), CreateBSA (écriture native), TransformedTexture (texconv natif), MergedPatch (fusions zEdit), Stock Game / fichiers originaux du jeu.
+[*][b]Téléchargements[/b] : Nexus (automatiques avec un compte Premium, 3 en parallèle ; les comptes gratuits utilisent le bouton Mod Manager Download, ou des liens manuels), Wabbajack CDN, Google Drive, MediaFire, ModDB et Mega.
 [*][b]Téléchargements avec reprise[/b] : un téléchargement interrompu reprend là où il s'était arrêté ; nouvelles tentatives automatiques en cas d'erreur réseau ou de limite de requêtes Nexus.
 [*][b]Mise à jour et réparation[/b] : réinstallez la même version pour vérifier et réparer une installation ; seuls les fichiers modifiés sont réécrits.
 [*][b]Nettoyage des téléchargements[/b] : repère les archives qu'aucune liste installée n'utilise plus et les place dans la Corbeille.
@@ -107,7 +135,7 @@ Wabbajack ne fonctionne que sous Windows. [b]mABBAJACK[/b] est une réimplément
 
 [size=4][b][color=#0ea5e9]Confidentialité et sécurité[/color][/b][/size]
 [list]
-[*]Votre clé API reste sur votre Mac et n'est jamais écrite dans les journaux.
+[*]Votre clé API est rangée dans le trousseau macOS, reste sur votre Mac et n'est jamais écrite dans les journaux.
 [*]Le serveur local de l'appli n'écoute que sur 127.0.0.1 et refuse les requêtes venant de pages web.
 [*]Rien n'est jamais supprimé définitivement : le nettoyage des téléchargements passe par la Corbeille de macOS.
 [/list]
