@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<title>mABBAJACK</title>
+<style>
+  /* Écran de lancement animé (règle Socle « Splash animé », modèle : mORTEX) :
+     icône qui se retourne dans un anneau, titre lettre à lettre, sous-titre, sortie en zoom arrière */
+  :root {
+    --cyan-1: #7dd3fc;
+    --cyan-2: #0ea5e9;
+    --orange: #f59e0b;
+    --text: #ffffff;
+    --muted: #93a4c3;
+  }
+
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  }
+
+  /* fenêtre 500 × 190 : carte 476 × 166 et marge de 12 px pour son ombre */
+  .stage {
+    position: absolute;
+    inset: 12px;
+    perspective: 900px;
+  }
+
+  .card {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 0 28px 0 30px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(160deg, #1b3a6b 0%, #0e1d40 55%, #080e22 100%);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 8%) inset,
+      0 10px 24px rgb(0 0 0 / 45%);
+    transform-style: preserve-3d;
+    animation: card-in 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Lueur cyan derrière l'icône */
+  .card::before {
+    content: "";
+    position: absolute;
+    left: -50px;
+    top: 50%;
+    width: 250px;
+    height: 250px;
+    margin-top: -125px;
+    background: radial-gradient(circle, rgb(14 165 233 / 26%), transparent 65%);
+    opacity: 0;
+    animation: glow 1.4s 300ms ease-out forwards;
+  }
+
+  /* Reflet qui balaie la carte */
+  .card::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 40%;
+    height: 200%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 9%) 45%,
+      rgb(255 255 255 / 16%) 50%, rgb(255 255 255 / 9%) 55%, transparent);
+    transform: rotate(8deg) translateX(0);
+    animation: sheen 1.1s 1.35s ease-in-out forwards;
+  }
+
+  /* ---- Logo ---- */
+  .logo {
+    position: relative;
+    flex: 0 0 auto;
+    width: 112px;
+    height: 112px;
+    perspective: 500px;
+  }
+
+  /* Anneau en arc qui tourne autour de l'icône */
+  .ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0 18%, var(--cyan-2) 40%, var(--cyan-1) 58%,
+      transparent 60% 72%, var(--orange) 82%, transparent 84%);
+    -webkit-mask: radial-gradient(circle, transparent 52px, #000 53px 55px, transparent 56px);
+    mask: radial-gradient(circle, transparent 52px, #000 53px 55px, transparent 56px);
+    filter: drop-shadow(0 0 4px rgb(56 189 248 / 60%));
+    animation:
+      ring-in 1.3s cubic-bezier(0.22, 1, 0.36, 1) both,
+      ring-idle 3.2s 1.3s linear infinite;
+  }
+
+  .icon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 96px;
+    height: 96px;
+    margin: -48px 0 0 -48px;
+    filter: drop-shadow(0 4px 10px rgb(0 0 0 / 45%));
+    animation:
+      icon-in 1.5s 150ms cubic-bezier(0.34, 1.3, 0.5, 1) both,
+      heartbeat 1.6s 1.65s ease-in-out infinite;
+  }
+
+  /* ---- Titre ---- */
+  .text {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .title {
+    display: flex;
+    margin: 0;
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    perspective: 400px;
+    white-space: nowrap;
+  }
+
+  .title span {
+    display: inline-block;
+    transform-origin: 50% 85%;
+    animation: letter-in 700ms cubic-bezier(0.2, 1.2, 0.4, 1) both;
+    animation-delay: calc(450ms + var(--i) * 60ms);
+  }
+
+  .title .m {
+    background: linear-gradient(135deg, var(--cyan-1), var(--cyan-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .rule {
+    height: 2px;
+    margin: 10px 0 9px;
+    border-radius: 1px;
+    background: linear-gradient(90deg, var(--cyan-1), var(--cyan-2) 55%, var(--orange) 75%, transparent);
+    transform-origin: left center;
+    animation: rule-in 700ms 1s cubic-bezier(0.65, 0, 0.35, 1) both;
+  }
+
+  .subtitle {
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: #d6e2f5;
+    white-space: nowrap;
+    text-transform: uppercase;
+    animation: subtitle-in 900ms 1.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .footer {
+    position: absolute;
+    right: 18px;
+    bottom: 10px;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    text-transform: uppercase;
+    animation: fade-in 600ms 1.5s ease-out both;
+  }
+
+  /* Sortie : zoom arrière avec rebond (easeInBack) — la carte gonfle un peu puis se replie */
+  body.leaving .stage {
+    animation: leave 600ms cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+  }
+
+  @keyframes leave {
+    from { opacity: 1; transform: scale(1); }
+    70% { opacity: 1; }
+    to { opacity: 0; transform: scale(0.05); }
+  }
+
+  @keyframes card-in {
+    from { opacity: 0; transform: rotateX(28deg) rotateY(-14deg) translateZ(-120px) scale(0.92); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes glow { to { opacity: 1; } }
+
+  @keyframes sheen { to { transform: rotate(8deg) translateX(520%); } }
+
+  @keyframes ring-in {
+    from { opacity: 0; transform: rotate(-420deg) scale(0.2); }
+    40% { opacity: 1; }
+    to { opacity: 1; transform: rotate(0deg) scale(1); }
+  }
+
+  @keyframes ring-idle { to { transform: rotate(360deg); } }
+
+  /* Arrivée en vrille depuis le fond, puis pose de face */
+  @keyframes icon-in {
+    from { opacity: 0; transform: translateZ(-200px) rotateY(-540deg) rotateX(30deg) scale(0.3); }
+    25% { opacity: 1; }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Battement : double pulsation puis repos (propriété « scale » séparée de « transform ») */
+  @keyframes heartbeat {
+    0%, 100% { scale: 1; }
+    14% { scale: 1.06; }
+    28% { scale: 0.94; }
+    42% { scale: 1.04; }
+    56% { scale: 0.98; }
+    70% { scale: 1; }
+  }
+
+  @keyframes letter-in {
+    from { opacity: 0; transform: rotateX(-95deg) translateY(14px); filter: blur(3px); }
+    to { opacity: 1; transform: none; filter: none; }
+  }
+
+  @keyframes rule-in {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  @keyframes subtitle-in {
+    from { opacity: 0; letter-spacing: 10px; filter: blur(4px); }
+    to { opacity: 1; letter-spacing: 3px; filter: none; }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Splash fixe, mêmes durées */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 1ms !important;
+      animation-delay: 0ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="card">
+      <div class="logo">
+        <div class="ring"></div>
+        <img class="icon" src="{{ICON}}" alt="">
+      </div>
+      <div class="text">
+        <h1 class="title" aria-label="mABBAJACK">
+          <span class="m" style="--i: 0">m</span><span style="--i: 1">A</span><span style="--i: 2">B</span><span style="--i: 3">B</span><span style="--i: 4">A</span><span style="--i: 5">J</span><span style="--i: 6">A</span><span style="--i: 7">C</span><span style="--i: 8">K</span>
+        </h1>
+        <div class="rule"></div>
+        <p class="subtitle" id="subtitle">{{SUBTITLE}}</p>
+      </div>
+      <div class="footer">{{FOOTER}}</div>
+    </div>
+  </div>
+  <script>
+    // Sous-titre traduit plus long que la place : on réduit la police (l'espacement est animé)
+    (function () {
+      var el = document.getElementById("subtitle");
+      var size = 12.5;
+      el.style.animation = "none";  // mesure à l'espacement final
+      while (el.scrollWidth > el.parentNode.clientWidth && size > 9) {
+        size -= 0.5;
+        el.style.fontSize = size + "px";
+      }
+      el.style.animation = "";
+    })();
+    // Appelé par le lanceur à t = 4 s
+    window.splashLeave = function () {
+      document.body.classList.add("leaving");
+    };
+  </script>
+</body>
+</html>

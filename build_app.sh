@@ -68,6 +68,7 @@ echo "▶ PyInstaller"
   --name mABBAJACK \
   --icon "$ROOT/assets/icon.icns" \
   --osx-bundle-identifier com.mabbajack.app \
+  --add-data "$ROOT/python_app/splash_assets:splash_assets" \
   --distpath "$BUILD/dist" --workpath "$BUILD/work" --specpath "$BUILD" \
   "$ROOT/python_app/mabbajack_app.py" >/dev/null
 

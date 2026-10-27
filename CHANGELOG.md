@@ -2,6 +2,16 @@
 
 Notes de version / release notes (EN + FR). Translations in IT and ES: see the Nexus Mods page.
 
+## Unreleased
+
+**English**
+
+- Animated splash screen at launch (shared Socle rule): the main window opens after 2 seconds, the splash leaves after 4 seconds. Fixed splash when "Reduce motion" is on.
+
+**Français**
+
+- Écran de lancement animé (règle commune Socle) : la fenêtre principale s'ouvre au bout de 2 secondes, le splash disparaît au bout de 4 secondes. Splash fixe si « Réduire les animations » est activé.
+
 ## 1.1.0
 
 **English**

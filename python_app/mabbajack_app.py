@@ -25,6 +25,7 @@ from pathlib import Path
 
 import update_check
 import webview
+from splash import Splash
 
 APP_NAME = "mABBAJACK"
 DATA_NAME = "mAbbajack"  # dossiers de réglages et de journaux existants : ne pas renommer
@@ -287,10 +288,18 @@ def main() -> None:
     root = payload_dir()
     backend = Backend(root)
     width, height, x, y = initial_geometry()
+    # Splash d'abord (première fenêtre affichée) ; la fenêtre principale reste cachée jusqu'à t = 2 s
+    splash = Splash(webview, lambda msg: launcher_log(msg))
     window = webview.create_window(
         APP_NAME, html=LOADING_HTML, width=width, height=height, x=x, y=y, min_size=WINDOW_MIN,
-        background_color="#1e1e1e",
+        background_color="#1e1e1e", hidden=True,
     )
+    app_url = ""
+
+    def on_main_loaded() -> None:
+        # l'interface est chargée : la fenêtre peut s'ouvrir sans page blanche
+        if app_url and window.get_current_url() and window.get_current_url().startswith(app_url):
+            splash.ready()
 
     def boot() -> None:
         try:
@@ -299,8 +308,12 @@ def main() -> None:
             msg = str(exc).replace("<", "&lt;")
             window.load_html(LOADING_HTML.replace("Démarrage du moteur…", f"Erreur : {msg}")
                              .replace('<div class="d"></div>', ""))
+            splash.ready()
             return
-        window.load_url(f"http://127.0.0.1:{backend.port}")
+        nonlocal app_url
+        app_url = f"http://127.0.0.1:{backend.port}"
+        window.load_url(app_url)
+        threading.Timer(15, splash.ready).start()  # page lente à charger : on ouvre quand même
         nxm.ready(backend.port)
         update_check.start_webview(window, APP_NAME, page="https://www.nexusmods.com/skyrimspecialedition/mods/196281?tab=files")
 
@@ -341,6 +354,7 @@ def main() -> None:
     nxm = NxmRouter(launcher_log)
     nxm.register()
     window.events.loaded += bind_drop
+    window.events.loaded += on_main_loaded
     window.events.closed += backend.stop
     atexit.register(backend.stop)
     for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
@@ -354,6 +368,7 @@ def main() -> None:
                 AppHelper.callAfter(nxm.register)
             except ImportError:
                 pass
+            threading.Thread(target=splash.run, args=(window,), daemon=True).start()
             boot()
 
         webview.start(start, private_mode=False, storage_path=str(DATA_DIR), menu=build_menu(), localization=MENU_FR)
