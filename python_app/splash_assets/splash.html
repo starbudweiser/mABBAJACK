@@ -126,7 +126,7 @@
   .title {
     display: flex;
     margin: 0;
-    font-size: 42px;
+    font-size: 40px;  /* token Socle size-splash-title : taille fixe, identique dans toutes les applis */
     font-weight: 800;
     line-height: 1;
     letter-spacing: 0.5px;
@@ -274,8 +274,8 @@
     </div>
   </div>
   <script>
-    // Titre ou sous-titre traduit trop long : on réduit la police pour tenir sur une ligne dans la
-    // zone utile (carte − 2 × 24 px − logo − écart), sans jamais toucher le bord droit
+    // Sous-titre traduit trop long : on réduit sa police pour tenir sur une ligne dans la zone utile
+    // (carte − 2 × 24 px − logo − écart). Le titre garde sa taille fixe.
     (function () {
       var card = document.querySelector(".card");
       var logo = document.querySelector(".logo");
@@ -290,7 +290,6 @@
         }
         all.forEach(function (n) { n.style.animation = ""; });
       }
-      fit(document.querySelector(".title"), 42, 24);
       fit(document.getElementById("subtitle"), 12.5, 8);
     })();
     // Appelé par le lanceur à t = 4 s
