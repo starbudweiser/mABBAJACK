@@ -42,7 +42,6 @@
     gap: 24px;
     padding: 0 24px;  /* space-6 : même marge à gauche et à droite */
     border-radius: 16px;
-    overflow: hidden;
     background: var(--surface);
     border: 1px solid var(--border);
     box-sizing: border-box;
@@ -116,7 +115,7 @@
 
   /* Sortie : zoom arrière avec rebond (easeInBack) */
   body.leaving .stage {
-    animation: leave 600ms cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+    animation: leave 600ms cubic-bezier(0.6, -0.15, 0.735, 0.045) forwards;
   }
 
   @keyframes leave {
