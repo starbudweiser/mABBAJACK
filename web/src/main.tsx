@@ -5,6 +5,7 @@ import { I18nProvider } from './locales';
 import { COMMON_UI, storedLanguage } from './locales/uiScreens';
 import './index.css';
 import { installGlobalLogCapture, sendClientLog } from './services/clientLog';
+import { startBrandHighlight } from './socle/brand_highlight.js';
 
 installGlobalLogCapture();
 
@@ -60,6 +61,8 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { err
 const rootElement = document.getElementById('root');
 
 if (rootElement) {
+  // « m » de mABBAJACK dans le cyan du logo partout où le nom est écrit (règle Socle « Nom de l'appli »)
+  startBrandHighlight({ names: ['mABBAJACK'], color: '#38bdf8' });
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
       <ErrorBoundary>
