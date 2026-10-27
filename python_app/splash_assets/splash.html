@@ -38,8 +38,9 @@
     inset: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 24px;
-    padding: 0 28px 0 30px;
+    padding: 0 24px;  /* space-6 : même marge à gauche et à droite */
     border-radius: 16px;
     overflow: hidden;
     background: linear-gradient(160deg, #1b3a6b 0%, #0e1d40 55%, #080e22 100%);
@@ -118,7 +119,7 @@
   /* ---- Titre ---- */
   .text {
     position: relative;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
   }
 
@@ -273,16 +274,24 @@
     </div>
   </div>
   <script>
-    // Sous-titre traduit plus long que la place : on réduit la police (l'espacement est animé)
+    // Titre ou sous-titre traduit trop long : on réduit la police pour tenir sur une ligne dans la
+    // zone utile (carte − 2 × 24 px − logo − écart), sans jamais toucher le bord droit
     (function () {
-      var el = document.getElementById("subtitle");
-      var size = 12.5;
-      el.style.animation = "none";  // mesure à l'espacement final
-      while (el.scrollWidth > el.parentNode.clientWidth && size > 9) {
-        size -= 0.5;
-        el.style.fontSize = size + "px";
+      var card = document.querySelector(".card");
+      var logo = document.querySelector(".logo");
+      var room = card.clientWidth - 2 * 24 - logo.offsetWidth - 24;
+      function fit(el, size, min) {
+        var spans = el.querySelectorAll("span");
+        var all = [el].concat(Array.prototype.slice.call(spans));
+        all.forEach(function (n) { n.style.animation = "none"; });  // mesure à l'état final
+        while (el.scrollWidth > room && size > min) {
+          size -= 0.5;
+          el.style.fontSize = size + "px";
+        }
+        all.forEach(function (n) { n.style.animation = ""; });
       }
-      el.style.animation = "";
+      fit(document.querySelector(".title"), 42, 24);
+      fit(document.getElementById("subtitle"), 12.5, 8);
     })();
     // Appelé par le lanceur à t = 4 s
     window.splashLeave = function () {
