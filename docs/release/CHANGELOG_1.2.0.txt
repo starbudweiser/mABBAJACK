@@ -1,0 +1,29 @@
+mABBAJACK 1.2.0
+
+EN
+- Signed with a Developer ID and notarized by Apple: macOS now opens the app without a security warning.
+- The app's launcher is now compiled from source when the app is built, instead of using PyInstaller's generic prebuilt launcher, which antivirus scanners tend to flag. No change in features.
+- New animated splash screen at launch.
+- The first letter of the app's name now uses the colour of its logo everywhere it appears.
+- The new-version notice now opens mABBAJACK's new page in Nexus Mods' Modding Tools section.
+
+FR
+- Signée avec un certificat Developer ID et notarisée par Apple : macOS ouvre désormais l'appli sans avertissement de sécurité.
+- Le lanceur de l'appli est maintenant compilé depuis les sources à la construction de l'appli, au lieu du lanceur générique précompilé de PyInstaller, souvent signalé par les antivirus. Aucun changement de fonctionnalités.
+- Nouvel écran de lancement animé.
+- La première lettre du nom de l'appli prend la couleur de son logo partout où il est écrit.
+- L'avis de nouvelle version ouvre maintenant la nouvelle page de mABBAJACK dans la section Modding Tools de Nexus Mods.
+
+IT
+- Firmata con un certificato Developer ID e autenticata da Apple: macOS ora apre l'app senza avvisi di sicurezza.
+- Il launcher dell'app viene ora compilato dai sorgenti durante la creazione dell'app, invece di usare il launcher generico precompilato di PyInstaller, spesso segnalato dagli antivirus. Nessuna modifica alle funzionalità.
+- Nuova schermata di avvio animata.
+- La prima lettera del nome dell'app ha ora il colore del logo ovunque compaia.
+- L'avviso di nuova versione apre ora la nuova pagina di mABBAJACK nella sezione Modding Tools di Nexus Mods.
+
+ES
+- Firmada con un certificado Developer ID y notarizada por Apple: macOS ahora abre la app sin aviso de seguridad.
+- El lanzador de la app ahora se compila desde el código fuente al crear la app, en lugar de usar el lanzador genérico precompilado de PyInstaller, que los antivirus suelen señalar. Sin cambios de funciones.
+- Nueva pantalla de inicio animada.
+- La primera letra del nombre de la app usa ahora el color de su logo en todas partes.
+- El aviso de nueva versión abre ahora la nueva página de mABBAJACK en la sección Modding Tools de Nexus Mods.

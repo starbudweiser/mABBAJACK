@@ -64,6 +64,9 @@ cp -R dist "$PAYLOAD/dist"
 ( cd "$PAYLOAD" && npm ci --omit=dev --ignore-scripts --no-audit --no-fund --silent )
 
 echo "▶ PyInstaller"
+# Lanceur PyInstaller compilé depuis les sources, contre les faux positifs antivirus (absent hors de ce dossier d'outils : lanceur standard).
+PYI_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/_tools/pyinstaller_source.sh"
+if [ -x "$PYI_SRC" ]; then "$PYI_SRC" "$VENV/bin/python"; fi
 "$VENV/bin/python" -m PyInstaller --noconfirm --clean --windowed \
   --name mABBAJACK \
   --icon "$ROOT/assets/icon.icns" \

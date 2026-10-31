@@ -315,7 +315,7 @@ def main() -> None:
         window.load_url(app_url)
         threading.Timer(15, splash.ready).start()  # page lente à charger : on ouvre quand même
         nxm.ready(backend.port)
-        update_check.start_webview(window, APP_NAME, page="https://www.nexusmods.com/skyrimspecialedition/mods/196281?tab=files")
+        update_check.start_webview(window, APP_NAME, page="https://www.nexusmods.com/site/mods/2527?tab=files")
 
     def launcher_log(msg: str) -> None:
         try:
