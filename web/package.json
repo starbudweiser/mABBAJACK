@@ -2,7 +2,7 @@
   "name": "mabbajack",
   "version": "1.2.0",
   "description": "Portage macOS et installateur automatisé de modlists Wabbajack pour Skyrim",
-  "author": "Claude Code & Stephan Le Gac Savoye aka Starbudweiser",
+  "author": "Starbudweiser",
   "type": "module",
   "scripts": {
     "dev": "vite",

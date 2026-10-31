@@ -19,7 +19,7 @@ export const es: Translations = {
   gallery: {
     title: 'Galería Oficial de Modlists',
     subtitle: 'Explora, inspecciona e instala cientos de configuraciones completas para Skyrim con descargas automatizadas.',
-    searchPlaceholder: 'Buscar por título, autor, LotD, Requiem, VR...',
+    searchPlaceholder: 'Título, autor, palabra clave...',
     allGames: 'Todos los juegos',
     skyrimSE: 'Skyrim Special Edition',
     skyrimVR: 'Skyrim VR',

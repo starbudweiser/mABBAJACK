@@ -40,25 +40,25 @@ export interface CommonUi {
 export const COMMON_UI: Record<Language, CommonUi> = {
   fr: {
     paste: 'Coller', pastePath: 'Coller le chemin', browse: 'Parcourir', apiKeyLabel: 'Clé API Nexus Mods', optional: '(optionnel)',
-    apiKeyPlaceholder: 'Collez votre clé API Nexus Mods ici…', show: 'Afficher', hide: 'Masquer',
+    apiKeyPlaceholder: 'Clé API Nexus Mods…', show: 'Afficher', hide: 'Masquer',
     validating: '⏳ Validation…', validate: '✓ Valider', nexusFree: 'Nexus gratuit', languageSelect: 'Sélection de la langue',
     reactError: '❌ Erreur de l\'interface', reload: 'Recharger', refresh: 'Actualiser le catalogue',
   },
   en: {
     paste: 'Paste', pastePath: 'Paste path', browse: 'Browse', apiKeyLabel: 'Nexus Mods API key', optional: '(optional)',
-    apiKeyPlaceholder: 'Paste your Nexus Mods API key here…', show: 'Show', hide: 'Hide',
+    apiKeyPlaceholder: 'Nexus Mods API key…', show: 'Show', hide: 'Hide',
     validating: '⏳ Validating…', validate: '✓ Validate', nexusFree: 'Nexus Free', languageSelect: 'Language selection',
     reactError: '❌ Interface error', reload: 'Reload', refresh: 'Refresh catalog',
   },
   es: {
     paste: 'Pegar', pastePath: 'Pegar la ruta', browse: 'Examinar', apiKeyLabel: 'Clave API de Nexus Mods', optional: '(opcional)',
-    apiKeyPlaceholder: 'Pegue aquí su clave API de Nexus Mods…', show: 'Mostrar', hide: 'Ocultar',
+    apiKeyPlaceholder: 'Clave API de Nexus Mods…', show: 'Mostrar', hide: 'Ocultar',
     validating: '⏳ Validando…', validate: '✓ Validar', nexusFree: 'Nexus gratuito', languageSelect: 'Selección de idioma',
     reactError: '❌ Error de la interfaz', reload: 'Recargar', refresh: 'Actualizar el catálogo',
   },
   it: {
     paste: 'Incolla', pastePath: 'Incolla il percorso', browse: 'Sfoglia', apiKeyLabel: 'Chiave API Nexus Mods', optional: '(facoltativa)',
-    apiKeyPlaceholder: 'Incollare qui la chiave API Nexus Mods…', show: 'Mostra', hide: 'Nascondi',
+    apiKeyPlaceholder: 'Chiave API Nexus Mods…', show: 'Mostra', hide: 'Nascondi',
     validating: '⏳ Verifica…', validate: '✓ Verifica', nexusFree: 'Nexus gratuito', languageSelect: 'Selezione della lingua',
     reactError: '❌ Errore dell\'interfaccia', reload: 'Ricarica', refresh: 'Aggiorna il catalogo',
   },

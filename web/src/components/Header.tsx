@@ -2,6 +2,7 @@ import React from 'react';
 import { useI18n } from '../locales';
 import { COMMON_UI } from '../locales/uiScreens';
 import LanguageSelector from './LanguageSelector';
+import { version } from '../../package.json';
 import { SkyrimEnvironment, NexusAccount } from '../types/wabbajack';
 
 export type ActiveTab = 'gallery' | 'inspector' | 'installer' | 'progress';
@@ -48,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
           <h1 className="text-title font-extrabold text-white tracking-wide flex items-center gap-1.5">
             <span>mABBAJACK</span>
             <span className="text-caption font-mono px-1 py-0.5 rounded bg-[#0369a1]/15 text-[#38bdf8] border border-[#0ea5e9]/30">
-              v3.0
+              v{version}
             </span>
           </h1>
         </div>

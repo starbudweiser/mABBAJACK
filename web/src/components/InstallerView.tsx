@@ -89,21 +89,6 @@ interface SkyrimCompat {
   validationIssues?: string[];
 }
 
-const DOWNLOAD_PRESETS = [
-  { label: '/Volumes/SKYRIM/DOWNLOADS',   value: '/Volumes/SKYRIM/DOWNLOADS' },
-  { label: '/Volumes/LaCie 6To/DOWNLOADS', value: '/Volumes/LaCie 6To/DOWNLOADS' },
-];
-
-const DEST_PRESETS = [
-  { label: '/Volumes/SKYRIM/READY_TO_PLAY',    value: '/Volumes/SKYRIM/READY_TO_PLAY' },
-  { label: '/Volumes/LaCie 6To/READY_TO_PLAY', value: '/Volumes/LaCie 6To/READY_TO_PLAY' },
-];
-
-const SKYRIM_PRESETS = [
-  { label: '/Volumes/SKYRIM/GAMES/Skyrim Special Edition',    value: '/Volumes/SKYRIM/GAMES/Skyrim Special Edition' },
-  { label: '/Volumes/LaCie 6To/GAMES/Skyrim Special Edition', value: '/Volumes/LaCie 6To/GAMES/Skyrim Special Edition' },
-];
-
 // ── Component ──────────────────────────────────────────────────────────────────
 export const InstallerView: React.FC<InstallerViewProps> = ({
   parsedFile, downloadsPath, setDownloadsPath, destPath, setDestPath, gamePath, setGamePath,
@@ -279,8 +264,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             onPaste={() => pastePath(setPath(setDownloadsPath, 'mabbajack_downloads_path'), 'mabbajack_downloads_path')}
             onBrowse={() => browsePath(ui.downloadsSelect, downloadsPath, setPath(setDownloadsPath, 'mabbajack_downloads_path'), 'mabbajack_downloads_path')}
             isBrowsing={browsingKey === ui.downloadsSelect}
-            placeholder="/Volumes/SKYRIM/DOWNLOADS"
-            presets={DOWNLOAD_PRESETS}
+            placeholder="/Volumes/Disk/DOWNLOADS"
             onPreset={setPath(setDownloadsPath, 'mabbajack_downloads_path')}
           />
 
@@ -314,8 +298,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             onPaste={() => pastePath(setPath(setDestPath, 'mabbajack_dest_path'), 'mabbajack_dest_path')}
             onBrowse={() => browsePath(ui.destSelect, destPath, setPath(setDestPath, 'mabbajack_dest_path'), 'mabbajack_dest_path')}
             isBrowsing={browsingKey === ui.destSelect}
-            placeholder="/Volumes/SKYRIM/READY_TO_PLAY"
-            presets={DEST_PRESETS}
+            placeholder="/Volumes/Disk/READY_TO_PLAY"
             onPreset={setPath(setDestPath, 'mabbajack_dest_path')}
           />
         </div>
@@ -332,7 +315,6 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             onBrowse={() => browsePath(t.installer.gameFolderSelect, gamePath, setPath(setGamePath, 'mabbajack_game_path'), 'mabbajack_game_path')}
             isBrowsing={browsingKey === t.installer.gameFolderSelect}
             placeholder="/Volumes/SKYRIM/GAMES/Skyrim Special Edition"
-            presets={SKYRIM_PRESETS}
             onPreset={setPath(setGamePath, 'mabbajack_game_path')}
           />
           {gameArchives.length > 0 && (

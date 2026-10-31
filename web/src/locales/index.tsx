@@ -27,6 +27,12 @@ interface I18nContextType {
   availableLanguages: LanguageInfo[];
 }
 
+function systemLanguage(): Language {
+  const code = (navigator.languages ?? [navigator.language]).map((l) => l.slice(0, 2).toLowerCase())
+    .find((l) => ['fr', 'en', 'it', 'es'].includes(l));
+  return (code ?? 'en') as Language;
+}
+
 const I18nContext = createContext<I18nContextType | null>(null);
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -35,7 +41,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (saved && ['fr', 'en', 'it', 'es'].includes(saved)) {
       return saved;
     }
-    return 'fr';
+    return systemLanguage();
   });
 
   const setLanguage = (lang: Language) => {

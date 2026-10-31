@@ -258,7 +258,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     const text = e.clipboardData?.getData('text');
                     if (text) setDownloadsInput(text.trim());
                   }}
-                  placeholder="/Volumes/SKYRIM/DOWNLOADS"
+                  placeholder="/Volumes/Disk/DOWNLOADS"
                   className="flex-1 h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
                 />
                 <button
@@ -290,7 +290,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     const text = e.clipboardData?.getData('text');
                     if (text) setDestInput(text.trim());
                   }}
-                  placeholder="/Volumes/SKYRIM/READY_TO_PLAY"
+                  placeholder="/Volumes/Disk/READY_TO_PLAY"
                   className="flex-1 h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
                 />
                 <button

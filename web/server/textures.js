@@ -7,14 +7,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { trackedSpawn } from './jobcontrol.js';
 
-const TOOLS_TEXCONV = '/Volumes/SKYRIM/TOOLS/MAC/_tools/texconv/texconv-mac';
-
-/** Binaire texconv : embarqué (BUNDLED_BIN_DIR), MABBAJACK_TEXCONV, puis dossier _tools. */
+/** Binaire texconv : embarqué (BUNDLED_BIN_DIR), puis MABBAJACK_TEXCONV. */
 export function findTexconv(bundledDir = '') {
   const candidates = [
     bundledDir ? path.join(bundledDir, 'texconv') : '',
     process.env.MABBAJACK_TEXCONV || '',
-    TOOLS_TEXCONV,
   ].filter(Boolean);
   for (const c of candidates) {
     try { fs.accessSync(c, fs.constants.X_OK); if (fs.statSync(c).isFile()) return c; } catch { /* */ }

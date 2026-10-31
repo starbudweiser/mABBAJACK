@@ -521,7 +521,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
                   if (!e.target.value) return;
                   setActiveFilter('other'); setOtherGame(e.target.value); setSelectedTag('all');
                 }}
-                className="appearance-none ml-auto h-[30px] pl-3 pr-7 rounded-lg text-body font-semibold leading-none border transition-all duration-150 cursor-pointer w-[140px] flex-shrink-0 truncate focus:outline-none"
+                className="appearance-none ml-auto h-[30px] pl-3 pr-7 rounded-lg text-body font-semibold leading-none border transition-all duration-150 cursor-pointer w-[180px] flex-shrink-0 truncate focus:outline-none"
                 style={{
                   ...(isActive
                     ? { color: OTHER_FILTER.activeColor, background: OTHER_FILTER.activeBg, borderColor: OTHER_FILTER.activeBorder }
