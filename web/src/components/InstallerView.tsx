@@ -314,7 +314,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             onPaste={() => pastePath(setPath(setGamePath, 'mabbajack_game_path'), 'mabbajack_game_path')}
             onBrowse={() => browsePath(t.installer.gameFolderSelect, gamePath, setPath(setGamePath, 'mabbajack_game_path'), 'mabbajack_game_path')}
             isBrowsing={browsingKey === t.installer.gameFolderSelect}
-            placeholder="/Volumes/SKYRIM/GAMES/Skyrim Special Edition"
+            placeholder="/Volumes/Disk/GAMES/Skyrim Special Edition"
             onPreset={setPath(setGamePath, 'mabbajack_game_path')}
           />
           {gameArchives.length > 0 && (
