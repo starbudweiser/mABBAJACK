@@ -4,6 +4,8 @@
 
 🇫🇷 [Français](#-français) · 🇬🇧 [English](#-english)
 
+💬 **Support & community:** [Discord](https://discord.gg/xdDVDPQsYs) · *Aide et communauté : [Discord](https://discord.gg/xdDVDPQsYs)*
+
 ---
 
 ## 🇫🇷 Français
