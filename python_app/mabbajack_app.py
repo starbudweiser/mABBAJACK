@@ -23,11 +23,12 @@ import threading
 import time
 from pathlib import Path
 
-import update_check
+import updater
 import webview
 from splash import Splash
 
 APP_NAME = "mABBAJACK"
+UPDATER = None  # contrôleur de mise à jour (updater.start_webview), branché sur le menu Aide
 DATA_NAME = "mAbbajack"  # dossiers de réglages et de journaux existants : ne pas renommer
 PREFERRED_PORT = 38300  # port fixe : l'origine (donc le localStorage : clé Nexus, réglages) reste stable
 LOG_DIR = Path.home() / "Library" / "Logs" / DATA_NAME
@@ -215,6 +216,7 @@ def build_menu():
         ]),
         Menu("Aide", [
             MenuAction("Ouvrir le dossier des journaux", open_logs),
+            MenuAction(updater.texts(updater.system_lang())["menu"], lambda: UPDATER and UPDATER.check_manual()),
         ]),
     ]
 
@@ -315,7 +317,8 @@ def main() -> None:
         window.load_url(app_url)
         threading.Timer(15, splash.ready).start()  # page lente à charger : on ouvre quand même
         nxm.ready(backend.port)
-        update_check.start_webview(window, APP_NAME)
+        global UPDATER
+        UPDATER = updater.start_webview(window, APP_NAME, brand='#38bdf8')  # « m » dans la couleur du logo
 
     def launcher_log(msg: str) -> None:
         try:
