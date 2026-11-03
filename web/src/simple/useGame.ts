@@ -6,7 +6,7 @@ export interface DetectedGame { loaded: boolean; found: boolean; edition: 'SE' |
 
 let pending: Promise<DetectedGame> | null = null;
 
-/** Skyrim installé sur ce Mac (détection Steam, Whisky, CrossOver) : une seule requête pour toute la session. */
+/** Skyrim installé sur ce Mac (détection Steam, CrossOver) : une seule requête pour toute la session. */
 function useAutoGame(): DetectedGame {
   const [game, setGame] = useState<DetectedGame>({ loaded: false, found: false, edition: 'Unknown', path: '', auto: true });
   useEffect(() => {

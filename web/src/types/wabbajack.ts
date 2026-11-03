@@ -161,7 +161,7 @@ export interface SkyrimEnvironment {
   dataPath: string;
   foundCorePlugins: string[];
   missingCorePlugins: string[];
-  sourceType: 'steam_mac' | 'whisky' | 'crossover' | 'custom';
+  sourceType: 'steam_mac' | 'crossover' | 'custom';
 }
 
 export interface NexusAccount {

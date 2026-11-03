@@ -127,7 +127,6 @@ export function autoDetectGameDirs(gameName, deep = false) {
   tryAdd(path.join(home, 'Library/Application Support/Steam/steamapps/common', folder));
   for (const root of [
     path.join(home, 'Library/Application Support/CrossOver/Bottles'),
-    path.join(home, 'Library/Containers/com.isaacmarovitz.Whisky/Bottles'),
   ]) {
     try {
       for (const b of fs.readdirSync(root)) {

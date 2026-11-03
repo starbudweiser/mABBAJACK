@@ -321,7 +321,6 @@ app.get('/api/system/detect-skyrim', (req, res) => {
   const home = os.homedir();
   const paths = [
     path.join(home, 'Library/Application Support/Steam/steamapps/common/Skyrim Special Edition'),
-    path.join(home, 'Library/Application Support/com.isaacmarovitz.Whisky/Libraries/Bottles/Skyrim/drive_c/Program Files (x86)/Steam/steamapps/common/Skyrim Special Edition'),
     path.join(home, 'Library/Application Support/CrossOver/Bottles/Skyrim/drive_c/Program Files (x86)/Steam/steamapps/common/Skyrim Special Edition'),
   ];
   for (const p of paths) {
