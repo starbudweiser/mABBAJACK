@@ -14,7 +14,7 @@ inchangé. Le mode **Simple** est un parcours guidé en 4 écrans pour le joueur
 
 ## Parcours Simple
 
-1. **Choisir.** Galerie réduite : Skyrim et Enderal, l'édition du jeu installé est détectée (`/api/system/detect-skyrim`) et sert de filtre,
+1. **Choisir.** Galerie réduite : Skyrim et Enderal (modlists pour adultes comprises, case « Masquer » facultative), l'édition du jeu installé est détectée (`/api/system/detect-skyrim`) et sert de filtre,
    sans barre de tags ni options NSFW (masqué par défaut). Grandes cartes avec : nom, image, taille sur disque, et un badge
    « Compatible avec votre jeu » ou « Demande Skyrim AE ». Un bouton **Installer** télécharge le .wabbajack (install-from-url).
 2. **Préparer.** Un seul écran :
@@ -68,4 +68,4 @@ Ordre conseillé : 1 (refonte sans changement visible, vérifiée par les tests 
   Au passage : glisser-déposer global branché (il n'était relié à rien), code mort retiré (sélection galerie synthétique, overlay de téléchargement jamais affiché).
 - [x] Étape 2 : bouton Installer de la galerie (carte et fiche), dans les deux modes : `installFromGallery()` dans l'état, overlay partagé `GalleryDownloadOverlay`, progression par le flux SSE. Le serveur lit les fichiers du CDN Wabbajack par parties (l'adresse du catalogue est une page web, d'où l'échec constaté d'abord), et refuse toute adresse qui renvoie du HTML.
 - [x] Étape 3 : `UiModeProvider` (`state/uiMode.tsx`, mode mémorisé, `?mode=`, `window.mabbajackSetMode`, actions de menu `mode:simple` / `mode:expert`) et `src/simple/` : `SimpleApp`, `ChooseStep`, `PrepareStep`, `InstallStep` (avec l'écran Terminé / Échec). Textes dans `locales/uiSimple.ts`. Réglage Simple / Expert dans les Paramètres, bouton « Simple » dans l'en-tête Expert, `POST /api/system/disk-space` pour l'espace libre. Dépôt de fichier et menus partagés (`useFileDrop`, `useMenuBridge`).
-- [ ] Étape 4 : menu natif Affichage (coche Simple / Expert), `ui_mode.json`, réglage dans les Paramètres.
+- [ ] Étape 4 (en attente de la fin de la session « menus natifs », qui modifie mabbajack_app.py) : menu natif Affichage (coche Simple / Expert), `ui_mode.json`, réglage dans les Paramètres.

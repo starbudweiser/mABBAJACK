@@ -21,7 +21,7 @@ export const ChooseStep: React.FC = () => {
   const m = useMabbajack();
   const game = useDetectedGame();
   const [search, setSearch] = useState('');
-  const [hideNsfw, setHideNsfw] = useState(() => localStorage.getItem('mabbajack_gallery_hide_nsfw') !== '0');
+  const [hideNsfw, setHideNsfw] = useState(() => localStorage.getItem('mabbajack_gallery_hide_nsfw') === '1');
 
   const list = useMemo(() => {
     const q = search.trim().toLowerCase();
