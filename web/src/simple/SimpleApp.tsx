@@ -59,7 +59,7 @@ export const SimpleApp: React.FC = () => {
           <span className="text-title font-extrabold text-white tracking-wide">mABBAJACK</span>
         </div>
 
-        <nav className="flex items-center gap-1 min-w-0" aria-label="Étapes">
+        <nav className="flex items-center gap-1 min-w-0" aria-label={ui.stepsLabel}>
           {STEPS.map((s, i) => {
             const active = s === step;
             return (

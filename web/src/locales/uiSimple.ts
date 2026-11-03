@@ -6,7 +6,7 @@ import type { Language } from './types';
 
 export interface SimpleUi {
   // en-tête et étapes
-  stepChoose: string; stepPrepare: string; stepInstall: string; stepDone: string;
+  stepsLabel: string; stepChoose: string; stepPrepare: string; stepInstall: string; stepDone: string;
   expertMode: string; settings: string;
   // 1. choisir
   chooseTitle: string; chooseSubtitle: string; search: string; loading: string; none: string;
@@ -32,7 +32,7 @@ export interface SimpleUi {
 
 export const SIMPLE_UI: Record<Language, SimpleUi> = {
   fr: {
-    stepChoose: 'Choisir', stepPrepare: 'Préparer', stepInstall: 'Installer', stepDone: 'Terminé',
+    stepsLabel: 'Étapes', stepChoose: 'Choisir', stepPrepare: 'Préparer', stepInstall: 'Installer', stepDone: 'Terminé',
     expertMode: 'Mode expert', settings: 'Paramètres',
     chooseTitle: 'Choisissez une modlist',
     chooseSubtitle: 'Une modlist est une collection de mods prête à jouer. mABBAJACK la télécharge et l’installe pour vous.',
@@ -70,7 +70,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     modeHint: 'Simple : un parcours guidé en 4 étapes. Expert : galerie, inspecteur, installation et progression.',
   },
   en: {
-    stepChoose: 'Choose', stepPrepare: 'Prepare', stepInstall: 'Install', stepDone: 'Done',
+    stepsLabel: 'Steps', stepChoose: 'Choose', stepPrepare: 'Prepare', stepInstall: 'Install', stepDone: 'Done',
     expertMode: 'Expert mode', settings: 'Settings',
     chooseTitle: 'Choose a modlist',
     chooseSubtitle: 'A modlist is a ready-to-play collection of mods. mABBAJACK downloads and installs it for you.',
@@ -108,7 +108,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     modeHint: 'Simple: a guided 4-step path. Expert: gallery, inspector, installation and progress.',
   },
   es: {
-    stepChoose: 'Elegir', stepPrepare: 'Preparar', stepInstall: 'Instalar', stepDone: 'Listo',
+    stepsLabel: 'Pasos', stepChoose: 'Elegir', stepPrepare: 'Preparar', stepInstall: 'Instalar', stepDone: 'Listo',
     expertMode: 'Modo experto', settings: 'Ajustes',
     chooseTitle: 'Elija una modlist',
     chooseSubtitle: 'Una modlist es una colección de mods lista para jugar. mABBAJACK la descarga y la instala por usted.',
@@ -146,7 +146,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     modeHint: 'Simple: un recorrido guiado en 4 pasos. Experto: galería, inspector, instalación y progreso.',
   },
   it: {
-    stepChoose: 'Scegli', stepPrepare: 'Prepara', stepInstall: 'Installa', stepDone: 'Fatto',
+    stepsLabel: 'Passaggi', stepChoose: 'Scegli', stepPrepare: 'Prepara', stepInstall: 'Installa', stepDone: 'Fatto',
     expertMode: 'Modalità esperto', settings: 'Impostazioni',
     chooseTitle: 'Scegli una modlist',
     chooseSubtitle: 'Una modlist è una raccolta di mod pronta da giocare. mABBAJACK la scarica e la installa per te.',

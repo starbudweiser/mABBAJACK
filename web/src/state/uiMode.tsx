@@ -6,6 +6,15 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 
 export type UiMode = 'simple' | 'expert';
 const KEY = 'mabbajack_ui_mode';
+/** Prévient l'appli macOS (python_app/ui_mode.py) du mode affiché : elle le mémorise et coche son menu Affichage. */
+function notifyNativeApp(mode: UiMode): void {
+  type Api = { set_ui_mode?: (m: string) => void };
+  const w = window as unknown as { pywebview?: { api?: Api } };
+  const send = () => w.pywebview?.api?.set_ui_mode?.(mode);
+  if (w.pywebview?.api?.set_ui_mode) send();
+  else if (w.pywebview) window.addEventListener('pywebviewready', send, { once: true });
+}
+
 const isMode = (v: unknown): v is UiMode => v === 'simple' || v === 'expert';
 
 interface UiModeContextType { mode: UiMode; setMode: (m: UiMode) => void }
@@ -23,6 +32,8 @@ export const UiModeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setModeState(m);
     try { localStorage.setItem(KEY, m); } catch { /* stockage indisponible */ }
   }, []);
+
+  useEffect(() => { notifyNativeApp(mode); }, [mode]);
 
   // Réglage poussé par l'appli macOS (menu Affichage)
   useEffect(() => {

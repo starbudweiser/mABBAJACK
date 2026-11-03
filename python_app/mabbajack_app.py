@@ -25,6 +25,7 @@ from pathlib import Path
 
 import about_window
 import lang_menu
+import ui_mode
 import updater
 import webview
 from splash import Splash
@@ -37,6 +38,8 @@ LOG_DIR = Path.home() / "Library" / "Logs" / DATA_NAME
 DATA_DIR = Path.home() / "Library" / "Application Support" / DATA_NAME
 # Langue de l'interface : choix du menu « Langue » (« auto » = langue du Mac), dans DATA_DIR/language.json
 LANG_STORE = lang_menu.FileStore(DATA_NAME)
+# Présentation de l'interface : Simple ou Expert, dans DATA_DIR/ui_mode.json
+MODE_STORE = ui_mode.ModeStore(DATA_DIR)
 
 # Fenêtre par défaut : ratio de la capture de référence (≈ 1,09:1), centrée. 1200 × 1100 px de contenu :
 # mesuré sur le rendu réel de la galerie — la 2e rangée de cartes se termine à 1042 px, ~58 px de marge.
@@ -209,6 +212,8 @@ MENU_TEXTS = {
     "Ouvrir un fichier .wabbajack…": ("Open a .wabbajack file…", "Abrir un archivo .wabbajack…", "Apri un file .wabbajack…"),
     "Paramètres…": ("Settings…", "Ajustes…", "Impostazioni…"),
     "Affichage": ("View", "Visualización", "Vista"),
+    "Interface simple": ("Simple interface", "Interfaz simple", "Interfaccia semplice"),
+    "Interface experte": ("Expert interface", "Interfaz experta", "Interfaccia esperta"),
     "Galerie": ("Gallery", "Galería", "Galleria"),
     "Inspecteur": ("Inspector", "Inspector", "Ispettore"),
     "Installation": ("Installation", "Instalación", "Installazione"),
@@ -259,6 +264,41 @@ def push_language(code: str) -> None:
         webview.windows[0].evaluate_js(f"window.mabbajackSetLanguage && window.mabbajackSetLanguage({json.dumps(code)})")
 
 
+def push_mode(mode: str) -> None:
+    """Présentation choisie : appliquée à l'interface (window.mabbajackSetMode)."""
+    if webview.windows:
+        webview.windows[0].evaluate_js(f"window.mabbajackSetMode && window.mabbajackSetMode({json.dumps(mode)})")
+
+
+def mark_mode(mode: str) -> None:
+    """Coche « Interface simple » ou « Interface experte » dans le menu Affichage. Fil principal."""
+    try:
+        from AppKit import NSApp
+        from PyObjCTools import AppHelper
+    except Exception:
+        return
+
+    def apply():
+        main = NSApp.mainMenu() if NSApp else None
+        top = main.itemWithTitle_(M("Affichage")) if main else None
+        sub = top.submenu() if top else None
+        if sub is None:
+            return
+        for title, value in ((M("Interface simple"), "simple"), (M("Interface experte"), "expert")):
+            item = sub.itemWithTitle_(title)
+            if item is not None:
+                item.setState_(1 if value == mode else 0)
+
+    AppHelper.callAfter(apply)
+
+
+def set_ui_mode(mode: str) -> None:
+    """Choix de présentation venu du menu ou des Paramètres de l'interface : mémorisé puis coché."""
+    mode = ui_mode.normalize(mode)
+    MODE_STORE.set(mode)
+    mark_mode(mode)
+
+
 def merge_view_menus() -> None:
     """pywebview ajoute son propre menu « Présentation » (Plein écran) à côté de notre « Affichage » :
     son entrée Plein écran rejoint notre menu et le sien disparaît (un seul menu d'affichage). Fil principal."""
@@ -293,7 +333,7 @@ def merge_view_menus() -> None:
 
 def build_menu():
     """Menus macOS natifs : chaque entrée déclenche l'action de l'interface
-    (pont window.mabbajackMenu défini dans web/src/App.tsx)."""
+    (pont window.mabbajackMenu défini dans web/src/state/uiMode.tsx)."""
     from webview.menu import Menu, MenuAction, MenuSeparator
 
     def item(title: str, action: str):
@@ -301,6 +341,12 @@ def build_menu():
             if webview.windows:
                 webview.windows[0].evaluate_js(f"window.mabbajackMenu && window.mabbajackMenu('{action}')")
         return MenuAction(title, run)
+
+    def choose_mode(mode: str):
+        def run():
+            set_ui_mode(mode)
+            push_mode(mode)
+        return run
 
     def open_logs():
         LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -313,6 +359,9 @@ def build_menu():
             item(M("Paramètres…"), "settings"),
         ]),
         Menu(M("Affichage"), [
+            MenuAction(M("Interface simple"), choose_mode("simple")),
+            MenuAction(M("Interface experte"), choose_mode("expert")),
+            MenuSeparator(),
             item(M("Galerie"), "gallery"),
             item(M("Inspecteur"), "inspector"),
             item(M("Installation"), "installer"),
@@ -404,6 +453,7 @@ def main() -> None:
         background_color="#1e1e1e", hidden=True,
     )
     app_url = ""
+    window.expose(set_ui_mode)  # appelé par les Paramètres de l'interface (pywebview.api.set_ui_mode)
 
     def on_main_loaded() -> None:
         # l'interface est chargée : la fenêtre peut s'ouvrir sans page blanche
@@ -421,7 +471,8 @@ def main() -> None:
             return
         nonlocal app_url
         app_url = f"http://127.0.0.1:{backend.port}"
-        window.load_url(f"{app_url}/?ui={lang_menu.resolve(LANG_STORE.get())}")  # langue lue par web/src/locales
+        mode = f"&mode={MODE_STORE.get()}" if MODE_STORE.has_choice() else ""  # sinon l'interface décide (Simple)
+        window.load_url(f"{app_url}/?ui={lang_menu.resolve(LANG_STORE.get())}{mode}")  # langue et mode lus par l'interface
         threading.Timer(15, splash.ready).start()  # page lente à charger : on ouvre quand même
         nxm.ready(backend.port)
         global UPDATER
@@ -466,6 +517,7 @@ def main() -> None:
     window.events.loaded += bind_drop
     window.events.loaded += on_main_loaded
     window.events.shown += lambda: lang_menu.cocoa_mark(LANG_STORE.get)  # coche du menu « Langue »
+    window.events.shown += lambda: mark_mode(MODE_STORE.get())  # coche du menu « Affichage »
     window.events.shown += merge_view_menus
     window.events.shown += lambda: about_window.install(MENU_LANG)  # « À propos » : fenêtre Socle
     window.events.closed += backend.stop
