@@ -504,7 +504,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
         </div>
 
         {/* Row 2 — Game filter buttons */}
-        <div className="px-4 pb-2 flex flex-wrap items-center gap-2">
+        <div className="px-4 pb-2 flex flex-nowrap items-center gap-2 overflow-x-auto scrollbar-hide">
           <span className="text-caption text-[#666666] uppercase font-bold tracking-wider flex-shrink-0">{t.gallery.filterLabel}</span>
           {BUTTON_FILTERS.map((f) => {
             const isActive = activeFilter === f.id;
@@ -514,7 +514,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
                 style={isActive ? { color: f.activeColor, background: f.activeBg, borderColor: f.activeBorder } : { color: '#707070', background: '#1a1a1a', borderColor: '#2c2c2c' }}>
                 <span>{f.icon}</span>
                 <span>{filterLabel(f.id, f.label, language)}</span>
-                {f.versionLabel && <span className="text-caption font-mono px-1 rounded font-bold opacity-80" style={isActive ? { color: f.color } : { color: '#444444' }}>{f.versionLabel}</span>}
+                {f.versionLabel && <span className="hidden min-[1380px]:inline text-caption font-mono px-1 rounded font-bold opacity-80" style={isActive ? { color: f.color } : { color: '#444444' }}>{f.versionLabel}</span>}
                 <span className="px-1.5 py-px rounded-full text-caption font-bold" style={isActive ? { background: f.color + '22', color: f.color } : { background: '#262626', color: '#444444' }}>{bucketCounts[f.id] ?? 0}</span>
               </button>
             );

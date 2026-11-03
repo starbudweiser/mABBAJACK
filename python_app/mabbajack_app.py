@@ -41,11 +41,12 @@ LANG_STORE = lang_menu.FileStore(DATA_NAME)
 # Présentation de l'interface : Simple ou Expert, dans DATA_DIR/ui_mode.json
 MODE_STORE = ui_mode.ModeStore(DATA_DIR)
 
-# Fenêtre par défaut : 1372 × 1100, centrée, réduite si l'écran est plus petit (ratio gardé). La largeur de 1372 px
-# tient sur une ligne la rangée de filtres de la galerie (Tous, Skyrim SE… Autres jeux) et la barre d'onglets ;
-# plus étroite, ces boutons passent à la ligne.
-WINDOW_W, WINDOW_H = 1372, 1100
-WINDOW_MIN = (900, 700)
+# Fenêtre par défaut : 1400 × 1100, centrée, réduite si l'écran est plus petit (ratio gardé, jamais sous le minimum).
+# Dès 1380 px la galerie affiche les versions de jeu (1.5.97, 1.6.x…) dans ses filtres, ce qui demande ~1360 px ;
+# en dessous elle les masque et la rangée tient en ~1170 px. Le minimum de 1200 px garantit donc que les boutons
+# du haut ne passent jamais à la ligne.
+WINDOW_W, WINDOW_H = 1400, 1100
+WINDOW_MIN = (1200, 700)
 
 
 def initial_geometry() -> tuple[int, int, int | None, int | None]:
