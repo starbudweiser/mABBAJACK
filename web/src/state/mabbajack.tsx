@@ -92,6 +92,12 @@ function useMabbajackState() {
 
   // Installation & Tracking
   const [progress, setProgress] = useState<InstallProgress>(DEFAULT_PROGRESS);
+  // Jauge de l'icône du Dock (appli macOS, python_app/dock_progress.py) pendant une installation
+  const dockPercent = ['idle', 'completed', 'error'].includes(progress.stage) ? null : Math.round(progress.overallPercent);
+  useEffect(() => {
+    type Api = { set_dock_progress?: (p: number | null) => void };
+    (window as unknown as { pywebview?: { api?: Api } }).pywebview?.api?.set_dock_progress?.(dockPercent);
+  }, [dockPercent]);
   const [logs, setLogs] = useState<LogEntry[]>([
     {
       id: 'log-init',

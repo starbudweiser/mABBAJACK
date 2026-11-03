@@ -24,6 +24,7 @@ import time
 from pathlib import Path
 
 import about_window
+import dock_progress
 import lang_menu
 import ui_mode
 import updater
@@ -469,6 +470,7 @@ def main() -> None:
     )
     app_url = ""
     window.expose(set_ui_mode)  # appelé par les Paramètres de l'interface (pywebview.api.set_ui_mode)
+    window.expose(dock_progress.set_dock_progress)  # jauge de l'icône du Dock pendant une installation
 
     def on_main_loaded() -> None:
         # l'interface est chargée : la fenêtre peut s'ouvrir sans page blanche
