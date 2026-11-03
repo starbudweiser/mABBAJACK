@@ -62,7 +62,11 @@ export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, o
     );
   }
 
-  const pct = Math.max(0, Math.min(100, p.overallPercent || 0));
+  // Pendant l'inventaire et la vérification des archives le pourcentage global n'avance pas : on montre celui de l'étape,
+  // et une barre animée tant que l'étape ne sait pas encore où elle en est.
+  const scanning = p.stage === 'scanning_downloads';
+  const indeterminate = !p.isPaused && ((scanning && !(p.stagePercent > 0)) || p.stage === 'validating_paths' || p.stage === 'idle');
+  const pct = Math.max(0, Math.min(100, (scanning ? p.stagePercent : p.overallPercent) || 0));
   return (
     <div className="flex-1 overflow-y-auto p-6 select-text">
       <div className="max-w-2xl mx-auto flex flex-col gap-4">
@@ -72,13 +76,13 @@ export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, o
         <div className={`${card} gap-3`}>
           <div className="flex items-baseline justify-between">
             <span className="text-heading font-bold text-white">{p.isPaused ? ui.paused : stageLabel(p.stage)}</span>
-            <span className="text-heading font-bold text-[#38bdf8] font-mono">{pct.toFixed(0)} %</span>
+            <span className="text-heading font-bold text-[#38bdf8] font-mono">{indeterminate ? '' : `${pct.toFixed(0)} %`}</span>
           </div>
           <div className="h-3 rounded-full bg-[#262626] overflow-hidden">
-            <div className="h-full rounded-full bg-[#0ea5e9] transition-all duration-500" style={{ width: `${pct}%` }} />
+            <div className={`h-full rounded-full bg-[#0ea5e9] transition-all duration-500 ${indeterminate ? 'animate-pulse' : ''}`} style={{ width: indeterminate ? '100%' : `${pct}%` }} />
           </div>
           <div className="flex flex-wrap justify-between gap-2 text-body text-[#aaaaaa]">
-            <span>{p.totalItems > 0 ? `${p.processedItems.toLocaleString(language)} / ${p.totalItems.toLocaleString(language)}` : ''}</span>
+            <span>{p.totalItems > 0 && !(scanning && p.processedItems === 0) ? `${p.processedItems.toLocaleString(language)} / ${p.totalItems.toLocaleString(language)}` : ''}</span>
             <span>{p.etaSeconds > 0 ? fillText(ui.eta, { time: mmss(p.etaSeconds) }) : ''}</span>
           </div>
           {p.currentTask && <p className="text-meta text-[#8f8f8f] break-words">{translateLog(p.currentTask, language)}</p>}

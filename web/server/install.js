@@ -300,8 +300,12 @@ export async function startInstall(req, res) {
       // archive de même nom : il sert peut-être à une autre modlist.
       // Fichier chargé par copie temporaire (envoi du navigateur) : retrouver le vrai .wabbajack
       let wabbajackRealPath = modlist.localFilePath;
-      if (isTempPath(wabbajackRealPath)) {
+      // Fichier téléchargé par l'appli depuis la galerie : il n'existe nulle part ailleurs, inutile de fouiller les disques
+      const fromGallery = path.basename(path.dirname(wabbajackRealPath || '')) === 'mwabbajack-uploads';
+      if (fromGallery) broadcastLog('info', `📄 .wabbajack téléchargé depuis la galerie : dossier dédié = ${path.join(cleanDownloads, modlistDirName)}`);
+      else if (isTempPath(wabbajackRealPath)) {
         const tmpSize = fileSizeOf(wabbajackRealPath);
+        if (tmpSize > 0) broadcastProgress({ currentTask: 'Recherche du fichier .wabbajack d\'origine…' });
         const found = tmpSize > 0 ? await locateWabbajack(path.basename(wabbajackRealPath), tmpSize) : null;
         if (found) { wabbajackRealPath = found; broadcastLog('info', `📄 Fichier .wabbajack d'origine retrouvé : ${found}`); }
         else broadcastLog('warn', `⚠ Fichier .wabbajack chargé par une copie temporaire et original introuvable : dossier dédié = ${path.join(cleanDownloads, modlistDirName)}`);

@@ -17,6 +17,8 @@ import type { Language } from './types';
 type Entry = [fr: string, en: string, es: string, it: string];
 
 const ENTRIES: Entry[] = [
+  ['📄 .wabbajack téléchargé depuis la galerie : dossier dédié = {0}', '📄 .wabbajack downloaded from the gallery: list folder = {0}', '📄 .wabbajack descargado desde la galería: carpeta dedicada = {0}', '📄 .wabbajack scaricato dalla galleria: cartella dedicata = {0}'],
+  ['Recherche du fichier .wabbajack d\'origine…', 'Looking for the original .wabbajack file…', 'Buscando el archivo .wabbajack original…', 'Ricerca del file .wabbajack originale…'],
   ['Enregistrement de l\'état de l\'installation…', 'Saving the installation state…', 'Guardando el estado de la instalación…', 'Salvataggio dello stato dell\'installazione…'],
   ['⚠ Dossier du jeu indiqué : {0} ({1}/{2} fichiers conformes à la version {3}).', '⚠ Game folder given: {0} ({1}/{2} files match version {3}).', '⚠ Carpeta del juego indicada: {0} ({1}/{2} archivos conformes a la versión {3}).', '⚠ Cartella del gioco indicata: {0} ({1}/{2} file conformi alla versione {3}).'],
   ['⚠ Dossier du jeu indiqué : {0}.', '⚠ Game folder given: {0}.', '⚠ Carpeta del juego indicada: {0}.', '⚠ Cartella del gioco indicata: {0}.'],
