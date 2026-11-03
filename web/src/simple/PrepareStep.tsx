@@ -100,7 +100,7 @@ export const PrepareStep: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <span className={sectionLabel}><span>🎮</span><span>{ui.yourGame}</span></span>
           {game.found
             ? <p className="text-body text-[#4ade80]">✓ {fillText(ui.gameDetected, { edition: game.edition })}</p>
-            : game.loaded && <p className="text-body text-[#fbbf24]">{ui.gameNotFound}</p>}
+            : game.loaded && <p className="text-body text-[#fbbf24]">{gamePath.trim() ? ui.gameFolderInvalid : ui.gameNotFound}</p>}
           {mismatch && <p className="text-body text-[#fbbf24]">⚠ {fillText(ui.gameMismatch, { need: need!, have: game.edition })}</p>}
           {(!game.found || !game.auto) && game.loaded && (
             <FieldRow label={ui.gameFolder} icon="📂" value={gamePath} onChange={m.setGamePath}

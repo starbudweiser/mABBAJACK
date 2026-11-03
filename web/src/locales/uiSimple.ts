@@ -13,7 +13,7 @@ export interface SimpleUi {
   hideNsfw: string; openFile: string; onDisk: string; install: string; by: string;
   compatible: string; needsAE: string; needsSE: string; gameLine: string; noGameLine: string;
   // 2. préparer
-  prepareTitle: string; back: string; yourGame: string; gameDetected: string; gameNotFound: string; gameMismatch: string;
+  prepareTitle: string; back: string; yourGame: string; gameDetected: string; gameNotFound: string; gameFolderInvalid: string; gameMismatch: string;
   gameFolder: string; gameFolderHint: string; downloadsFolder: string; downloadsHint: string;
   destFolder: string; destHint: string; browse: string; paste: string; chooseFolder: string; pastePrompt: string;
   diskNeed: string; diskFree: string; diskLow: string;
@@ -41,7 +41,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     compatible: 'Compatible avec votre jeu', needsAE: 'Demande Skyrim AE', needsSE: 'Demande Skyrim SE',
     gameLine: 'Votre jeu : Skyrim {edition}', noGameLine: 'Skyrim n’a pas été trouvé sur ce Mac.',
     prepareTitle: 'Préparer l’installation', back: 'Retour', yourGame: 'Votre jeu',
-    gameDetected: 'Skyrim {edition} détecté.', gameNotFound: 'Skyrim n’a pas été trouvé automatiquement. Indiquez son dossier.',
+    gameDetected: 'Skyrim {edition} détecté.', gameNotFound: 'Skyrim n’a pas été trouvé automatiquement. Indiquez son dossier.', gameFolderInvalid: 'Ce dossier ne contient pas Skyrim (Data/Skyrim.esm introuvable).',
     gameMismatch: 'Cette modlist demande Skyrim {need} et vous avez Skyrim {have} : elle risque de ne pas fonctionner.',
     gameFolder: 'Dossier du jeu', gameFolderHint: 'Le dossier de Skyrim, celui qui contient « Data ».',
     downloadsFolder: 'Dossier des téléchargements', downloadsHint: 'Les mods sont téléchargés ici. Gardez-les : ils resservent aux mises à jour.',
@@ -79,7 +79,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     compatible: 'Compatible with your game', needsAE: 'Needs Skyrim AE', needsSE: 'Needs Skyrim SE',
     gameLine: 'Your game: Skyrim {edition}', noGameLine: 'Skyrim was not found on this Mac.',
     prepareTitle: 'Prepare the installation', back: 'Back', yourGame: 'Your game',
-    gameDetected: 'Skyrim {edition} detected.', gameNotFound: 'Skyrim was not found automatically. Choose its folder.',
+    gameDetected: 'Skyrim {edition} detected.', gameNotFound: 'Skyrim was not found automatically. Choose its folder.', gameFolderInvalid: 'This folder does not contain Skyrim (Data/Skyrim.esm not found).',
     gameMismatch: 'This modlist needs Skyrim {need} and you have Skyrim {have}: it may not work.',
     gameFolder: 'Game folder', gameFolderHint: 'The Skyrim folder, the one that contains “Data”.',
     downloadsFolder: 'Downloads folder', downloadsHint: 'Mods are downloaded here. Keep them: they are reused for updates.',
@@ -117,7 +117,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     compatible: 'Compatible con su juego', needsAE: 'Requiere Skyrim AE', needsSE: 'Requiere Skyrim SE',
     gameLine: 'Su juego: Skyrim {edition}', noGameLine: 'No se encontró Skyrim en este Mac.',
     prepareTitle: 'Preparar la instalación', back: 'Volver', yourGame: 'Su juego',
-    gameDetected: 'Skyrim {edition} detectado.', gameNotFound: 'No se encontró Skyrim automáticamente. Indique su carpeta.',
+    gameDetected: 'Skyrim {edition} detectado.', gameNotFound: 'No se encontró Skyrim automáticamente. Indique su carpeta.', gameFolderInvalid: 'Esta carpeta no contiene Skyrim (no se encuentra Data/Skyrim.esm).',
     gameMismatch: 'Esta modlist requiere Skyrim {need} y usted tiene Skyrim {have}: puede que no funcione.',
     gameFolder: 'Carpeta del juego', gameFolderHint: 'La carpeta de Skyrim, la que contiene «Data».',
     downloadsFolder: 'Carpeta de descargas', downloadsHint: 'Los mods se descargan aquí. Consérvelos: se reutilizan en las actualizaciones.',
@@ -155,7 +155,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     compatible: 'Compatibile con il tuo gioco', needsAE: 'Richiede Skyrim AE', needsSE: 'Richiede Skyrim SE',
     gameLine: 'Il tuo gioco: Skyrim {edition}', noGameLine: 'Skyrim non è stato trovato su questo Mac.',
     prepareTitle: 'Prepara l’installazione', back: 'Indietro', yourGame: 'Il tuo gioco',
-    gameDetected: 'Skyrim {edition} rilevato.', gameNotFound: 'Skyrim non è stato trovato automaticamente. Indica la sua cartella.',
+    gameDetected: 'Skyrim {edition} rilevato.', gameNotFound: 'Skyrim non è stato trovato automaticamente. Indica la sua cartella.', gameFolderInvalid: 'Questa cartella non contiene Skyrim (Data/Skyrim.esm non trovato).',
     gameMismatch: 'Questa modlist richiede Skyrim {need} e hai Skyrim {have}: potrebbe non funzionare.',
     gameFolder: 'Cartella del gioco', gameFolderHint: 'La cartella di Skyrim, quella che contiene «Data».',
     downloadsFolder: 'Cartella dei download', downloadsHint: 'Le mod vengono scaricate qui. Conservale: servono per gli aggiornamenti.',
