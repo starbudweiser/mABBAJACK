@@ -35,8 +35,15 @@ export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, o
       <div className="flex-1 overflow-y-auto p-6 flex items-center justify-center select-text">
         <div className={`${card} max-w-lg w-full items-center text-center gap-4 p-8`}>
           <div className="text-[48px]">✅</div>
-          <h2 className="text-display font-bold text-white">{ui.doneTitle}</h2>
+          <h2 className="text-display font-bold text-white">{p.missingArchivesCount > 0 ? ui.doneTitleMissing : ui.doneTitle}</h2>
           <p className="text-body-lg text-[#dddddd]">{fillText(ui.doneBody, { name: m.parsedFile?.name || '' })}</p>
+          {p.missingArchivesCount > 0 && (
+            <div className="rounded-lg border border-[#f59e0b]/40 bg-[#3f2a0c]/30 p-3 text-body text-[#fbbf24] flex flex-col gap-2 items-center">
+              <p>⚠ {fillText(ui.doneMissing, { n: p.missingArchivesCount })}</p>
+              <p className="text-meta text-[#aaaaaa]">{ui.doneRelaunch}</p>
+              <button type="button" className={btn.warning} onClick={onOpenManual}>{fillText(ui.manualDownloads, { n: p.missingArchivesCount })}</button>
+            </div>
+          )}
           <p className="text-body text-[#aaaaaa]">{ui.doneHow}</p>
           <div className="flex flex-wrap justify-center gap-2 pt-2">
             <button type="button" className={btn.primary} onClick={m.openDestFolder}>📂 {ui.openFolder}</button>

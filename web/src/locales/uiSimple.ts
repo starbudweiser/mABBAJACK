@@ -24,7 +24,7 @@ export interface SimpleUi {
   showDetails: string; hideDetails: string; manualDownloads: string; paused: string;
   stageValidating: string; stageScanning: string; stageDownloading: string; stageExtracting: string; stageConfig: string;
   // 4. terminé
-  doneTitle: string; doneBody: string; doneHow: string; openFolder: string; pluginsTxt: string; another: string;
+  doneTitleMissing: string; doneMissing: string; doneRelaunch: string; doneTitle: string; doneBody: string; doneHow: string; openFolder: string; pluginsTxt: string; another: string;
   failTitle: string; failHint: string; retry: string;
   // réglage de présentation
   modeLabel: string; modeSimple: string; modeExpert: string; modeHint: string;
@@ -62,7 +62,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     manualDownloads: 'Téléchargements à faire à la main ({n})', paused: 'En pause',
     stageValidating: 'Préparation des dossiers', stageScanning: 'Vérification des archives',
     stageDownloading: 'Téléchargement des mods', stageExtracting: 'Installation des fichiers', stageConfig: 'Écriture de la configuration',
-    doneTitle: 'Installation terminée !', doneBody: 'La modlist « {name} » est prête.',
+    doneTitleMissing: 'Installation terminée, avec des manques', doneMissing: '{n} archive(s) n’ont pas pu être téléchargées automatiquement : les mods concernés seront incomplets tant que vous ne les aurez pas ajoutées.', doneRelaunch: 'Ajoutez-les dans le dossier des téléchargements, puis relancez l’installation .', doneTitle: 'Installation terminée !', doneBody: 'La modlist « {name} » est prête.',
     doneHow: 'Pour jouer : copiez le contenu du dossier dans le dossier Data de Skyrim, puis lancez le jeu.',
     openFolder: 'Ouvrir le dossier', pluginsTxt: 'Voir plugins.txt', another: 'Installer une autre modlist',
     failTitle: 'L’installation a échoué', failHint: 'Vous pouvez corriger le problème puis relancer : ce qui est déjà téléchargé est conservé.', retry: 'Revenir à la préparation',
@@ -100,7 +100,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     manualDownloads: 'Downloads to do by hand ({n})', paused: 'Paused',
     stageValidating: 'Preparing the folders', stageScanning: 'Checking the archives',
     stageDownloading: 'Downloading the mods', stageExtracting: 'Installing the files', stageConfig: 'Writing the configuration',
-    doneTitle: 'Installation complete!', doneBody: 'The modlist “{name}” is ready.',
+    doneTitleMissing: 'Installation complete, with gaps', doneMissing: '{n} archive(s) could not be downloaded automatically: the mods concerned will be incomplete until you add them.', doneRelaunch: 'Add them to the downloads folder, then run the installation again.', doneTitle: 'Installation complete!', doneBody: 'The modlist “{name}” is ready.',
     doneHow: 'To play: copy the contents of the folder into Skyrim’s Data folder, then launch the game.',
     openFolder: 'Open the folder', pluginsTxt: 'View plugins.txt', another: 'Install another modlist',
     failTitle: 'The installation failed', failHint: 'You can fix the problem and start again: what is already downloaded is kept.', retry: 'Back to preparation',
@@ -138,7 +138,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     manualDownloads: 'Descargas a hacer a mano ({n})', paused: 'En pausa',
     stageValidating: 'Preparando las carpetas', stageScanning: 'Comprobando los archivos',
     stageDownloading: 'Descargando los mods', stageExtracting: 'Instalando los archivos', stageConfig: 'Escribiendo la configuración',
-    doneTitle: '¡Instalación terminada!', doneBody: 'La modlist «{name}» está lista.',
+    doneTitleMissing: 'Instalación terminada, con carencias', doneMissing: '{n} archivo(s) no se pudieron descargar automáticamente: los mods afectados estarán incompletos hasta que los añada.', doneRelaunch: 'Añádalos a la carpeta de descargas y vuelva a lanzar la instalación.', doneTitle: '¡Instalación terminada!', doneBody: 'La modlist «{name}» está lista.',
     doneHow: 'Para jugar: copie el contenido de la carpeta en la carpeta Data de Skyrim y abra el juego.',
     openFolder: 'Abrir la carpeta', pluginsTxt: 'Ver plugins.txt', another: 'Instalar otra modlist',
     failTitle: 'La instalación ha fallado', failHint: 'Puede corregir el problema y volver a empezar: lo ya descargado se conserva.', retry: 'Volver a la preparación',
@@ -176,7 +176,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     manualDownloads: 'Download da fare a mano ({n})', paused: 'In pausa',
     stageValidating: 'Preparazione delle cartelle', stageScanning: 'Verifica degli archivi',
     stageDownloading: 'Download delle mod', stageExtracting: 'Installazione dei file', stageConfig: 'Scrittura della configurazione',
-    doneTitle: 'Installazione completata!', doneBody: 'La modlist «{name}» è pronta.',
+    doneTitleMissing: 'Installazione completata, con lacune', doneMissing: '{n} archivio/i non sono stati scaricati automaticamente: le mod interessate saranno incomplete finché non li aggiungi.', doneRelaunch: 'Aggiungili alla cartella dei download, poi rilancia l’installazione.', doneTitle: 'Installazione completata!', doneBody: 'La modlist «{name}» è pronta.',
     doneHow: 'Per giocare: copia il contenuto della cartella nella cartella Data di Skyrim, poi avvia il gioco.',
     openFolder: 'Apri la cartella', pluginsTxt: 'Vedi plugins.txt', another: 'Installa un’altra modlist',
     failTitle: 'L’installazione non è riuscita', failHint: 'Puoi risolvere il problema e riprovare: ciò che è già stato scaricato viene conservato.', retry: 'Torna alla preparazione',
