@@ -13,6 +13,9 @@ const isOffered = (m: GalleryModlist) => {
   const k = gameKey(m.game);
   return (k.startsWith('skyrim') && !k.includes('vr')) || k.startsWith('enderal');
 };
+type SortKey = 'name' | 'sizeAsc' | 'sizeDesc' | 'updated' | 'newest';
+const SORTS: SortKey[] = ['name', 'sizeAsc', 'sizeDesc', 'updated', 'newest'];
+const sizeOf = (m: GalleryModlist) => (m.download_metadata?.SizeOfArchives || 0) + (m.download_metadata?.SizeOfInstalledFiles || 0);
 const isNsfw = (m: GalleryModlist) => !!m.nsfw || !!m.tags?.some((t) => t.toLowerCase() === 'nsfw');
 
 export const ChooseStep: React.FC = () => {
@@ -23,13 +26,34 @@ export const ChooseStep: React.FC = () => {
   const [search, setSearch] = useState('');
   const [hideNsfw, setHideNsfw] = useState(() => localStorage.getItem('mabbajack_gallery_hide_nsfw') === '1');
 
+  const [sortBy, setSortByState] = useState<SortKey>(() => {
+    const v = localStorage.getItem('mabbajack_simple_sort') as SortKey | null;
+    return v && SORTS.includes(v) ? v : 'name';
+  });
+  const setSortBy = (v: SortKey) => { setSortByState(v); localStorage.setItem('mabbajack_simple_sort', v); };
+  const sortText: Record<SortKey, string> = {
+    name: ui.sortName, sizeAsc: ui.sortSizeAsc, sizeDesc: ui.sortSizeDesc, updated: ui.sortUpdated, newest: ui.sortNewest,
+  };
+
   const list = useMemo(() => {
     const q = search.trim().toLowerCase();
     return m.galleryModlists
       .filter((x) => isOffered(x) && !x.utility_list && !!x.links?.download && !(hideNsfw && isNsfw(x)))
       .filter((x) => !q || x.title.toLowerCase().includes(q) || (x.author || '').toLowerCase().includes(q))
-      .sort((a, b) => a.title.localeCompare(b.title));
-  }, [m.galleryModlists, search, hideNsfw]);
+      .sort((a, b) => {
+        // Les modlists sans taille / sans date connue passent après les autres
+        if (sortBy === 'sizeAsc' || sortBy === 'sizeDesc') {
+          const sa = sizeOf(a), sb = sizeOf(b);
+          if (sa && sb && sa !== sb) return sortBy === 'sizeAsc' ? sa - sb : sb - sa;
+          if (!sa !== !sb) return sa ? -1 : 1;
+        } else if (sortBy === 'updated' || sortBy === 'newest') {
+          const k = sortBy === 'updated' ? 'dateUpdated' : 'dateCreated';
+          const c = (b[k] || '').localeCompare(a[k] || '');
+          if (c) return c;
+        }
+        return a.title.localeCompare(b.title);
+      });
+  }, [m.galleryModlists, search, hideNsfw, sortBy]);
 
   const badge = (x: GalleryModlist) => {
     const sv = String((x as unknown as { skyrimVersion?: string }).skyrimVersion || '').toLowerCase();
@@ -53,6 +77,12 @@ export const ChooseStep: React.FC = () => {
         <div className="flex flex-wrap items-center gap-3">
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={ui.search}
             className={`${inputField} max-w-sm font-sans`} />
+          <label className="flex items-center gap-2 text-body text-[#aaaaaa]">
+            {ui.sortLabel}
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)} className={`${inputField} font-sans w-auto py-1.5`}>
+              {SORTS.map((k) => <option key={k} value={k}>{sortText[k]}</option>)}
+            </select>
+          </label>
           <label className="flex items-center gap-2 text-body text-[#aaaaaa] cursor-pointer select-none">
             <input type="checkbox" checked={hideNsfw} className="accent-[#0ea5e9]"
               onChange={(e) => { setHideNsfw(e.target.checked); localStorage.setItem('mabbajack_gallery_hide_nsfw', e.target.checked ? '1' : '0'); }} />
