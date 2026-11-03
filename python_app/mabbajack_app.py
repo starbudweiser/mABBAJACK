@@ -176,8 +176,34 @@ class Backend:
         self.proc = None
 
 
-# Menus standard de macOS fournis par pywebview, en français
-MENU_FR = {
+# Langue des menus natifs : celle du menu « Langue » (« auto » = langue du Mac), lue au démarrage ;
+# l'interface web change tout de suite, les menus natifs au lancement suivant.
+MENU_LANG = lang_menu.resolve(LANG_STORE.get())
+
+# Titres des menus : {texte français: (anglais, espagnol, italien)}
+MENU_TEXTS = {
+    "Fichier": ("File", "Archivo", "File"),
+    "Ouvrir un fichier .wabbajack…": ("Open a .wabbajack file…", "Abrir un archivo .wabbajack…", "Apri un file .wabbajack…"),
+    "Paramètres…": ("Settings…", "Ajustes…", "Impostazioni…"),
+    "Affichage": ("View", "Visualización", "Vista"),
+    "Galerie": ("Gallery", "Galería", "Galleria"),
+    "Inspecteur": ("Inspector", "Inspector", "Ispettore"),
+    "Installation": ("Installation", "Instalación", "Installazione"),
+    "Progression": ("Progress", "Progreso", "Avanzamento"),
+    "Actualiser le catalogue": ("Refresh catalog", "Actualizar el catálogo", "Aggiorna il catalogo"),
+    "Aide": ("Help", "Ayuda", "Aiuto"),
+    "Ouvrir le dossier des journaux": ("Open logs folder", "Abrir la carpeta de registros", "Apri la cartella dei log"),
+}
+
+
+def M(text: str) -> str:
+    if MENU_LANG == "fr":
+        return text
+    return MENU_TEXTS.get(text, (text,) * 3)[("en", "es", "it").index(MENU_LANG)]
+
+
+# Menus standard de macOS fournis par pywebview (en anglais par défaut)
+MENU_LOCALIZATION = {"fr": {
     "global.quitConfirmation": "Voulez-vous vraiment quitter ?", "global.ok": "OK", "global.quit": "Quitter",
     "global.cancel": "Annuler", "global.saveFile": "Enregistrer le fichier",
     "cocoa.menu.about": "À propos de", "cocoa.menu.services": "Services", "cocoa.menu.view": "Présentation",
@@ -185,7 +211,23 @@ MENU_FR = {
     "cocoa.menu.showAll": "Tout afficher", "cocoa.menu.quit": "Quitter", "cocoa.menu.fullscreen": "Plein écran",
     "cocoa.menu.cut": "Couper", "cocoa.menu.copy": "Copier", "cocoa.menu.paste": "Coller",
     "cocoa.menu.selectAll": "Tout sélectionner",
-}
+}, "es": {
+    "global.quitConfirmation": "¿Seguro que quieres salir?", "global.ok": "OK", "global.quit": "Salir",
+    "global.cancel": "Cancelar", "global.saveFile": "Guardar el archivo",
+    "cocoa.menu.about": "Acerca de", "cocoa.menu.services": "Servicios", "cocoa.menu.view": "Visualización",
+    "cocoa.menu.edit": "Edición", "cocoa.menu.hide": "Ocultar", "cocoa.menu.hideOthers": "Ocultar otros",
+    "cocoa.menu.showAll": "Mostrar todo", "cocoa.menu.quit": "Salir", "cocoa.menu.fullscreen": "Pantalla completa",
+    "cocoa.menu.cut": "Cortar", "cocoa.menu.copy": "Copiar", "cocoa.menu.paste": "Pegar",
+    "cocoa.menu.selectAll": "Seleccionar todo",
+}, "it": {
+    "global.quitConfirmation": "Vuoi davvero uscire?", "global.ok": "OK", "global.quit": "Esci",
+    "global.cancel": "Annulla", "global.saveFile": "Salva il file",
+    "cocoa.menu.about": "Informazioni su", "cocoa.menu.services": "Servizi", "cocoa.menu.view": "Vista",
+    "cocoa.menu.edit": "Modifica", "cocoa.menu.hide": "Nascondi", "cocoa.menu.hideOthers": "Nascondi altre",
+    "cocoa.menu.showAll": "Mostra tutte", "cocoa.menu.quit": "Esci", "cocoa.menu.fullscreen": "Schermo intero",
+    "cocoa.menu.cut": "Taglia", "cocoa.menu.copy": "Copia", "cocoa.menu.paste": "Incolla",
+    "cocoa.menu.selectAll": "Seleziona tutto",
+}}
 
 
 def push_language(code: str) -> None:
@@ -210,23 +252,23 @@ def build_menu():
         subprocess.Popen(["open", str(LOG_DIR)])
 
     return [
-        Menu("Fichier", [
-            item("Ouvrir un fichier .wabbajack…", "open"),
+        Menu(M("Fichier"), [
+            item(M("Ouvrir un fichier .wabbajack…"), "open"),
             MenuSeparator(),
-            item("Paramètres…", "settings"),
+            item(M("Paramètres…"), "settings"),
         ]),
-        Menu("Affichage", [
-            item("Galerie", "gallery"),
-            item("Inspecteur", "inspector"),
-            item("Installation", "installer"),
-            item("Progression", "progress"),
+        Menu(M("Affichage"), [
+            item(M("Galerie"), "gallery"),
+            item(M("Inspecteur"), "inspector"),
+            item(M("Installation"), "installer"),
+            item(M("Progression"), "progress"),
             MenuSeparator(),
-            item("Actualiser le catalogue", "refresh"),
+            item(M("Actualiser le catalogue"), "refresh"),
         ]),
         lang_menu.web_menu(LANG_STORE.get, LANG_STORE.set, push_language),
-        Menu("Aide", [
-            MenuAction("Ouvrir le dossier des journaux", open_logs),
-            MenuAction(updater.texts(updater.system_lang())["menu"], lambda: UPDATER and UPDATER.check_manual()),
+        Menu(M("Aide"), [
+            MenuAction(M("Ouvrir le dossier des journaux"), open_logs),
+            MenuAction(updater.texts(MENU_LANG)["menu"], lambda: UPDATER and UPDATER.check_manual()),
         ]),
     ]
 
@@ -385,7 +427,7 @@ def main() -> None:
             threading.Thread(target=splash.run, args=(window,), daemon=True).start()
             boot()
 
-        webview.start(start, private_mode=False, storage_path=str(DATA_DIR), menu=build_menu(), localization=MENU_FR)
+        webview.start(start, private_mode=False, storage_path=str(DATA_DIR), menu=build_menu(), localization=MENU_LOCALIZATION.get(MENU_LANG, {}))
     finally:
         backend.stop()
 
