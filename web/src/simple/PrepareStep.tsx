@@ -102,7 +102,7 @@ export const PrepareStep: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             ? <p className="text-body text-[#4ade80]">✓ {fillText(ui.gameDetected, { edition: game.edition })}</p>
             : game.loaded && <p className="text-body text-[#fbbf24]">{ui.gameNotFound}</p>}
           {mismatch && <p className="text-body text-[#fbbf24]">⚠ {fillText(ui.gameMismatch, { need: need!, have: game.edition })}</p>}
-          {(!game.found && game.loaded) && (
+          {(!game.found || !game.auto) && game.loaded && (
             <FieldRow label={ui.gameFolder} icon="📂" value={gamePath} onChange={m.setGamePath}
               onPaste={() => paste(m.setGamePath)} onBrowse={() => pick(ui.gameFolder, gamePath, m.setGamePath)}
               isBrowsing={browsing === ui.gameFolder} placeholder="…/Skyrim Special Edition" />
