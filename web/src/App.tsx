@@ -8,6 +8,7 @@ import SettingsModal from './components/SettingsModal';
 import ManualDownloadModal from './components/ManualDownloadModal';
 import PluginsTxtModal from './components/PluginsTxtModal';
 import ImportProgress from './components/ImportProgress';
+import GalleryDownloadOverlay from './components/GalleryDownloadOverlay';
 import { useI18n } from './locales';
 import { APP_UI } from './locales/uiScreens';
 import { useMabbajack, useMabbajackEvents } from './state/mabbajack';
@@ -20,7 +21,7 @@ export const App: React.FC = () => {
   const { loadWabbajackFile, addLog, pickNativeWabbajackFile, fetchModlists } = m;
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('gallery');
-  useMabbajackEvents((e) => setActiveTab(e === 'installStarted' ? 'progress' : 'inspector'));
+  useMabbajackEvents((e) => setActiveTab(e === 'installStarted' ? 'progress' : e === 'galleryReady' ? 'installer' : 'inspector'));
 
   // Modals
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -127,6 +128,8 @@ export const App: React.FC = () => {
         </div>
       )}
 
+      {m.galleryDownload && <GalleryDownloadOverlay download={m.galleryDownload} />}
+
       {/* Top Application Header */}
       <Header
         activeTab={activeTab}
@@ -143,6 +146,7 @@ export const App: React.FC = () => {
             modlists={m.galleryModlists}
             isLoading={m.isLoadingModlists}
             onRefresh={m.fetchModlists}
+            onInstall={m.installFromGallery}
           />
         )}
 

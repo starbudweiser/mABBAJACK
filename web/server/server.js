@@ -19,6 +19,7 @@ import { initLogger, writeLog, getLogInfo, tailLog } from './logger.js';
 import { sseClients, logHistory, currentInstallJob, broadcastLog, broadcastProgress } from './events.js';
 import { getExpectedSkyrimVersion, isGameFileArchive, isIgnorableGameFile, resolveGameFileArchive, expectedGameFilePath, detectSkyrimAtPath } from './gamefiles.js';
 import { nexusPremiumCache } from './nexus.js';
+import { downloadWabbajackCdn, isTrustedCdnUrl } from './downloaders.js';
 import { find7z } from './tools.js';
 import { startInstall } from './install.js';
 import { APP_VERSION, NEXUS_APP_HEADERS } from './version.js';
@@ -440,32 +441,41 @@ app.post('/api/wabbajack/install-from-url', async (req, res) => {
 
   try {
     broadcastProgress({ currentTask: `⬇️ Téléchargement de ${safeName}.wabbajack…`, stagePercent: 0 });
-    const ctrl = new AbortController();
-    const timeout = setTimeout(() => ctrl.abort(), 3600000);
-    let dlRes;
-    try { dlRes = await fetch(url, { signal: ctrl.signal }); } catch (e) { clearTimeout(timeout); throw e; }
-    if (!dlRes.ok) { clearTimeout(timeout); return res.status(502).json({ error: `Téléchargement échoué : HTTP ${dlRes.status}` }); }
-
-    // Écriture en flux sur disque (jamais tout en mémoire : > 2 Go possible)
-    const totalSize = parseInt(dlRes.headers.get('content-length') || '0', 10);
-    let downloaded = 0;
-    const out = fs.createWriteStream(partFile);
-    try {
-      for await (const chunk of dlRes.body) {
-        if (!out.write(chunk)) await new Promise((r) => out.once('drain', r));
-        downloaded += chunk.length;
-        if (totalSize > 0) {
-          const pct = Math.round((downloaded / totalSize) * 100);
-          broadcastProgress({ currentTask: `⬇️ Téléchargement ${safeName} — ${pct}% (${(downloaded/1024/1024).toFixed(0)} Mo / ${(totalSize/1024/1024).toFixed(0)} Mo)`, stagePercent: pct });
-        }
+    const report = (got, totalSize) => {
+      const pct = totalSize > 0 ? Math.round((got / totalSize) * 100) : 0;
+      broadcastProgress({ currentTask: `⬇️ ${safeName} — ${pct}% (${(got / 1048576).toFixed(0)} Mo / ${(totalSize / 1048576).toFixed(0)} Mo)`, stagePercent: pct });
+    };
+    if (isTrustedCdnUrl(url)) {
+      // CDN Wabbajack : l'adresse est une page web ; le fichier se lit par parties (definition.json.gz + parts/N)
+      await downloadWabbajackCdn(url, destFile, report);
+    } else {
+      const ctrl = new AbortController();
+      const timeout = setTimeout(() => ctrl.abort(), 3600000);
+      let dlRes;
+      try { dlRes = await fetch(url, { signal: ctrl.signal }); } catch (e) { clearTimeout(timeout); throw e; }
+      if (!dlRes.ok) { clearTimeout(timeout); return res.status(502).json({ error: `Téléchargement échoué : HTTP ${dlRes.status}` }); }
+      if ((dlRes.headers.get('content-type') || '').includes('text/html')) {
+        clearTimeout(timeout);
+        return res.status(502).json({ error: 'Cette adresse renvoie une page web, pas un fichier .wabbajack.' });
       }
-      await new Promise((resolve, reject) => { out.once('error', reject); out.end(resolve); });
-    } catch (e) {
-      out.destroy();
-      try { fs.unlinkSync(partFile); } catch { /* absent */ }
-      throw e;
-    } finally { clearTimeout(timeout); }
-    fs.renameSync(partFile, destFile);
+      // Écriture en flux sur disque (jamais tout en mémoire : > 2 Go possible)
+      const totalSize = parseInt(dlRes.headers.get('content-length') || '0', 10);
+      let downloaded = 0;
+      const out = fs.createWriteStream(partFile);
+      try {
+        for await (const chunk of dlRes.body) {
+          if (!out.write(chunk)) await new Promise((r) => out.once('drain', r));
+          downloaded += chunk.length;
+          if (totalSize > 0) report(downloaded, totalSize);
+        }
+        await new Promise((resolve, reject) => { out.once('error', reject); out.end(resolve); });
+      } catch (e) {
+        out.destroy();
+        try { fs.unlinkSync(partFile); } catch { /* absent */ }
+        throw e;
+      } finally { clearTimeout(timeout); }
+      fs.renameSync(partFile, destFile);
+    }
     broadcastProgress({ currentTask: `🔍 Analyse de ${safeName}.wabbajack…`, stagePercent: 100 });
 
     res.json(await inspectWabbajack(destFile, safeName));

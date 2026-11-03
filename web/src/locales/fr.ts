@@ -40,7 +40,7 @@ export const fr: Translations = {
     nsfwBadge: '18+ NSFW',
     detailsBtn: 'Détails',
     loadingModlists: 'Synchronisation du catalogue officiel Wabbajack...',
-    noModlistsFound: 'Aucun modlist ne correspond à votre recherche.',
+    noModlistsFound: 'Aucune modlist ne correspond à votre recherche.',
     retryBtn: 'Réinitialiser les filtres',
     siteOfficiel: '🌐 Site officiel',
     guideInstall: '📖 Guide d’installation',

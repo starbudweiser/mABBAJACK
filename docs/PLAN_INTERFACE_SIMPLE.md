@@ -66,6 +66,6 @@ Ordre conseillé : 1 (refonte sans changement visible, vérifiée par les tests 
 - [x] Étape 1 : état et actions sortis d'`App.tsx` dans `src/state/mabbajack.tsx` (`MabbajackProvider`, `useMabbajack()`,
   `useMabbajackEvents()` pour la navigation). Démo dans `src/state/demoModlist.ts`. `App.tsx` = présentation Expert (248 lignes).
   Au passage : glisser-déposer global branché (il n'était relié à rien), code mort retiré (sélection galerie synthétique, overlay de téléchargement jamais affiché).
-- [ ] Étape 2 : bouton Installer de la galerie (install-from-url + progression du téléchargement par le flux SSE), dans les deux modes.
+- [x] Étape 2 : bouton Installer de la galerie (carte et fiche), dans les deux modes : `installFromGallery()` dans l'état, overlay partagé `GalleryDownloadOverlay`, progression par le flux SSE. Le serveur lit les fichiers du CDN Wabbajack par parties (l'adresse du catalogue est une page web, d'où l'échec constaté d'abord), et refuse toute adresse qui renvoie du HTML.
 - [ ] Étape 3 : `UiModeProvider` + `src/simple/` écran par écran.
 - [ ] Étape 4 : menu natif Affichage (coche Simple / Expert), `ui_mode.json`, réglage dans les Paramètres.

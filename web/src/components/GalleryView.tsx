@@ -13,6 +13,8 @@ interface GalleryViewProps {
   modlists: GalleryModlist[];
   isLoading: boolean;
   onRefresh: () => void;
+  /** Télécharge le .wabbajack de la modlist et la prépare à l'installation. */
+  onInstall: (modlist: GalleryModlist) => void;
 }
 
 /** Libellé traduit d'un filtre de jeu (les noms de jeux restent tels quels). */
@@ -222,7 +224,8 @@ const CardDescription: React.FC<{ raw?: string; language: Language; fallback: st
 const DetailModal: React.FC<{
   modlist: GalleryModlist;
   onClose: () => void;
-}> = ({ modlist, onClose }) => {
+  onInstall: (modlist: GalleryModlist) => void;
+}> = ({ modlist, onClose, onInstall }) => {
   useEscapeKey(onClose);
   const { t, language } = useI18n();
   const formatBytes = (b: number) => fmtBytes(b, language, 'gb');
@@ -379,6 +382,12 @@ const DetailModal: React.FC<{
 
         <div style={{ padding: '12px 20px', background: '#181818', borderTop: '1px solid #262626',
           display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, flexShrink: 0 }}>
+          {modlist.links?.download && (
+            <button type="button" onClick={() => { onClose(); onInstall(modlist); }}
+              style={{ padding: '7px 20px', borderRadius: 8, background: '#0369a1', border: 'none', color: '#ffffff', fontSize: 'calc(12px * var(--text-scale))', fontWeight: 700, cursor: 'pointer' }}>
+              ⬇️ {t.gallery.installBtn}
+            </button>
+          )}
           <button type="button" onClick={onClose}
             style={{ padding: '7px 20px', borderRadius: 8, background: '#262626', border: 'none', color: '#dddddd', fontSize: 'calc(12px * var(--text-scale))', fontWeight: 500, cursor: 'pointer' }}>
             {t.gallery.detailClose}
@@ -390,7 +399,7 @@ const DetailModal: React.FC<{
 };
 
 // ── Main component ──────────────────────────────────────────────────────────
-export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, onRefresh }) => {
+export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, onRefresh, onInstall }) => {
   const { t, language } = useI18n();
   const formatBytes = (b: number) => fmtBytes(b, language, 'gb');
   const [search, setSearch]               = useState('');
@@ -654,6 +663,12 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
                           className="flex-1 py-2 px-3 rounded-lg bg-[#222222] hover:bg-[#2c2c2c] border border-[#333333] hover:border-[#38bdf8]/40 text-[#dddddd] hover:text-[#38bdf8] text-body font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                           <span>ℹ️</span><span>{t.gallery.detailsBtn || 'Infos'}</span>
                         </button>
+                        {modlist.links?.download && (
+                          <button type="button" onClick={() => onInstall(modlist)}
+                            className="flex-1 py-2 px-3 rounded-lg bg-[#0369a1] hover:bg-[#075985] border border-[#0369a1] text-white text-body font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                            <span>⬇️</span><span>{t.gallery.installBtn}</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -667,6 +682,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
       {/* ── Detail Modal ─────────────────────────────── */}
       {detailModlist && (
         <DetailModal
+          onInstall={onInstall}
           modlist={detailModlist}
           onClose={() => setDetailModlist(null)}
         />

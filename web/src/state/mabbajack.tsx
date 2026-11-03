@@ -22,9 +22,10 @@ import { useI18n } from '../locales';
 import { APP_UI } from '../locales/uiScreens';
 import { translateLog } from '../locales/logCatalog';
 import { PHOENIX_DEMO_MODLIST } from './demoModlist';
+import type { GalleryDownload } from '../components/GalleryDownloadOverlay';
 
 /** Étapes signalées aux écrans : modlist analysée, installation lancée, lancement refusé. */
-export type MabbajackEvent = 'loaded' | 'installStarted' | 'installFailed';
+export type MabbajackEvent = 'loaded' | 'galleryReady' | 'installStarted' | 'installFailed';
 
 export const DEFAULT_PROGRESS: InstallProgress = {
   stage: 'idle',
@@ -375,6 +376,45 @@ function useMabbajackState() {
     [addLog, waitDroppedPath, inspectWabbajackPath]
   );
 
+  // Modlist de la galerie : le serveur télécharge son .wabbajack puis l'analyse ; l'avancement arrive par le flux SSE.
+  const [galleryDownload, setGalleryDownload] = useState<GalleryDownload | null>(null);
+  const installFromGallery = useCallback(async (modlist: GalleryModlist) => {
+    const url = modlist.links?.download;
+    if (!url) {
+      addLog('warn', `"${modlist.title}" : aucune URL CDN disponible — glissez le fichier .wabbajack manuellement.`);
+      return;
+    }
+    addLog('info', `⬇ Téléchargement direct .wabbajack…`);
+    setGalleryDownload({ title: modlist.title, pct: 0, status: '' });
+    const sse = new EventSource(`${getApiBaseUrl()}/api/install/stream`);
+    sse.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'progress') {
+          setGalleryDownload((d) => (d ? { ...d, pct: data.progress.stagePercent ?? 0, status: data.progress.currentTask ?? '' } : d));
+        }
+      } catch { /* ignore */ }
+    };
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/wabbajack/install-from-url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, title: modlist.title }),
+      });
+      const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+      if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+      setParsedFile(body);
+      addLog('success', `Modlist "${body.name}" analysée : ${body.numberOfArchives} archives.`);
+      emit('galleryReady');
+    } catch (err: any) {
+      addLog('error', `Erreur lors de l'analyse du fichier .wabbajack : ${err.message}`);
+      alert(`${APP_UI[langRef.current].analysisError} ${translateLog(String(err.message), langRef.current)}`);
+    } finally {
+      sse.close();
+      setGalleryDownload(null);
+    }
+  }, [addLog, emit]);
+
   // 6. Load Demo Phoenix Modlist
   const handleLoadDemoModlist = useCallback(() => {
     setIsInspecting(true);
@@ -587,6 +627,7 @@ function useMabbajackState() {
     parsedFile, isInspecting, importProgress,
     loadWabbajackFile: handleLoadWabbajackFile, inspectWabbajackPath, pickNativeWabbajackFile: handlePickNativeWabbajackFile,
     loadDemoModlist: handleLoadDemoModlist,
+    galleryDownload, installFromGallery,
     installOptions, setInstallOptions, updateRequest, setUpdateRequest,
     // dossiers et réglages
     downloadsPath, setDownloadsPath: saveDownloadsPath, destPath, setDestPath: saveDestPath,
