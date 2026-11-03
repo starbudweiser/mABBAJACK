@@ -14,10 +14,10 @@ const translationsMap: Record<Language, Translations> = {
 };
 
 export const availableLanguages: LanguageInfo[] = [
-  { code: 'fr', name: 'Français', nativeName: 'Français', flag: '🇫🇷' },
-  { code: 'en', name: 'English', nativeName: 'English', flag: '🇬🇧' },
-  { code: 'it', name: 'Italiano', nativeName: 'Italiano', flag: '🇮🇹' },
-  { code: 'es', name: 'Español', nativeName: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', nativeName: 'Français' },
+  { code: 'en', name: 'English', nativeName: 'English' },
+  { code: 'it', name: 'Italiano', nativeName: 'Italiano' },
+  { code: 'es', name: 'Español', nativeName: 'Español' },
 ];
 
 interface I18nContextType {
@@ -36,7 +36,12 @@ function systemLanguage(): Language {
 const I18nContext = createContext<I18nContextType | null>(null);
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Langue donnée par l'appli macOS (?ui=, menu natif « Langue »), sinon mémorisée (preview), sinon navigateur
   const [language, setLanguageState] = useState<Language>(() => {
+    const asked = new URLSearchParams(location.search).get('ui') as Language;
+    if (asked && ['fr', 'en', 'it', 'es'].includes(asked)) {
+      return asked;
+    }
     const saved = localStorage.getItem('mabbajack_language') as Language;
     if (saved && ['fr', 'en', 'it', 'es'].includes(saved)) {
       return saved;
@@ -52,6 +57,13 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
+
+  // Menu natif « Langue » (python_app/mabbajack_app.py)
+  useEffect(() => {
+    (window as unknown as { mabbajackSetLanguage?: (c: string) => void }).mabbajackSetLanguage = (code: string) => {
+      if (['fr', 'en', 'it', 'es'].includes(code)) setLanguage(code as Language);
+    };
+  });
 
   const value: I18nContextType = {
     language,

@@ -30,10 +30,10 @@ export function mbUnit(lang: Language): string {
   return (UNITS[lang] ?? UNITS.fr).mb;
 }
 
-// ── Composants communs (design.tsx, Header, LanguageSelector) ────────────────
+// ── Composants communs (design.tsx, Header) ────────────────
 export interface CommonUi {
   paste: string; pastePath: string; browse: string; apiKeyLabel: string; optional: string; apiKeyPlaceholder: string;
-  show: string; hide: string; validating: string; validate: string; nexusFree: string; languageSelect: string;
+  show: string; hide: string; validating: string; validate: string; nexusFree: string;
   reactError: string; reload: string; refresh: string;
 }
 
@@ -41,25 +41,25 @@ export const COMMON_UI: Record<Language, CommonUi> = {
   fr: {
     paste: 'Coller', pastePath: 'Coller le chemin', browse: 'Parcourir', apiKeyLabel: 'Clé API Nexus Mods', optional: '(optionnel)',
     apiKeyPlaceholder: 'Clé API Nexus Mods…', show: 'Afficher', hide: 'Masquer',
-    validating: '⏳ Validation…', validate: '✓ Valider', nexusFree: 'Nexus gratuit', languageSelect: 'Sélection de la langue',
+    validating: '⏳ Validation…', validate: '✓ Valider', nexusFree: 'Nexus gratuit',
     reactError: '❌ Erreur de l\'interface', reload: 'Recharger', refresh: 'Actualiser le catalogue',
   },
   en: {
     paste: 'Paste', pastePath: 'Paste path', browse: 'Browse', apiKeyLabel: 'Nexus Mods API key', optional: '(optional)',
     apiKeyPlaceholder: 'Nexus Mods API key…', show: 'Show', hide: 'Hide',
-    validating: '⏳ Validating…', validate: '✓ Validate', nexusFree: 'Nexus Free', languageSelect: 'Language selection',
+    validating: '⏳ Validating…', validate: '✓ Validate', nexusFree: 'Nexus Free',
     reactError: '❌ Interface error', reload: 'Reload', refresh: 'Refresh catalog',
   },
   es: {
     paste: 'Pegar', pastePath: 'Pegar la ruta', browse: 'Examinar', apiKeyLabel: 'Clave API de Nexus Mods', optional: '(opcional)',
     apiKeyPlaceholder: 'Clave API de Nexus Mods…', show: 'Mostrar', hide: 'Ocultar',
-    validating: '⏳ Validando…', validate: '✓ Validar', nexusFree: 'Nexus gratuito', languageSelect: 'Selección de idioma',
+    validating: '⏳ Validando…', validate: '✓ Validar', nexusFree: 'Nexus gratuito',
     reactError: '❌ Error de la interfaz', reload: 'Recargar', refresh: 'Actualizar el catálogo',
   },
   it: {
     paste: 'Incolla', pastePath: 'Incolla il percorso', browse: 'Sfoglia', apiKeyLabel: 'Chiave API Nexus Mods', optional: '(facoltativa)',
     apiKeyPlaceholder: 'Chiave API Nexus Mods…', show: 'Mostra', hide: 'Nascondi',
-    validating: '⏳ Verifica…', validate: '✓ Verifica', nexusFree: 'Nexus gratuito', languageSelect: 'Selezione della lingua',
+    validating: '⏳ Verifica…', validate: '✓ Verifica', nexusFree: 'Nexus gratuito',
     reactError: '❌ Errore dell\'interfaccia', reload: 'Ricarica', refresh: 'Aggiorna il catalogo',
   },
 };

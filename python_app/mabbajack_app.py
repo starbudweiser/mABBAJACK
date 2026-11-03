@@ -23,6 +23,7 @@ import threading
 import time
 from pathlib import Path
 
+import lang_menu
 import updater
 import webview
 from splash import Splash
@@ -33,6 +34,8 @@ DATA_NAME = "mAbbajack"  # dossiers de réglages et de journaux existants : ne p
 PREFERRED_PORT = 38300  # port fixe : l'origine (donc le localStorage : clé Nexus, réglages) reste stable
 LOG_DIR = Path.home() / "Library" / "Logs" / DATA_NAME
 DATA_DIR = Path.home() / "Library" / "Application Support" / DATA_NAME
+# Langue de l'interface : choix du menu « Langue » (« auto » = langue du Mac), dans DATA_DIR/language.json
+LANG_STORE = lang_menu.FileStore(DATA_NAME)
 
 # Fenêtre par défaut : ratio de la capture de référence (≈ 1,09:1), centrée. 1200 × 1100 px de contenu :
 # mesuré sur le rendu réel de la galerie — la 2e rangée de cartes se termine à 1042 px, ~58 px de marge.
@@ -185,6 +188,12 @@ MENU_FR = {
 }
 
 
+def push_language(code: str) -> None:
+    """Langue choisie dans le menu « Langue » : appliquée à l'interface (window.mabbajackSetLanguage)."""
+    if webview.windows:
+        webview.windows[0].evaluate_js(f"window.mabbajackSetLanguage && window.mabbajackSetLanguage({json.dumps(code)})")
+
+
 def build_menu():
     """Menus macOS natifs : chaque entrée déclenche l'action de l'interface
     (pont window.mabbajackMenu défini dans web/src/App.tsx)."""
@@ -214,6 +223,7 @@ def build_menu():
             MenuSeparator(),
             item("Actualiser le catalogue", "refresh"),
         ]),
+        lang_menu.web_menu(LANG_STORE.get, LANG_STORE.set, push_language),
         Menu("Aide", [
             MenuAction("Ouvrir le dossier des journaux", open_logs),
             MenuAction(updater.texts(updater.system_lang())["menu"], lambda: UPDATER and UPDATER.check_manual()),
@@ -314,7 +324,7 @@ def main() -> None:
             return
         nonlocal app_url
         app_url = f"http://127.0.0.1:{backend.port}"
-        window.load_url(app_url)
+        window.load_url(f"{app_url}/?ui={lang_menu.resolve(LANG_STORE.get())}")  # langue lue par web/src/locales
         threading.Timer(15, splash.ready).start()  # page lente à charger : on ouvre quand même
         nxm.ready(backend.port)
         global UPDATER
@@ -358,6 +368,7 @@ def main() -> None:
     nxm.register()
     window.events.loaded += bind_drop
     window.events.loaded += on_main_loaded
+    window.events.shown += lambda: lang_menu.cocoa_mark(LANG_STORE.get)  # coche du menu « Langue »
     window.events.closed += backend.stop
     atexit.register(backend.stop)
     for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):

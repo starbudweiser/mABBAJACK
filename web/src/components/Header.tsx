@@ -1,7 +1,6 @@
 import React from 'react';
 import { useI18n } from '../locales';
 import { COMMON_UI } from '../locales/uiScreens';
-import LanguageSelector from './LanguageSelector';
 import { version } from '../../package.json';
 import { SkyrimEnvironment, NexusAccount } from '../types/wabbajack';
 
@@ -100,7 +99,6 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden lg:inline">{t.header.tabs.settings}</span>
         </button>
 
-        <LanguageSelector variant="dropdown" />
       </div>
     </header>
   );

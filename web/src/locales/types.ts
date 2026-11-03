@@ -4,7 +4,6 @@ export interface LanguageInfo {
   code: Language;
   name: string;
   nativeName: string;
-  flag: string;
 }
 
 export interface Translations {
