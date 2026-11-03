@@ -49,6 +49,18 @@ WINDOW_W, WINDOW_H = 1400, 1100
 WINDOW_MIN = (1200, 700)
 
 
+def window_min() -> tuple[int, int]:
+    """Taille minimale de la fenêtre, plafonnée au plus petit écran : sur un écran de 1080 px de large
+    (portrait), un minimum de 1200 px ferait déborder la fenêtre hors de l'écran."""
+    mw, mh = WINDOW_MIN
+    try:
+        mw = min(mw, min(int(s.width * 0.98) for s in webview.screens))
+        mh = min(mh, min(int(s.height * 0.8) for s in webview.screens))
+    except Exception:  # écrans non détectables
+        pass
+    return mw, mh
+
+
 def initial_geometry() -> tuple[int, int, int | None, int | None]:
     """(largeur, hauteur, x, y) : taille par défaut réduite à l'écran en gardant le ratio, centrée.
     Si l'écran est inconnu, x/y = None : pywebview centre la fenêtre."""
@@ -57,7 +69,8 @@ def initial_geometry() -> tuple[int, int, int | None, int | None]:
         scr = webview.screens[0]
         # marge pour la barre de menus et le Dock
         scale = min(1.0, (scr.width * 0.95) / w, (scr.height * 0.88) / h)
-        w, h = max(WINDOW_MIN[0], int(w * scale)), max(WINDOW_MIN[1], int(h * scale))
+        mw, mh = window_min()
+        w, h = max(mw, int(w * scale)), max(mh, int(h * scale))
         x = int(scr.x + (scr.width - w) / 2)
         y = int(scr.y + max(0, (scr.height - h) / 2))
         return w, h, x, y
@@ -451,7 +464,7 @@ def main() -> None:
     # Splash d'abord (première fenêtre affichée) ; la fenêtre principale reste cachée jusqu'à t = 2 s
     splash = Splash(webview, lambda msg: launcher_log(msg))
     window = webview.create_window(
-        APP_NAME, html=LOADING_HTML, width=width, height=height, x=x, y=y, min_size=WINDOW_MIN,
+        APP_NAME, html=LOADING_HTML, width=width, height=height, x=x, y=y, min_size=window_min(),
         background_color="#1e1e1e", hidden=True,
     )
     app_url = ""
