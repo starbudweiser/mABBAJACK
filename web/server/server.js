@@ -20,6 +20,7 @@ import { sseClients, logHistory, currentInstallJob, broadcastLog, broadcastProgr
 import { getExpectedSkyrimVersion, isGameFileArchive, isIgnorableGameFile, resolveGameFileArchive, expectedGameFilePath, detectSkyrimAtPath } from './gamefiles.js';
 import { nexusPremiumCache } from './nexus.js';
 import { downloadWabbajackCdn, isTrustedCdnUrl } from './downloaders.js';
+import { volumeInfo } from './diskspace.js';
 import { find7z } from './tools.js';
 import { startInstall } from './install.js';
 import { APP_VERSION, NEXUS_APP_HEADERS } from './version.js';
@@ -308,6 +309,12 @@ app.post('/api/system/detect-skyrim-at', (req, res) => {
     else compatibility = { compatible: false, message: `⚠ La modlist cible AE (1.6.x) mais vous avez SE (1.5.97). Risque de crash.`, level: 'error' };
   }
   res.json({ ...detection, expected, compatibility });
+});
+
+/** Espace libre du volume de chaque dossier (le dossier peut ne pas exister encore) : { volumes: [{ free, dev } | null] }. */
+app.post('/api/system/disk-space', (req, res) => {
+  const paths = Array.isArray(req.body?.paths) ? req.body.paths.slice(0, 4) : [];
+  res.json({ volumes: paths.map((p) => (typeof p === 'string' && p.trim() ? volumeInfo(p.trim()) : null)) });
 });
 
 app.get('/api/system/detect-skyrim', (req, res) => {

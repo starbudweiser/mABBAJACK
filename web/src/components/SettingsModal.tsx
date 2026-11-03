@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useUiMode } from '../state/uiMode';
+import { SIMPLE_UI } from '../locales/uiSimple';
 import { useI18n } from '../locales';
 import { useEscapeKey } from '../design';
 import { INSTALLER_UI } from '../locales/uiExtra';
@@ -37,8 +39,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   setConcurrency,
 }) => {
   useEscapeKey(onClose, isOpen);
+  const { mode: uiMode, setMode: setUiMode } = useUiMode();
   const { t, language } = useI18n();
   const ui = SETTINGS_UI[language] ?? SETTINGS_UI.fr;
+  const simpleUi = SIMPLE_UI[language] ?? SIMPLE_UI.fr;
   const [keyInput, setKeyInput] = useState(nexusApiKey);
   const [downloadsInput, setDownloadsInput] = useState(defaultDownloadsPath);
   const [destInput, setDestInput] = useState(defaultDestPath);
@@ -155,6 +159,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Modal Body */}
         <div className="p-5 overflow-y-auto space-y-5 text-body select-text">
+
+          {/* Présentation de l'interface */}
+          <div className="space-y-2">
+            <span className="text-body font-bold text-white uppercase tracking-wider flex items-center gap-1.5"><span>🧭</span><span>{simpleUi.modeLabel}</span></span>
+            <div className="flex gap-2">
+              {(['simple', 'expert'] as const).map((md) => (
+                <button key={md} type="button" onClick={() => setUiMode(md)} aria-pressed={uiMode === md}
+                  className={`h-8 px-4 rounded-lg border text-body font-semibold cursor-pointer transition-colors ${uiMode === md ? 'bg-[#0369a1] border-[#0369a1] text-white' : 'bg-[#262626] border-[#444444] text-[#dddddd] hover:bg-[#333333]'}`}>
+                  {md === 'simple' ? simpleUi.modeSimple : simpleUi.modeExpert}
+                </button>
+              ))}
+            </div>
+            <p className="text-meta text-[#8f8f8f]">{simpleUi.modeHint}</p>
+          </div>
           {/* Section 1: Nexus Mods Integration */}
           <div className="space-y-2">
             <span className="font-bold text-white text-body uppercase tracking-wider block flex items-center gap-1.5">

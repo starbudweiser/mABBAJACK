@@ -1,6 +1,8 @@
 import React from 'react';
 import { useI18n } from '../locales';
 import { COMMON_UI } from '../locales/uiScreens';
+import { useUiMode } from '../state/uiMode';
+import { SIMPLE_UI } from '../locales/uiSimple';
 import { version } from '../../package.json';
 import { SkyrimEnvironment, NexusAccount } from '../types/wabbajack';
 
@@ -24,6 +26,8 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { t, language } = useI18n();
   const ui = COMMON_UI[language] ?? COMMON_UI.fr;
+  const { setMode } = useUiMode();
+  const simpleLabel = (SIMPLE_UI[language] ?? SIMPLE_UI.fr).modeSimple;
 
   const TAB_BASE = 'px-3 py-1.5 rounded-md text-body font-medium flex items-center gap-1.5 transition-all duration-150 cursor-pointer whitespace-nowrap';
   const TAB_ACTIVE = `${TAB_BASE} bg-[#0369a1] text-white font-semibold shadow-sm shadow-[#0369a1]/30`;
@@ -90,6 +94,11 @@ export const Header: React.FC<HeaderProps> = ({
           <span>🛡️</span>
           <span>{nexusAccount?.isPremium ? 'Premium ⭐' : nexusAccount?.valid ? ui.nexusFree : 'Nexus'}</span>
         </div>
+
+        <button type="button" onClick={() => setMode('simple')}
+          className="h-7 px-2 rounded-md bg-[#1e1e1e] hover:bg-[#2c2c2c] border border-[#333333] text-[#aaaaaa] hover:text-white text-body cursor-pointer flex-shrink-0">
+          {simpleLabel}
+        </button>
 
         {/* Settings */}
         <button

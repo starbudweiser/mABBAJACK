@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import Root from './Root';
+import { UiModeProvider } from './state/uiMode';
 import { MabbajackProvider } from './state/mabbajack';
 import { I18nProvider } from './locales';
 import { COMMON_UI, storedLanguage } from './locales/uiScreens';
@@ -68,9 +69,11 @@ if (rootElement) {
     <React.StrictMode>
       <ErrorBoundary>
         <I18nProvider>
-          <MabbajackProvider>
-            <App />
-          </MabbajackProvider>
+          <UiModeProvider>
+            <MabbajackProvider>
+              <Root />
+            </MabbajackProvider>
+          </UiModeProvider>
         </I18nProvider>
       </ErrorBoundary>
     </React.StrictMode>
