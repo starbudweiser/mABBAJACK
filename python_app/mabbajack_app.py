@@ -23,6 +23,7 @@ import threading
 import time
 from pathlib import Path
 
+import about_window
 import lang_menu
 import updater
 import webview
@@ -176,8 +177,30 @@ class Backend:
         self.proc = None
 
 
+def sync_apple_languages(choice: str) -> None:
+    """Les entrées que macOS ajoute lui-même aux menus (Dictée, Emoji, « Quitter et garder les fenêtres »…) suivent
+    AppleLanguages, lu par macOS avant ce code : un choix explicite du menu « Langue » y est inscrit pour l'appli
+    seule, « auto » l'en retire (langue du Mac). Effet au lancement suivant, comme les autres menus natifs.
+    Les arguments -AppleLanguages des essais restent prioritaires."""
+    try:
+        from Foundation import NSUserDefaults
+        defaults = NSUserDefaults.standardUserDefaults()  # domaine de l'appli (identifiant du paquet)
+        if lang_menu.normalize_choice(choice) == lang_menu.AUTO:
+            defaults.removeObjectForKey_("AppleLanguages")
+        else:
+            defaults.setObject_forKey_([choice], "AppleLanguages")
+    except Exception:
+        pass
+
+
+def set_language_choice(choice: str) -> None:
+    LANG_STORE.set(choice)
+    sync_apple_languages(choice)
+
+
 # Langue des menus natifs : celle du menu « Langue » (« auto » = langue du Mac), lue au démarrage ;
 # l'interface web change tout de suite, les menus natifs au lancement suivant.
+sync_apple_languages(LANG_STORE.get())
 MENU_LANG = lang_menu.resolve(LANG_STORE.get())
 
 # Titres des menus : {texte français: (anglais, espagnol, italien)}
@@ -236,6 +259,38 @@ def push_language(code: str) -> None:
         webview.windows[0].evaluate_js(f"window.mabbajackSetLanguage && window.mabbajackSetLanguage({json.dumps(code)})")
 
 
+def merge_view_menus() -> None:
+    """pywebview ajoute son propre menu « Présentation » (Plein écran) à côté de notre « Affichage » :
+    son entrée Plein écran rejoint notre menu et le sien disparaît (un seul menu d'affichage). Fil principal."""
+    try:
+        from AppKit import NSApp, NSMenuItem
+        from PyObjCTools import AppHelper
+    except Exception:
+        return
+
+    def apply():
+        main = NSApp.mainMenu() if NSApp else None
+        if main is None:
+            return
+        ours = main.itemWithTitle_(M("Affichage"))
+        for i in range(main.numberOfItems()):
+            top = main.itemAtIndex_(i)
+            sub = top.submenu()
+            if top is ours or sub is None or ours is None or ours.submenu() is None:
+                continue
+            full = next((sub.itemAtIndex_(j) for j in range(sub.numberOfItems())
+                         if sub.itemAtIndex_(j).action() == "toggleFullScreen:"), None)
+            if full is None:
+                continue
+            sub.removeItem_(full)
+            ours.submenu().addItem_(NSMenuItem.separatorItem())
+            ours.submenu().addItem_(full)
+            main.removeItem_(top)
+            return
+
+    AppHelper.callAfter(apply)
+
+
 def build_menu():
     """Menus macOS natifs : chaque entrée déclenche l'action de l'interface
     (pont window.mabbajackMenu défini dans web/src/App.tsx)."""
@@ -265,7 +320,7 @@ def build_menu():
             MenuSeparator(),
             item(M("Actualiser le catalogue"), "refresh"),
         ]),
-        lang_menu.web_menu(LANG_STORE.get, LANG_STORE.set, push_language),
+        lang_menu.web_menu(LANG_STORE.get, set_language_choice, push_language),
         Menu(M("Aide"), [
             MenuAction(M("Ouvrir le dossier des journaux"), open_logs),
             MenuAction(updater.texts(MENU_LANG)["menu"], lambda: UPDATER and UPDATER.check_manual()),
@@ -411,6 +466,8 @@ def main() -> None:
     window.events.loaded += bind_drop
     window.events.loaded += on_main_loaded
     window.events.shown += lambda: lang_menu.cocoa_mark(LANG_STORE.get)  # coche du menu « Langue »
+    window.events.shown += merge_view_menus
+    window.events.shown += lambda: about_window.install(MENU_LANG)  # « À propos » : fenêtre Socle
     window.events.closed += backend.stop
     atexit.register(backend.stop)
     for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):

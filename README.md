@@ -6,6 +6,13 @@
 
 💬 **Support & community:** [Discord](https://discord.gg/xdDVDPQsYs) · *Aide et communauté : [Discord](https://discord.gg/xdDVDPQsYs)*
 
+## About
+
+**mABBAJACK** is a native Wabbajack modlist installer for macOS.
+Authors: **Starbudweiser & Claude Code (Anthropic)**. MIT License, © 2026 Starbudweiser.
+Provided as is, without warranty. Inspired by Wabbajack, not affiliated with its authors.
+In the app: **mABBAJACK › About mABBAJACK**.
+
 ---
 
 ## 🇫🇷 Français

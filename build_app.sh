@@ -92,6 +92,13 @@ PLIST="$APP/Contents/Info.plist"
   -c "Add :CFBundleURLTypes:0:CFBundleURLName string com.mabbajack.nxm" \
   -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes array" \
   -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes:0 string nxm" "$PLIST"
+# Langues de l'appli : sans elles, macOS écrit en anglais les entrées qu'il ajoute aux menus (Dictée, Emoji…)
+/usr/libexec/PlistBuddy -c "Delete :CFBundleLocalizations" "$PLIST" 2>/dev/null || true
+/usr/libexec/PlistBuddy -c "Add :CFBundleLocalizations array" "$PLIST"
+for lang in fr en es it; do
+  mkdir -p "$APP/Contents/Resources/$lang.lproj"
+  /usr/libexec/PlistBuddy -c "Add :CFBundleLocalizations: string $lang" "$PLIST"
+done
 
 echo "▶ Signature (certificat local stable)"
 "$(cd "$ROOT/.." && pwd)/_tools/sign_app.sh" "$APP" "$VERSION"
