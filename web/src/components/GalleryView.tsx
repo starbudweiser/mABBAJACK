@@ -510,7 +510,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
             const isActive = activeFilter === f.id;
             return (
               <button key={f.id} type="button" onClick={() => { setActiveFilter(f.id); setSelectedTag('all'); }}
-                className="flex items-center gap-1.5 px-3 h-[30px] rounded-lg text-body font-semibold border transition-all duration-150 cursor-pointer flex-shrink-0"
+                className="flex items-center gap-1.5 px-1.5 min-[1200px]:px-3 h-[30px] rounded-lg text-body font-semibold border transition-all duration-150 cursor-pointer flex-shrink-0"
                 style={isActive ? { color: f.activeColor, background: f.activeBg, borderColor: f.activeBorder } : { color: '#707070', background: '#1a1a1a', borderColor: '#2c2c2c' }}>
                 <span>{f.icon}</span>
                 <span>{filterLabel(f.id, f.label, language)}</span>
@@ -532,7 +532,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ modlists, isLoading, o
                   if (!e.target.value) return;
                   setActiveFilter('other'); setOtherGame(e.target.value); setSelectedTag('all');
                 }}
-                className="appearance-none ml-auto h-[30px] pl-3 pr-7 rounded-lg text-body font-semibold leading-none border transition-all duration-150 cursor-pointer w-[210px] flex-shrink-0 truncate focus:outline-none"
+                className="appearance-none ml-auto h-[30px] pl-3 pr-7 rounded-lg text-body font-semibold leading-none border transition-all duration-150 cursor-pointer w-[210px] min-w-[140px] flex-shrink truncate focus:outline-none"
                 style={{
                   ...(isActive
                     ? { color: OTHER_FILTER.activeColor, background: OTHER_FILTER.activeBg, borderColor: OTHER_FILTER.activeBorder }
