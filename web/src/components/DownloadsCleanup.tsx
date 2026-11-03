@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useI18n } from '../locales';
+import { fmtBytes } from '../locales/uiScreens';
 import { CLEANUP_UI } from '../locales/uiExtra';
 import { findUnusedDownloads, trashDownloads, UnusedDownloads } from '../services/api';
 import { btn } from '../design';
@@ -12,11 +13,6 @@ interface Props {
 const fill = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
 const SHOWN = 50;
 
-function formatBytes(bytes: number, fr: boolean): string {
-  const gb = bytes / (1024 * 1024 * 1024);
-  if (gb >= 1) return `${gb.toFixed(1)} ${fr ? 'Go' : 'GB'}`;
-  return `${Math.round(bytes / (1024 * 1024))} ${fr ? 'Mo' : 'MB'}`;
-}
 
 /** Paramètres : archives de DOWNLOADS inutilisées par les listes installées → Corbeille. */
 export const DownloadsCleanup: React.FC<Props> = ({ downloadsPath, destPath }) => {
@@ -74,15 +70,15 @@ export const DownloadsCleanup: React.FC<Props> = ({ downloadsPath, destPath }) =
           {!result.blocked && (result.unused.length === 0 ? <span className="text-[#4ade80]">{ui.none}</span> : (
             <>
               <details>
-                <summary className="cursor-pointer select-none text-white">{fill(ui.found, { n: result.unused.length, size: formatBytes(result.totalSize, fr) })}</summary>
+                <summary className="cursor-pointer select-none text-white">{fill(ui.found, { n: result.unused.length, size: fmtBytes(result.totalSize, language) })}</summary>
                 <ul className="mt-1 ml-4 flex flex-col gap-0.5 text-caption text-[#cccccc] max-h-48 overflow-y-auto font-mono">
-                  {result.unused.slice(0, SHOWN).map((u) => <li key={u.path} className="break-all">{u.name} <span className="text-[#707070]">({formatBytes(u.size, fr)})</span></li>)}
+                  {result.unused.slice(0, SHOWN).map((u) => <li key={u.path} className="break-all">{u.name} <span className="text-[#707070]">({fmtBytes(u.size, language)})</span></li>)}
                   {result.unused.length > SHOWN && <li className="text-[#707070]">{fill(ui.more, { n: result.unused.length - SHOWN })}</li>}
                 </ul>
               </details>
               {confirming ? (
                 <div className="flex flex-col gap-2">
-                  <span className="text-[#fbbf24] whitespace-pre-line">{fill(ui.confirm, { n: result.unused.length, size: formatBytes(result.totalSize, fr) })}</span>
+                  <span className="text-[#fbbf24] whitespace-pre-line">{fill(ui.confirm, { n: result.unused.length, size: fmtBytes(result.totalSize, language) })}</span>
                   <div className="flex gap-2">
                     <button type="button" className={btn.danger} onClick={trash} disabled={!!busy}>{fill(ui.trash, { n: result.unused.length })}</button>
                     <button type="button" className={btn.secondary} onClick={() => setConfirming(false)}>{ui.cancel}</button>

@@ -62,10 +62,13 @@ export const Header: React.FC<HeaderProps> = ({
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
+              title={tab.label}
+              aria-label={tab.label}
+              aria-current={activeTab === tab.id ? 'page' : undefined}
               className={`${activeTab === tab.id ? TAB_ACTIVE : TAB_IDLE} relative`}
             >
               <span>{tab.icon}</span>
-              <span className="hidden xs:inline">{tab.label}</span>
+              <span className="hidden md:inline">{tab.label}</span>
               {tab.id === 'progress' && isInstalling && (
                 <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-ping absolute -top-0.5 -right-0.5" />
               )}
@@ -94,6 +97,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={onOpenSettings}
           className="h-7 px-2 rounded-md bg-[#1e1e1e] hover:bg-[#2c2c2c] border border-[#333333] text-[#aaaaaa] hover:text-white text-body flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0"
           title={t.header.tabs.settings}
+          aria-label={t.header.tabs.settings}
         >
           <span>⚙️</span>
           <span className="hidden lg:inline">{t.header.tabs.settings}</span>

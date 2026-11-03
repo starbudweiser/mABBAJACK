@@ -37,9 +37,9 @@ const PHOENIX_DEMO_MODLIST: ParsedWabbajackFile = {
   description: 'A minimal, clean and high-performance base for Skyrim Special Edition / Anniversary Edition including SKSE, SkyUI, Bug Fixes, Address Library and Engine Fixes.',
   version: '3.4.1',
   gameType: 'SkyrimSpecialEdition',
-  totalArchiveSize: 2450000000,
+  totalArchiveSize: 1773875760,
   totalInstalledSize: 5800000000,
-  numberOfArchives: 12,
+  numberOfArchives: 8,
   numberOfDirectives: 1840,
   inlinedFilesCount: 42,
   patchesCount: 8,
@@ -359,7 +359,7 @@ export const App: React.FC = () => {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 20) {
           setGalleryModlists(data);
-          addLog('success', `${data.length} modlists chargés depuis le serveur local.`);
+          addLog('success', `${data.length} modlists chargées depuis le serveur local.`);
           setIsLoadingModlists(false);
           return;
         }

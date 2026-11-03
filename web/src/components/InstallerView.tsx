@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useI18n } from '../locales';
+import { fmtBytes } from '../locales/uiScreens';
 import { INSTALLER_UI } from '../locales/uiExtra';
 import { ParsedWabbajackFile, NexusAccount, InstallOptions, UpdateRequest } from '../types/wabbajack';
 import OptionalModsCard from './OptionalModsCard';
@@ -30,14 +31,6 @@ interface InstallerViewProps {
   setUpdateRequest: (u: UpdateRequest | null) => void;
 }
 
-function formatBytes(bytes: number, fr = true): string {
-  const mbUnit = fr ? 'Mo' : 'MB';
-  const gbUnit = fr ? 'Go' : 'GB';
-  if (!bytes || bytes <= 0) return `0 ${mbUnit}`;
-  const gb = bytes / (1024 * 1024 * 1024);
-  if (gb >= 1) return `${gb.toFixed(1)} ${gbUnit}`;
-  return `${(bytes / (1024 * 1024)).toFixed(0)} ${mbUnit}`;
-}
 
 /** Map wabbajack gameType + optional skyrimVersion classification to edition info */
 function getEditionInfo(gameType: string, skyrimVersion?: string) {
@@ -177,7 +170,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
         <div className={card}>
           <div className="flex items-center justify-between">
             <span className={sectionLabel}><span>📋</span><span>{ui.modlistLoaded}</span></span>
-            {parsedFile && <span className={badge.blue}>{parsedFile.numberOfArchives} archives · {formatBytes(parsedFile.totalArchiveSize, isFr)}</span>}
+            {parsedFile && <span className={badge.blue}>{ui.archivesN.replace('{n}', parsedFile.numberOfArchives.toLocaleString(language))} · {fmtBytes(parsedFile.totalArchiveSize, language)}</span>}
           </div>
 
           {/* ── Demo mode warning ─────────────────────────────────────── */}

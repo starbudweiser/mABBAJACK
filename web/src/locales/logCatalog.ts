@@ -57,7 +57,7 @@ const ENTRIES: Entry[] = [
   // ── App (client) ───────────────────────────────────────────────────────────
   ['mABBAJACK Initialisé - Moteur macOS prêt', 'mABBAJACK initialized - macOS engine ready', 'mABBAJACK inicializado - Motor macOS listo', 'mABBAJACK inizializzato - Motore macOS pronto'],
   ['Récupération du catalogue Wabbajack…', 'Fetching Wabbajack catalog…', 'Obteniendo el catálogo de Wabbajack…', 'Recupero del catalogo Wabbajack…'],
-  ['{0} modlists chargés depuis le serveur local.', '{0} modlists loaded from the local server.', '{0} modlists cargadas desde el servidor local.', '{0} modlist caricate dal server locale.'],
+  ['{0} modlists chargées depuis le serveur local.', '{0} modlists loaded from the local server.', '{0} modlists cargadas desde el servidor local.', '{0} modlist caricate dal server locale.'],
   ['Serveur local indisponible — agrégation directe depuis GitHub…', 'Local server unavailable — aggregating directly from GitHub…', 'Servidor local no disponible — agregando directamente desde GitHub…', 'Server locale non disponibile — aggregazione diretta da GitHub…'],
   ['{0} modlists agrégés depuis GitHub ({1} dépôts).', '{0} modlists aggregated from GitHub ({1} repositories).', '{0} modlists agregadas desde GitHub ({1} repositorios).', '{0} modlist aggregate da GitHub ({1} repository).'],
   ['GitHub inaccessible : {0}', 'GitHub unreachable: {0}', 'GitHub inaccesible: {0}', 'GitHub irraggiungibile: {0}'],

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useI18n } from '../locales';
+import { useEscapeKey } from '../design';
 import { INSTALLER_UI } from '../locales/uiExtra';
 import { NexusAccount } from '../types/wabbajack';
 import { pickNativeFolder, getNativeClipboard } from '../services/api';
@@ -35,6 +36,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   concurrency,
   setConcurrency,
 }) => {
+  useEscapeKey(onClose, isOpen);
   const { t, language } = useI18n();
   const ui = SETTINGS_UI[language] ?? SETTINGS_UI.fr;
   const [keyInput, setKeyInput] = useState(nexusApiKey);
@@ -227,7 +229,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <span className="text-[#666666]">
                 {nexusAccount?.isPremium
                   ? t.settings.nexusPremiumActive
-                  : t.settings.nexusStandardAccount}
+                  : nexusAccount?.valid ? t.settings.nexusStandardAccount : ''}
               </span>
               <a
                 href="https://www.nexusmods.com/users/myaccount?tab=api"

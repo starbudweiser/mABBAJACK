@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useI18n } from '../locales';
+import { useEscapeKey } from '../design';
 import { GalleryModlist } from '../types/wabbajack';
 import { getApiBaseUrl } from '../services/api';
 import { translateOne, translateBatch, useTranslated } from '../hooks/useTranslated';
@@ -56,13 +57,13 @@ const ALL_OTHERS = '*';
 const KNOWN_GAME_NAMES: Record<string, string> = {
   fallout4: 'Fallout 4', fallout3: 'Fallout 3', falloutnewvegas: 'Fallout: New Vegas', fallout4vr: 'Fallout 4 VR',
   oblivion: 'Oblivion', oblivionremastered: 'Oblivion Remastered', morrowind: 'Morrowind', starfield: 'Starfield',
-  skyrim: 'Skyrim LE', skyrimle: 'Skyrim LE', cyberpunk2077: 'Cyberpunk 2077', witcher3: 'The Witcher 3',
+  skyrim: 'Skyrim LE', skyrimle: 'Skyrim LE', skyrimspecialedition: 'Skyrim Special Edition', skyrimse: 'Skyrim Special Edition', skyrimvr: 'Skyrim VR', enderal: 'Enderal', cyberpunk2077: 'Cyberpunk 2077', witcher3: 'The Witcher 3',
   baldursgate3: "Baldur's Gate 3", dragonage: 'Dragon Age', dragonageorigins: 'Dragon Age: Origins',
   dragonage2: 'Dragon Age 2', dragonageinquisition: 'Dragon Age: Inquisition', kingdomcomedeliverance: 'Kingdom Come: Deliverance',
   stardewvalley: 'Stardew Valley', dragonsdogma: "Dragon's Dogma", dragonsdogma2: "Dragon's Dogma 2",
   darksouls: 'Dark Souls', eldenring: 'Elden Ring', mountandblade2bannerlord: 'Mount & Blade II: Bannerlord',
   vtmb: 'Vampire: The Masquerade – Bloodlines', nomanssky: "No Man's Sky", sevendaystodie: '7 Days to Die',
-  nierautomata: 'NieR: Automata', dishonored: 'Dishonored', enderalspecialedition: 'Enderal SE',
+  nierautomata: 'NieR: Automata', dishonored: 'Dishonored', enderalspecialedition: 'Enderal SE', duneawakening: 'Dune: Awakening',
 };
 
 /** Clé de regroupement d'un jeu (insensible à la casse, espaces et tirets). */
@@ -222,6 +223,7 @@ const DetailModal: React.FC<{
   modlist: GalleryModlist;
   onClose: () => void;
 }> = ({ modlist, onClose }) => {
+  useEscapeKey(onClose);
   const { t, language } = useI18n();
   const formatBytes = (b: number) => fmtBytes(b, language, 'gb');
   const bucket = classifyModlist(modlist);
@@ -346,7 +348,7 @@ const DetailModal: React.FC<{
                 [t.gallery.statDl,        formatBytes(dl?.SizeOfArchives || 0), '#38bdf8'],
                 [t.gallery.statInstalled, formatBytes(dl?.SizeOfInstalledFiles || 0), '#4ade80'],
                 [t.gallery.statArchives,  String(dl?.NumberOfArchives || 0), '#dddddd'],
-                [t.gallery.statGame,      modlist.game || '—', '#aaaaaa'],
+                [t.gallery.statGame,      modlist.game ? prettyGameName(modlist.game) : '—', '#aaaaaa'],
               ] as [string, string, string][]).map(([label, value, color]) => (
                 <div key={label} style={{ background: '#181818', border: '1px solid #262626', borderRadius: 10, padding: '10px 12px' }}>
                   <p style={{ margin: '0 0 2px', fontSize: 'calc(10px * var(--text-scale))', color: '#707070' }}>{label}</p>

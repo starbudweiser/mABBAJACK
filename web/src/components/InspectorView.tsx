@@ -3,7 +3,7 @@ import { useI18n } from '../locales';
 import { btn, badge, Divider } from '../design';
 import { ParsedWabbajackFile, ModlistArchive } from '../types/wabbajack';
 import { useTranslated } from '../hooks/useTranslated';
-import { INSPECTOR_UI, fmtBytes } from '../locales/uiScreens';
+import { INSPECTOR_UI, fmtBytes, colon } from '../locales/uiScreens';
 import { SCAN_UI } from '../locales/uiExtra';
 import type { ScanProgress } from '../services/api';
 import UpdateCard from './UpdateCard';
@@ -295,7 +295,7 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
               <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', border: '2px solid #38bdf8', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
               {scanPhase === 'match' ? scanUi.matching : scanUi.listing}
               {scanPhase === 'match' && scanTotal > 0 && (
-                <span className="font-mono text-[#38bdf8]">{scanProgress?.done.toLocaleString()} / {scanTotal.toLocaleString()}</span>
+                <span className="font-mono text-[#38bdf8]">{scanProgress?.done.toLocaleString(language)} / {scanTotal.toLocaleString(language)}</span>
               )}
             </span>
             <span className="font-mono font-bold text-[#38bdf8]">{scanPct !== null ? `${scanPct} %` : '…'}</span>
@@ -316,25 +316,25 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 px-5 py-3.5 bg-[#181818] border-b border-[#2e2e2e] flex-shrink-0">
         <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e]">
           <span className="text-caption text-[#666666] uppercase font-mono block">{ui.requiredArchives}</span>
-          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.numberOfArchives.toLocaleString()}</span>
+          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.numberOfArchives.toLocaleString(language)}</span>
           <span className="text-caption text-[#38bdf8]">{ui.totalSize} {formatBytes(parsedFile.totalArchiveSize)}</span>
         </div>
 
         <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e]">
           <span className="text-caption text-[#666666] uppercase font-mono block">{ui.directives}</span>
-          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.numberOfDirectives.toLocaleString()}</span>
+          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.numberOfDirectives.toLocaleString(language)}</span>
           <span className="text-caption text-[#38bdf8]">{ui.installedSize} {formatBytes(parsedFile.totalInstalledSize)}</span>
         </div>
 
         <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e]">
           <span className="text-caption text-[#666666] uppercase font-mono block">{ui.inlined}</span>
-          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.inlinedFilesCount.toLocaleString()}</span>
+          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.inlinedFilesCount.toLocaleString(language)}</span>
           <span className="text-caption text-[#4ade80]">{ui.inlinedDesc}</span>
         </div>
 
         <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e]">
           <span className="text-caption text-[#666666] uppercase font-mono block">{ui.patches}</span>
-          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.patchesCount.toLocaleString()}</span>
+          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.patchesCount.toLocaleString(language)}</span>
           <span className="text-caption text-[#fbbf24]">{ui.patchesDesc}</span>
         </div>
 
@@ -346,14 +346,14 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
           ) : (
             <>
               <span className="text-heading font-bold font-mono mt-0.5 block text-white">
-                {isScanning ? '…' : `${readyCount.toLocaleString()} / ${parsedFile.archives.length.toLocaleString()}`}
+                {isScanning ? '…' : `${readyCount.toLocaleString(language)} / ${parsedFile.archives.length.toLocaleString(language)}`}
               </span>
               <div className="h-1.5 mt-1 rounded-full bg-[#181818] overflow-hidden">
                 <div className="h-full rounded-full bg-[#22c55e] transition-[width] duration-300"
                   style={{ width: `${parsedFile.archives.length ? Math.round((readyCount / parsedFile.archives.length) * 100) : 0}%` }} />
               </div>
               <span className={`text-caption mt-1 block ${missingCount > 0 ? 'text-[#f87171]' : 'text-[#4ade80]'}`}>
-                {isScanning ? scanUi.scanning : scanUi.missingN.replace('{n}', missingCount.toLocaleString())}
+                {isScanning ? scanUi.scanning : scanUi.missingN.replace('{n}', missingCount.toLocaleString(language))}
               </span>
             </>
           )}
@@ -435,10 +435,10 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
                   </div>
 
                   <div className="text-caption text-[#666666] font-mono mt-1 flex items-center gap-3">
-                    {archive.Hash && <span>Hash : {archive.Hash.slice(0, 16)}…</span>}
-                    {archive.State?.ModID && <span>Mod ID : {archive.State.ModID}</span>}
-                    {archive.State?.FileID && <span>File ID : {archive.State.FileID}</span>}
-                    {archive.State?.Author && <span>{ui.author} : {archive.State.Author}</span>}
+                    {archive.Hash && <span>Hash{colon(language)} {archive.Hash.slice(0, 16)}…</span>}
+                    {archive.State?.ModID && <span>Mod ID{colon(language)} {archive.State.ModID}</span>}
+                    {archive.State?.FileID && <span>File ID{colon(language)} {archive.State.FileID}</span>}
+                    {archive.State?.Author && <span>{ui.author}{colon(language)} {archive.State.Author}</span>}
                   </div>
                 </div>
 
@@ -460,7 +460,7 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
           <div className="space-y-1.5 font-mono text-body">
             {parsedFile.directivesTruncated && (
               <div className="text-body text-[#aaaaaa] font-sans px-1 pb-1">
-                {parsedFile.directives.length.toLocaleString()} / {(parsedFile.numberOfDirectives ?? 0).toLocaleString()}
+                {parsedFile.directives.length.toLocaleString(language)} / {(parsedFile.numberOfDirectives ?? 0).toLocaleString(language)}
               </div>
             )}
             {parsedFile.directives.map((dir, idx) => (

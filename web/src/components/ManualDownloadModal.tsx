@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getApiBaseUrl } from '../services/api';
 import { useI18n } from '../locales';
+import { useEscapeKey } from '../design';
+import { fmtBytes, colon } from '../locales/uiScreens';
 import { MANUAL_UI } from '../locales/uiExtra';
 import { ModlistArchive } from '../types/wabbajack';
 
@@ -13,13 +15,15 @@ interface ManualDownloadModalProps {
   isScanning: boolean;
 }
 
-function formatBytes(bytes: number, fr: boolean): string {
-  const mbUnit = fr ? 'Mo' : 'MB';
-  const gbUnit = fr ? 'Go' : 'GB';
-  if (!bytes || bytes <= 0) return `0 ${mbUnit}`;
-  const mb = bytes / (1024 * 1024);
-  if (mb < 1024) return `${mb.toFixed(1)} ${mbUnit}`;
-  return `${(mb / 1024).toFixed(1)} ${gbUnit}`;
+
+/** Libellé du lien de téléchargement : « Nexus Mods » ou le nom du site d'origine. */
+function linkLabel(url: string): string {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '');
+    return host.endsWith('nexusmods.com') ? 'Nexus Mods' : host;
+  } catch {
+    return url;
+  }
 }
 
 export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
@@ -30,6 +34,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
   onScanDownloads,
   isScanning,
 }) => {
+  useEscapeKey(onClose, isOpen);
   const { language } = useI18n();
   const ui = MANUAL_UI[language] ?? MANUAL_UI.fr;
   const isFr = language === 'fr';
@@ -80,12 +85,12 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
     if (state.Url) return state.Url;
 
     if (state.ModID && state.FileID) {
-      const game = state.GameName || 'skyrimspecialedition';
+      const game = (state.GameName || 'skyrimspecialedition').toLowerCase();
       return `https://www.nexusmods.com/${game}/mods/${state.ModID}?tab=files&file_id=${state.FileID}&nmm=1`;
     }
 
     if (state.ModID) {
-      const game = state.GameName || 'skyrimspecialedition';
+      const game = (state.GameName || 'skyrimspecialedition').toLowerCase();
       return `https://www.nexusmods.com/${game}/mods/${state.ModID}?tab=files`;
     }
 
@@ -117,7 +122,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                 <span className="text-caption font-mono px-2 py-0.5 rounded-full bg-[#ef4444]/20 text-[#f87171] border border-[#ef4444]/30">
                   {ui.missingCount
                     .replace('{n}', String(missingArchives.length))
-                    .replace('{size}', formatBytes(totalMissingSize, isFr))}
+                    .replace('{size}', fmtBytes(totalMissingSize, language))}
                 </span>
               </h2>
               <p className="text-meta text-[#8f8f8f]">{ui.subtitle}</p>
@@ -200,7 +205,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                     <div className="flex items-center gap-2">
                       <span className="text-body-lg font-semibold text-white truncate">{archive.Name}</span>
                       <span className="text-caption font-mono px-2 py-0.5 rounded bg-[#262626] text-[#aaaaaa]">
-                        {formatBytes(archive.Size, isFr)}
+                        {fmtBytes(archive.Size, language)}
                       </span>
                       {isGame && (
                         <span className="text-caption font-semibold px-2 py-0.5 rounded bg-[#f59e0b]/20 text-[#fbbf24] border border-[#f59e0b]/40">
@@ -212,17 +217,17 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                     <div className="flex flex-wrap items-center gap-3 text-meta text-[#666666] mt-1">
                       {archive.Hash && (
                         <span className="font-mono text-caption text-[#666666]">
-                          Hash: {archive.Hash.slice(0, 16)}…
+                          Hash{colon(language)} {archive.Hash.slice(0, 16)}…
                         </span>
                       )}
                       {archive.State?.ModID && (
-                        <span>Mod ID: <strong className="text-[#aaaaaa]">{archive.State.ModID}</strong></span>
+                        <span>Mod ID{colon(language)} <strong className="text-[#aaaaaa]">{archive.State.ModID}</strong></span>
                       )}
                       {archive.State?.FileID && (
-                        <span>File ID: <strong className="text-[#aaaaaa]">{archive.State.FileID}</strong></span>
+                        <span>File ID{colon(language)} <strong className="text-[#aaaaaa]">{archive.State.FileID}</strong></span>
                       )}
                       {archive.State?.Author && (
-                        <span>{ui.author} : <strong className="text-[#aaaaaa]">{archive.State.Author}</strong></span>
+                        <span>{ui.author}{colon(language)} <strong className="text-[#aaaaaa]">{archive.State.Author}</strong></span>
                       )}
                     </div>
 
@@ -248,7 +253,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                           className="h-8 px-3 bg-[#0369a1]/20 hover:bg-[#0369a1]/30 border border-[#0ea5e9]/50 text-[#38bdf8] rounded-lg text-body font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
                           <span>🔗</span>
-                          <span>Nexus Mods</span>
+                          <span>{linkLabel(url)}</span>
                         </a>
                       ) : (
                         <a

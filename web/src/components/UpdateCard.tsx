@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useI18n } from '../locales';
+import { fmtBytes } from '../locales/uiScreens';
 import { UPDATE_UI } from '../locales/uiExtra';
 import { adoptInstalled, compareInstalled, pickNativeFile } from '../services/api';
 import { InstalledComparison, UpdateRequest } from '../types/wabbajack';
@@ -27,11 +28,6 @@ export function compare(filePath: string, destPath: string, previousFile?: strin
   return cache.get(key)!;
 }
 
-function formatBytes(bytes: number, fr: boolean): string {
-  const gb = bytes / (1024 * 1024 * 1024);
-  if (gb >= 1) return `${gb.toFixed(1)} ${fr ? 'Go' : 'GB'}`;
-  return `${Math.round(bytes / (1024 * 1024))} ${fr ? 'Mo' : 'MB'}`;
-}
 
 const fill = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
 
@@ -137,14 +133,14 @@ export const UpdateCard: React.FC<Props> = ({ filePath, destPath, value, onChang
               </span>
             ))} />
           <NameList title={fill(ui.modsAdded, { n: diff.mods.addedCount })} total={diff.mods.addedCount} more={ui.more} color="#4ade80"
-            items={diff.mods.added.map((m) => <span><span className="text-white">{m.name}</span><span className="text-[#707070]"> — {m.files} · {formatBytes(m.size, fr)}</span></span>)} />
+            items={diff.mods.added.map((m) => <span><span className="text-white">{m.name}</span><span className="text-[#707070]"> — {m.files} · {fmtBytes(m.size, language)}</span></span>)} />
           <NameList title={fill(ui.modsRemoved, { n: diff.mods.removedCount })} total={diff.mods.removedCount} more={ui.more} color="#f87171"
             items={diff.mods.removed.map((m) => <span><span className="text-white">{m.name}</span><span className="text-[#707070]"> — {m.files}</span></span>)} />
           <span className="text-caption text-[#aaaaaa]">{fill(ui.modsUnchanged, { n: diff.mods.unchangedCount })}</span>
           <span className="text-caption text-[#aaaaaa]">{fill(ui.files, { a: diff.files.added, r: diff.files.removed, c: diff.files.changed, u: diff.files.unchanged })}</span>
-          <NameList title={fill(ui.archives, { a: diff.archives.addedCount, size: formatBytes(diff.archives.downloadSize, fr), r: diff.archives.removedCount })}
+          <NameList title={fill(ui.archives, { a: diff.archives.addedCount, size: fmtBytes(diff.archives.downloadSize, language), r: diff.archives.removedCount })}
             total={diff.archives.addedCount} more={ui.more} color="#aaaaaa"
-            items={diff.archives.added.map((a) => <span className="font-mono">{a.name} <span className="text-[#707070]">({formatBytes(a.size, fr)})</span></span>)} />
+            items={diff.archives.added.map((a) => <span className="font-mono">{a.name} <span className="text-[#707070]">({fmtBytes(a.size, language)})</span></span>)} />
         </div>
       )}
 

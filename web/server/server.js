@@ -23,6 +23,7 @@ import { find7z } from './tools.js';
 import { startInstall } from './install.js';
 import { APP_VERSION, NEXUS_APP_HEADERS } from './version.js';
 import { readKey, saveKey, deleteKey } from './keychain.js';
+import { translateCache, cacheSet, quotaExhausted, noteQuotaMessage } from './translatecache.js';
 import { handleNxm, parseNxm, setNxmTarget, nxmHandler, claimNxmHandler } from './nxm.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -109,8 +110,6 @@ async function inspectWabbajack(...args) {
   return info;
 }
 let lastModlistsFetch = 0;
-// Translation cache: key = `${lang}:${text}` → translated string
-const translateCache = new Map();
 
 
 // ──────────────────────────────────────────────────────────
@@ -173,17 +172,10 @@ const LANG_PAIRS = { fr: 'en|fr', es: 'en|es', it: 'en|it', de: 'en|de', pt: 'en
 
 const TRANSLATE_CHUNK_BYTES = 400;       // MyMemory : 500 octets max (pas caractères) par requête
 const TRANSLATE_MAX_CHARS = 20000;        // au-delà : texte tronqué (protège la mémoire et le quota)
-const TRANSLATE_CACHE_MAX = 1000;         // entrées max du cache (LRU simple)
 const TRANSLATE_MAX_BATCH = 100;          // textes max par requête /api/translate
 const TRANSLATE_CONCURRENCY = 4;
 const TRANSLATE_MAX_RESPONSE = 256 * 1024;
 const TRANSLATE_ERROR_RE = /QUERY LENGTH LIMIT|MAX ALLOWED QUERY|MYMEMORY WARNING|INVALID (LANGUAGE|EMAIL)|PLEASE SELECT TWO DISTINCT|NO CONTENT/i;
-
-function cacheSet(key, value) {
-  if (translateCache.has(key)) translateCache.delete(key);
-  translateCache.set(key, value);
-  while (translateCache.size > TRANSLATE_CACHE_MAX) translateCache.delete(translateCache.keys().next().value);
-}
 
 /** Découpe un texte en unités traduisibles ≤ maxBytes (phrases), les sauts de ligne restent intacts. */
 function splitForTranslation(text, maxBytes = TRANSLATE_CHUNK_BYTES) {
@@ -212,6 +204,7 @@ function splitForTranslation(text, maxBytes = TRANSLATE_CHUNK_BYTES) {
 
 /** Une requête MyMemory ; retourne le texte d'origine en cas d'erreur (jamais le message d'erreur de l'API). */
 function translateChunk(chunk, pair) {
+  if (quotaExhausted()) return Promise.resolve(null);
   return new Promise((resolve) => {
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=${pair}`;
     const req = https.get(url, { timeout: 8000 }, (r) => {
@@ -227,7 +220,10 @@ function translateChunk(chunk, pair) {
           const json = JSON.parse(Buffer.concat(bufs).toString('utf8'));
           const t = json?.responseData?.translatedText;
           const status = Number(json?.responseStatus);
-          if (typeof t !== 'string' || !t || (status && status !== 200) || TRANSLATE_ERROR_RE.test(t)) return resolve(null);
+          if (typeof t !== 'string' || !t || (status && status !== 200) || TRANSLATE_ERROR_RE.test(t)) {
+            noteQuotaMessage(t || json?.responseDetails);
+            return resolve(null);
+          }
           resolve(t);
         } catch { resolve(null); }
       });

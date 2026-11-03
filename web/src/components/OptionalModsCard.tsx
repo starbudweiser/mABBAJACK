@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '../locales';
+import { fmtBytes } from '../locales/uiScreens';
 import { OPTIONS_UI } from '../locales/uiExtra';
 import { fetchModlistOptions } from '../services/api';
 import { compare } from './UpdateCard';
@@ -15,11 +16,6 @@ interface Props {
   onChange: (v: InstallOptions) => void;
 }
 
-function formatBytes(bytes: number, fr: boolean): string {
-  const gb = bytes / (1024 * 1024 * 1024);
-  if (gb >= 1) return `${gb.toFixed(1)} ${fr ? 'Go' : 'GB'}`;
-  return `${Math.round(bytes / (1024 * 1024))} ${fr ? 'Mo' : 'MB'}`;
-}
 
 /** Format d'écran le plus proche de l'écran courant (null = 16:9, format natif des interfaces). */
 function detectScreenFormat(): { id: string | null; ratio: string } {
@@ -168,7 +164,7 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, o
                 <input type="checkbox" disabled={off} checked={enabled.has(m.name) && !off} onChange={(e) => set([m.name], e.target.checked)} />
                 <span className="truncate flex-1">{m.name}</span>
                 {off && <span className="text-caption text-[#666666] shrink-0 truncate max-w-[40%]">{ui.requires.replace('{deps}', missing.join(', '))}</span>}
-                <span className="text-caption text-[#666666] shrink-0">{formatBytes(m.size, fr)}</span>
+                <span className="text-caption text-[#666666] shrink-0">{fmtBytes(m.size, language)}</span>
               </label>
             );
           })}
@@ -182,7 +178,7 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, o
       <div className="flex items-center justify-between gap-2">
         <span className={sectionLabel}><span>🎛</span><span>{ui.title}</span></span>
         <span className={badge.blue}>
-          {ui.selected.replace('{n}', String(enabled.size)).replace('{total}', String(profile.optionalCount)).replace('{size}', formatBytes(selectedBytes, fr))}
+          {ui.selected.replace('{n}', String(enabled.size)).replace('{total}', String(profile.optionalCount)).replace('{size}', fmtBytes(selectedBytes, language))}
         </span>
       </div>
       <p className="text-meta text-[#666666] -mt-1">{ui.hint}</p>
@@ -217,7 +213,7 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, o
                     <label key={o.id} className="text-body text-[#dddddd] flex items-center gap-1.5 py-0.5" title={o.mods.join('\n')}>
                       <input type="radio" name={`mabba-${c.id}`} checked={cur === o.id} onChange={() => pick(c, o.id)} />
                       <span>{c.kind === 'exclusive' && o.id === 'none' ? ui.none : o.label}</span>
-                      {o.size >= 1048576 && <span className="text-caption text-[#666666]">{formatBytes(o.size, fr)}</span>}
+                      {o.size >= 1048576 && <span className="text-caption text-[#666666]">{fmtBytes(o.size, language)}</span>}
                     </label>
                   ))}
                 </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useI18n } from '../locales';
+import { useEscapeKey } from '../design';
 import { PLUGINS_UI } from '../locales/uiScreens';
 
 interface PluginsTxtModalProps {
@@ -15,6 +16,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
   pluginsTxtContent,
   modlistName = 'Modlist',
 }) => {
+  useEscapeKey(onClose, isOpen);
   const { language } = useI18n();
   const ui = PLUGINS_UI[language] ?? PLUGINS_UI.fr;
   const [copied, setCopied] = useState(false);

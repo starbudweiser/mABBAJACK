@@ -4,11 +4,21 @@
  * Import this in any component that needs buttons, badges or field rows.
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useI18n } from './locales';
 import { COMMON_UI } from './locales/uiScreens';
 
 // ── Color Tokens ──────────────────────────────────────────────────────────────
+/** Ferme une fenêtre modale avec la touche Échap. */
+export function useEscapeKey(onClose: () => void, active = true): void {
+  useEffect(() => {
+    if (!active) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose, active]);
+}
+
 export const colors = {
   // Backgrounds
   bg0: '#181818',      // page background

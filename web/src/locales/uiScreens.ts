@@ -20,10 +20,20 @@ const UNITS: Record<Language, { mb: string; gb: string }> = {
 export function fmtBytes(bytes: number, lang: Language, mode: 'auto' | 'gb' = 'auto', mbDigits = 1): string {
   const u = UNITS[lang] ?? UNITS.fr;
   const b = Number.isFinite(bytes) && bytes > 0 ? bytes : 0;
-  if (mode === 'gb') return `${(b / 1073741824).toFixed(1)} ${u.gb}`;
+  if (mode === 'gb') return `${fmtNum(b / 1073741824, lang, 1)} ${u.gb}`;
   if (!b) return `0 ${u.mb}`;
   const mb = b / 1048576;
-  return mb < 1024 ? `${mb.toFixed(mbDigits)} ${u.mb}` : `${(mb / 1024).toFixed(1)} ${u.gb}`;
+  return mb < 1024 ? `${fmtNum(mb, lang, mbDigits)} ${u.mb}` : `${fmtNum(mb / 1024, lang, 1)} ${u.gb}`;
+}
+
+/** Nombre au format de la langue d'interface (virgule décimale en fr/es/it, séparateur de milliers). */
+export function fmtNum(n: number, lang: Language, digits = 0): string {
+  return (Number.isFinite(n) ? n : 0).toLocaleString(lang, { minimumFractionDigits: digits, maximumFractionDigits: digits });
+}
+
+/** Deux-points typographique : espace insécable avant en français uniquement. */
+export function colon(lang: Language): string {
+  return lang === 'fr' ? '\u00a0:' : ':';
 }
 
 export function mbUnit(lang: Language): string {
@@ -82,7 +92,7 @@ export const INSPECTOR_UI: Record<Language, InspectorUi> = {
     patches: 'Patchs binaires OctoDiff', patchesDesc: 'Différentiels à appliquer',
     tabArchives: 'Archives', tabDirectives: 'Directives', tabPlugins: 'Plugins',
     all: 'Tous', ready: 'Prêts', missing: 'Manquants', search: 'Rechercher…', statusReady: '✓ Prêt', statusMissing: '⚠️ Manquant',
-    author: 'Auteur', pluginsTitle: 'plugins.txt prédéfini par le modlist',
+    author: 'Auteur', pluginsTitle: 'plugins.txt prédéfini par la modlist',
     pluginsDesc: 'Cet ordre de chargement est généré automatiquement et sera copié dans votre dossier d\'installation.',
     fullViewer: 'Afficheur complet',
   },
@@ -183,7 +193,7 @@ export interface PluginsUi {
 
 export const PLUGINS_UI: Record<Language, PluginsUi> = {
   fr: {
-    title: 'plugins.txt • Ordre de chargement post-LOOT', subtitle: 'Généré selon l’ordre optimal défini par le modlist « {name} »',
+    title: 'plugins.txt • Ordre de chargement post-LOOT', subtitle: 'Généré selon l’ordre optimal défini par la modlist « {name} »',
     filter: 'Filtrer les plugins (ex. : SkyUI, Dawnguard)…', copied: 'Copié !', copyAll: 'Tout copier', download: 'Télécharger plugins.txt',
     noMatch: 'Aucun plugin ne correspond à votre filtre.', footerHint: 'Sous macOS / Wine, ce fichier se place généralement dans :', close: 'Fermer',
   },
@@ -223,7 +233,7 @@ export interface AppUi {
 export const APP_UI: Record<Language, AppUi> = {
   fr: {
     pickFileTitle: 'Sélectionnez votre fichier .wabbajack', analysisError: 'Erreur d\'analyse :',
-    loadModlistFirst: 'Veuillez d’abord charger un modlist.', setDestFirst: 'Veuillez définir un dossier de destination.',
+    loadModlistFirst: 'Veuillez d’abord charger une modlist.', setDestFirst: 'Veuillez définir un dossier de destination.',
     dropTitle: 'Déposer le fichier .wabbajack', dropSubtitle: 'Relâchez pour analyser la modlist',
     downloading: 'Téléchargement en cours…', downloadingHint: 'Le fichier .wabbajack peut peser plusieurs centaines de Mo — merci de patienter.',
     destFolderAlert: 'Dossier READY TO PLAY :',

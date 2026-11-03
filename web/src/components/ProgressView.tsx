@@ -3,7 +3,7 @@ import { useI18n } from '../locales';
 import { InstallProgress, LogEntry } from '../types/wabbajack';
 import { btn, Divider } from '../design';
 import { translateLog, PROGRESS_UI } from '../locales/logCatalog';
-import { fmtBytes, mbUnit } from '../locales/uiScreens';
+import { fmtBytes, fmtNum, mbUnit } from '../locales/uiScreens';
 
 interface ProgressViewProps {
   progress: InstallProgress;
@@ -186,7 +186,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
               <span className="text-2xl flex-shrink-0">❌</span>
               <div className="flex-1 min-w-0">
                 <h3 className="text-title font-bold text-[#fecaca]">
-                  {ui.interruptedAt} {progress.overallPercent.toFixed(1)}%
+                  {ui.interruptedAt} {fmtNum(progress.overallPercent, language, 1)}%
                 </h3>
                 <code className="text-body text-[#fecaca] mt-1.5 block font-mono break-all bg-[#181818] p-2.5 rounded-lg border border-[#ef4444]/30">
                   {tr(progress.errorMessage) || tr(progress.currentTask) || ui.diskError}
@@ -214,7 +214,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
               {tr(progress.currentTask) || t.progress.overallProgress}
             </span>
             <span className={`font-mono font-bold text-title flex-shrink-0 ${hasError ? 'text-[#f87171]' : 'text-[#38bdf8]'}`}>
-              {progress.overallPercent.toFixed(1)}%
+              {fmtNum(progress.overallPercent, language, 1)}%
             </span>
           </div>
           {/* Overall progress bar */}
@@ -260,7 +260,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
           {[
             { label: ui.files, value: `${progress.processedItems} / ${progress.totalItems}`, color: 'text-white' },
             { label: ui.data, value: `${formatBytes(progress.processedBytes)} / ${formatBytes(progress.totalBytes)}`, color: 'text-[#38bdf8]' },
-            { label: t.progress.speed, value: progress.speedBytesPerSec > 0 ? `${(progress.speedBytesPerSec / (1024 * 1024)).toFixed(1)} ${mbps}` : `-- ${mbps}`, color: 'text-[#4ade80]' },
+            { label: t.progress.speed, value: progress.speedBytesPerSec > 0 ? `${fmtNum(progress.speedBytesPerSec / (1024 * 1024), language, 1)} ${mbps}` : `-- ${mbps}`, color: 'text-[#4ade80]' },
             { label: t.progress.eta, value: formatSeconds(progress.etaSeconds), color: 'text-[#fbbf24]' },
           ].map((s) => (
             <div key={s.label} className="bg-[#181818] px-2.5 py-2 rounded-lg border border-[#2e2e2e]">
