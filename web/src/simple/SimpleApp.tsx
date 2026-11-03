@@ -84,7 +84,7 @@ export const SimpleApp: React.FC = () => {
         {step === 'choose' && <ChooseStep />}
         {step === 'prepare' && m.parsedFile && <PrepareStep onBack={() => setStep('choose')} />}
         {step === 'install' && (
-          <InstallStep onOpenManual={() => setIsManualOpen(true)} onOpenPluginsTxt={() => setIsPluginsTxtOpen(true)}
+          <InstallStep onOpenManual={() => { m.scanDownloads(); setIsManualOpen(true); }} onOpenPluginsTxt={() => setIsPluginsTxtOpen(true)}
             onBack={() => setStep(m.parsedFile ? 'prepare' : 'choose')} onAnother={() => { m.cancelInstall(); setStep('choose'); }} />
         )}
       </main>

@@ -405,7 +405,7 @@ export async function startInstall(req, res) {
       const globalStart = Date.now();
 
       if (missingCount > 0) {
-        broadcastProgress({ stage: 'downloading_archives', stageName: `Téléchargements`, overallPercent: 12, processedItems: readyCount, totalItems: archives.length, currentTask: `${missingCount} archive(s) à télécharger...` });
+        broadcastProgress({ stage: 'downloading_archives', stageName: `Téléchargements`, overallPercent: 12, missingArchivesCount: 0, processedItems: readyCount, totalItems: archives.length, currentTask: `${missingCount} archive(s) à télécharger...` });
 
         // Plusieurs archives à la fois : le débit Nexus / CDN est mieux exploité
         const queue = archiveStatuses.filter((a) => a.status !== 'ready');
@@ -447,6 +447,7 @@ export async function startInstall(req, res) {
 
           if (requiresManual) {
             skippedManual++;
+            broadcastProgress({ missingArchivesCount: skippedManual });
             manualUrl ||= archiveSourceUrl(arc);
             const copyDir = arc.wrongVersion ? dedicatedDir : cleanDownloads;
             if (manualUrl) { manualUrls.set(archiveName, manualUrl); broadcastLog('warn', `  → Manuel : ${manualUrl}`); broadcastLog('warn', `  → Copiez "${archiveName}" dans : ${copyDir}`); }
@@ -490,6 +491,7 @@ export async function startInstall(req, res) {
             if (src) { manualUrls.set(archiveName, src); broadcastLog('warn', `  → Manuel : ${src}`); }
             broadcastLog('warn', `  → Copiez manuellement "${archiveName}" dans : ${arc.wrongVersion ? dedicatedDir : cleanDownloads}`);
             skippedManual++;
+            broadcastProgress({ missingArchivesCount: skippedManual });
           }
           finally { active--; }
         };
