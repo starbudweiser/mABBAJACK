@@ -41,9 +41,10 @@ LANG_STORE = lang_menu.FileStore(DATA_NAME)
 # Présentation de l'interface : Simple ou Expert, dans DATA_DIR/ui_mode.json
 MODE_STORE = ui_mode.ModeStore(DATA_DIR)
 
-# Fenêtre par défaut : ratio de la capture de référence (≈ 1,09:1), centrée. 1200 × 1100 px de contenu :
-# mesuré sur le rendu réel de la galerie — la 2e rangée de cartes se termine à 1042 px, ~58 px de marge.
-WINDOW_W, WINDOW_H = 1200, 1100
+# Fenêtre par défaut : 1372 × 1100, centrée, réduite si l'écran est plus petit (ratio gardé). La largeur de 1372 px
+# tient sur une ligne la rangée de filtres de la galerie (Tous, Skyrim SE… Autres jeux) et la barre d'onglets ;
+# plus étroite, ces boutons passent à la ligne.
+WINDOW_W, WINDOW_H = 1372, 1100
 WINDOW_MIN = (900, 700)
 
 
