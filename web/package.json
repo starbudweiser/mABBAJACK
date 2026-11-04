@@ -10,7 +10,12 @@
     "preview": "vite preview",
     "server": "node server/server.js",
     "start": "node server/server.js",
-    "test": "node ../scripts/run-tests.mjs"
+    "test": "node ../scripts/run-tests.mjs",
+    "build:mackit": "node ../scripts/build-mackit.mjs",
+    "prebuild": "npm run build:mackit",
+    "prestart": "node ../scripts/build-mackit.mjs --if-missing",
+    "preserver": "node ../scripts/build-mackit.mjs --if-missing",
+    "pretest": "npm run build:mackit"
   },
   "dependencies": {
     "cors": "^2.8.5",

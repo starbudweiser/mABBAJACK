@@ -31,6 +31,7 @@ Fonctionnalités :
 - Organisation des téléchargements « à la Vortex » (`<dossier>/skyrimse`).
 - Détection automatique du jeu (Steam, CrossOver, `/Volumes/*/GAMES`).
 - Journal en direct (filtres Tous / Avertissements / Erreurs), journaux enregistrés dans `~/Library/Logs/mABBAJACK/`.
+- Adaptation au Mac (DXMT, ENB, DLSS), annoncée avant l'installation et annulable après : une carte « Adaptation au Mac » liste chaque correctif, une carte « Bilan Mac » dit ce qui a été appliqué, échoué ou ignoré, avec un bouton Annuler (les fichiers d'origine sont gardés dans `_MAC_BACKUP`). Bottled Shaders (1.0.26 ou plus) se télécharge avec votre clé Nexus.
 - Interface en 4 langues : français, anglais, espagnol, italien.
 - Application autonome : fenêtre native, Node, 7zz, unar et texconv embarqués.
 
@@ -82,6 +83,7 @@ Features:
 - Vortex-style download layout (`<folder>/skyrimse`).
 - Automatic game detection (Steam, CrossOver, `/Volumes/*/GAMES`).
 - Live log (All / Warnings / Errors filters); logs saved in `~/Library/Logs/mABBAJACK/`.
+- Mac adaptation (DXMT, ENB, DLSS), announced before the installation and undoable afterwards: a "Mac adaptation" card lists every fix, a "Mac report" card says what was applied, failed or skipped, with an Undo button (original files are kept in `_MAC_BACKUP`). Bottled Shaders (1.0.26 or later) is downloaded with your Nexus key.
 - 4 UI languages: French, English, Spanish, Italian.
 - Standalone app: native window, bundled Node, 7zz, unar and texconv.
 

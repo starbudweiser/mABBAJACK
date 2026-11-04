@@ -70,6 +70,10 @@ function useMabbajackState() {
   // Mise à jour d'une installation existante de la liste (null = installation complète)
   const [updateRequest, setUpdateRequest] = useState<UpdateRequest | null>(null);
 
+  // Adaptation au Mac (moteur commun mackit) : cochée par défaut, bouteille choisie par le serveur sauf si l'utilisateur en impose une
+  const [macAdapt, setMacAdapt] = useState(true);
+  const [macBottle, setMacBottle] = useState('');
+
   // Configuration Paths (strictly 2 directories: DOWNLOADS and READY TO PLAY)
   const [downloadsPath, setDownloadsPath] = useState<string>(() => {
     return localStorage.getItem('mabbajack_downloads_path') || '';
@@ -537,6 +541,7 @@ function useMabbajackState() {
           nexusApiKey,
           uiLanguage: language,
           options: { ...installOptions, update: updateRequest || undefined },
+          macAdapt: { enabled: macAdapt, bottle: macBottle || undefined },
         }),
       });
 
@@ -564,7 +569,7 @@ function useMabbajackState() {
       addLog('error', `Erreur réseau : ${err.message || err}`);
       emit('installFailed');
     }
-  }, [parsedFile, downloadsPath, destPath, gamePath, nexusApiKey, installOptions, updateRequest, addLog, language]);
+  }, [parsedFile, downloadsPath, destPath, gamePath, nexusApiKey, installOptions, updateRequest, macAdapt, macBottle, addLog, language]);
 
 
 
@@ -635,6 +640,7 @@ function useMabbajackState() {
     loadDemoModlist: handleLoadDemoModlist,
     galleryDownload, installFromGallery,
     installOptions, setInstallOptions, updateRequest, setUpdateRequest,
+    macAdapt, setMacAdapt, macBottle, setMacBottle,
     // dossiers et réglages
     downloadsPath, setDownloadsPath: saveDownloadsPath, destPath, setDestPath: saveDestPath,
     gamePath, setGamePath: saveGamePath, concurrency, setConcurrency: saveConcurrency,

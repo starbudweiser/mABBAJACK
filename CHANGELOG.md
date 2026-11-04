@@ -2,6 +2,22 @@
 
 Notes de version / release notes (EN + FR). Translations in IT and ES: see the Nexus Mods page.
 
+## Unreleased
+
+**English**
+
+- New "Mac adaptation" card before the installation (checked by default): it lists every fix that will be applied for Skyrim on macOS (DXMT graphics engine, DLSS bridge, SSE Display Tweaks, DLLs duplicated by Bottled Shaders, shader compiler, Wine DLL overrides). Nothing is written before the installation ends.
+- New "Mac report" card at the end of the installation: for each fix, applied, failed or skipped, with an Undo button per fix and for all. Original files are kept in the game's `_MAC_BACKUP` folder.
+- Bottled Shaders 1.0.26 or later can be downloaded from the report with your Nexus API key (never bundled with the app).
+- Shared Mac engine (the same one as mORTEX and mO2FLATTENER), bundled into the app's server.
+
+**Français**
+
+- Nouvelle carte « Adaptation au Mac » avant l'installation (cochée par défaut) : elle liste chaque correctif appliqué pour Skyrim sous macOS (moteur graphique DXMT, pont DLSS, SSE Display Tweaks, DLL en double avec Bottled Shaders, compilateur de shaders, substitutions de DLL Wine). Rien n'est écrit avant la fin de l'installation.
+- Nouvelle carte « Bilan Mac » à la fin de l'installation : pour chaque correctif, appliqué, échoué ou ignoré, avec un bouton Annuler par correctif et pour tout. Les fichiers d'origine sont gardés dans le dossier `_MAC_BACKUP` du jeu.
+- Bottled Shaders 1.0.26 ou plus récent se télécharge depuis le bilan avec votre clé API Nexus (jamais embarqué dans l'appli).
+- Moteur Mac commun (le même que mORTEX et mO2FLATTENER), empaqueté dans le serveur de l'appli.
+
 ## 1.3.0
 
 **English**

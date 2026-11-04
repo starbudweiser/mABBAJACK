@@ -14,7 +14,7 @@ export const currentInstallJob = {
     stage: 'idle', stageName: 'En attente', overallPercent: 0, stagePercent: 0,
     currentTask: 'Prêt', processedItems: 0, totalItems: 0, processedBytes: 0,
     totalBytes: 0, speedBytesPerSec: 0, etaSeconds: 0, activeDownloads: 0,
-    missingArchivesCount: 0, isPaused: false, hasError: false, errorMessage: null,
+    missingArchivesCount: 0, isPaused: false, hasError: false, errorMessage: null, mac: null,
   },
 };
 

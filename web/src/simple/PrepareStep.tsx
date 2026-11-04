@@ -7,6 +7,7 @@ import { useMabbajack } from '../state/mabbajack';
 import { ApiKeyRow, FieldRow, btn, card, sectionLabel } from '../design';
 import { getApiBaseUrl, getNativeClipboard, pickNativeFolder } from '../services/api';
 import OptionalModsCard from '../components/OptionalModsCard';
+import { MacCard } from '../components/MacCards';
 import { requiredEdition, useDetectedGame } from './useGame';
 
 export const PrepareStep: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -142,6 +143,9 @@ export const PrepareStep: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </>
           )}
         </div>
+
+        {/* Adaptation au Mac */}
+        {!isDemo && <MacCard />}
 
         {/* Mods optionnels */}
         {!isDemo && (

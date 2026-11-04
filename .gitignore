@@ -30,3 +30,6 @@ dist/
 
 # Paquets de publication (scripts/package_release.sh)
 /release/
+
+# Moteur Mac empaqueté (scripts/build-mackit.mjs)
+web/server/mackit/engine.mjs

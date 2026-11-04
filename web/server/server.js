@@ -23,6 +23,7 @@ import { downloadWabbajackCdn, isTrustedCdnUrl } from './downloaders.js';
 import { volumeInfo } from './diskspace.js';
 import { find7z } from './tools.js';
 import { startInstall } from './install.js';
+import { registerMacRoutes } from './mac.js';
 import { APP_VERSION, NEXUS_APP_HEADERS } from './version.js';
 import { readKey, saveKey, deleteKey } from './keychain.js';
 import { translateCache, cacheSet, quotaExhausted, noteQuotaMessage } from './translatecache.js';
@@ -844,6 +845,9 @@ app.post('/api/install/cancel', (req, res) => {
   res.json({ status: 'cancelled' });
 });
 
+
+// Adaptation au Mac (moteur commun mackit) : annonce, annulation, Bottled Shaders
+registerMacRoutes(app, { readKey });
 
 app.post('/api/install/start', startInstall);
 

@@ -2,6 +2,8 @@ import React from 'react';
 import { useI18n } from '../locales';
 import { translateLog } from '../locales/logCatalog';
 import { SIMPLE_UI, fillText } from '../locales/uiSimple';
+import { MAC_UI, fillMac } from '../locales/uiMac';
+import { MacReportCard } from '../components/MacCards';
 import { useMabbajack } from '../state/mabbajack';
 import { btn, card } from '../design';
 import { InstallStage } from '../types/wabbajack';
@@ -22,15 +24,46 @@ interface Props {
 export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, onBack, onAnother }) => {
   const { language } = useI18n();
   const ui = SIMPLE_UI[language] ?? SIMPLE_UI.fr;
+  const macUi = MAC_UI[language] ?? MAC_UI.fr;
   const m = useMabbajack();
   const p = m.progress;
 
   const stageLabel = (s: InstallStage): string => ({
     validating_paths: ui.stageValidating, scanning_downloads: ui.stageScanning, downloading_archives: ui.stageDownloading,
-    extracting_files: ui.stageExtracting, generating_mo2: ui.stageConfig,
+    extracting_files: ui.stageExtracting, generating_mo2: ui.stageConfig, adapting_mac: macUi.stageMac,
   } as Partial<Record<InstallStage, string>>)[s] ?? ui.starting;
 
   if (p.stage === 'completed') {
+    const missing = p.missingArchivesCount > 0 && (
+      <div className="rounded-lg border border-[#f59e0b]/40 bg-[#3f2a0c]/30 p-3 text-body text-[#fbbf24] flex flex-col gap-2 items-center text-center">
+        <p>⚠ {fillText(ui.doneMissing, { n: p.missingArchivesCount })}</p>
+        <p className="text-meta text-[#aaaaaa]">{ui.doneRelaunch}</p>
+        <button type="button" className={btn.warning} onClick={onOpenManual}>{fillText(ui.manualDownloads, { n: p.missingArchivesCount })}</button>
+      </div>
+    );
+    const actions = (
+      <>
+        <p className="text-body text-[#aaaaaa] text-center">{ui.doneHow}</p>
+        <div className="flex flex-wrap justify-center gap-2 pt-2">
+          <button type="button" className={btn.primary} onClick={m.openDestFolder}>📂 {ui.openFolder}</button>
+          <button type="button" className={btn.secondary} onClick={onOpenPluginsTxt}>📄 {ui.pluginsTxt}</button>
+        </div>
+        <button type="button" className={`${btn.ghost} self-center`} onClick={onAnother}>{ui.another}</button>
+      </>
+    );
+    // Adaptation au Mac demandée : la carte « Bilan Mac » prend la place de « Installation terminée »
+    if (p.mac) {
+      return (
+        <div className="flex-1 overflow-y-auto p-6 select-text">
+          <div className="max-w-2xl mx-auto">
+            <MacReportCard report={p.mac} subtitle={fillMac(macUi.installDone, { name: m.parsedFile?.name || '' })}>
+              {missing}
+              {actions}
+            </MacReportCard>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="flex-1 overflow-y-auto p-6 flex items-center justify-center select-text">
         <div className={`${card} max-w-lg w-full items-center text-center gap-4 p-8`}>

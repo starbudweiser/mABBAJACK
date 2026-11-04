@@ -5,6 +5,7 @@ import { INSTALLER_UI } from '../locales/uiExtra';
 import { ParsedWabbajackFile, NexusAccount, InstallOptions, UpdateRequest } from '../types/wabbajack';
 import OptionalModsCard from './OptionalModsCard';
 import UpdateCard from './UpdateCard';
+import { MacCard } from './MacCards';
 import { pickNativeFolder, getNativeClipboard, getApiBaseUrl } from '../services/api';
 import { btn, btnFull, badge, card, sectionLabel, inputField, chip, FieldRow, ApiKeyRow, Divider } from '../design';
 
@@ -323,6 +324,9 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             )
           )}
         </div>
+
+        {/* ── Adaptation au Mac (DXMT, ENB, DLSS) : annoncée avant, annulable après ───── */}
+        <MacCard />
 
         {/* ── CARD 5: Clé API Nexus ────────────────────────────────── */}
         <div className={card}>

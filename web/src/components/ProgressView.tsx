@@ -4,6 +4,7 @@ import { InstallProgress, LogEntry } from '../types/wabbajack';
 import { btn, Divider } from '../design';
 import { translateLog, PROGRESS_UI } from '../locales/logCatalog';
 import { fmtBytes, fmtNum, mbUnit } from '../locales/uiScreens';
+import { MacReportCard } from './MacCards';
 
 interface ProgressViewProps {
   progress: InstallProgress;
@@ -270,6 +271,13 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
           ))}
         </div>
       </div>
+
+      {/* ── Bilan Mac : après l'installation, ce que l'adaptation au Mac a fait (annulable) ───── */}
+      {isCompleted && progress.mac && (
+        <div className="flex-shrink-0 max-h-[45vh] overflow-y-auto">
+          <MacReportCard report={progress.mac} />
+        </div>
+      )}
 
       {/* ── Terminal logs ──────────────────────────────────────────── */}
       <div className="flex-1 bg-[#181818] border border-[#2e2e2e] rounded-xl overflow-hidden flex flex-col shadow-inner min-h-0">

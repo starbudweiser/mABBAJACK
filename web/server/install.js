@@ -21,6 +21,7 @@ import { getExpectedSkyrimVersion, isGameFileArchive, isIgnorableGameFile, gameF
 import { getNexusDownloadUrl, nexusFetch } from './nexus.js';
 import { makeDirResilient, testWriteAccess, find7z, findUnar, findTexconvBin } from './tools.js';
 import { prepareUpdate, processDirectives } from './directives.js';
+import { finishMac, macSupported } from './mac.js';
 import { resolveMediaFire, resolveModDB, downloadFromMirrors, downloadMega } from './mirrors.js';
 
 const DOWNLOAD_CONCURRENCY = 3; // archives téléchargées en même temps
@@ -70,7 +71,7 @@ export function notifyMac(lang, kind, name) {
 }
 
 export async function startInstall(req, res) {
-  const { modlist, downloadsPath, destPath, nexusApiKey, gamePath, options, uiLanguage } = req.body;
+  const { modlist, downloadsPath, destPath, nexusApiKey, gamePath, options, uiLanguage, macAdapt } = req.body;
   if (!modlist || !destPath) return res.status(400).json({ error: 'Modlist et dossier READY TO PLAY requis.' });
 
   // Build the modlist-named subdirectory: UPPERCASE, filesystem-safe chars only
@@ -102,7 +103,7 @@ export async function startInstall(req, res) {
     details: JSON.stringify({
       modlist: modlist.name, version: modlist.version, gameType: modlist.gameType, skyrimVersion: modlist.skyrimVersion,
       localFilePath: modlist.localFilePath, archives: (modlist.archives || []).length, directives: (modlist.directives || []).length,
-      downloadsPath, destPath, gamePath, nexusApiKey: nexusApiKey ? '(renseignée)' : '(absente)',
+      downloadsPath, destPath, gamePath, nexusApiKey: nexusApiKey ? '(renseignée)' : '(absente)', macAdapt: macAdapt || null,
     }, null, 2),
   });
 
@@ -112,7 +113,7 @@ export async function startInstall(req, res) {
     totalItems: (modlist.directives || []).length || (modlist.archives || []).length,
     processedBytes: 0, totalBytes: modlist.totalArchiveSize || 0,
     speedBytesPerSec: 0, etaSeconds: 0, activeDownloads: 0, missingArchivesCount: 0,
-    isPaused: false, hasError: false, errorMessage: null,
+    isPaused: false, hasError: false, errorMessage: null, mac: null,
   };
 
   res.json({ status: 'started', message: 'Installation démarrée.' });
@@ -1123,8 +1124,21 @@ export async function startInstall(req, res) {
         try { fs.unlinkSync(wabbajackTempPath); } catch { /* ignore */ }
       }
 
+      // ── Adaptation au Mac (moteur commun mackit) : annoncée avant, réversible après ───
+      // Ne fait jamais échouer l'installation : une erreur se lit dans le bilan.
+      let macReport = null;
+      if (macAdapt?.enabled && macSupported() && !signal.aborted) {
+        broadcastProgress({ stage: 'adapting_mac', stageName: 'Adaptation au Mac', overallPercent: 98, stagePercent: 0, currentTask: 'Adaptation de l\'installation au Mac…' });
+        broadcastLog('info', '🍎 Adaptation au Mac…');
+        macReport = await finishMac({ installDir: cleanDest, gamePath, bottle: typeof macAdapt.bottle === 'string' ? macAdapt.bottle : undefined });
+        const counts = (st) => macReport.items.filter((i) => i.status === st).length;
+        if (macReport.error) broadcastLog('warn', `⚠ Adaptation au Mac impossible : ${String(macReport.error).slice(0, 200)}`);
+        else if (!macReport.target) broadcastLog('warn', '⚠ Adaptation au Mac : aucun dossier de jeu à adapter.');
+        else broadcastLog(counts('failed') ? 'warn' : 'success', `✓ Adaptation au Mac : ${counts('applied')} correctif(s) appliqué(s), ${counts('failed')} échoué(s), ${counts('skipped')} ignoré(s).`);
+      }
+
       // ── TERMINÉ ────────────────────────────────────────────────────
-      broadcastProgress({ stage: 'completed', stageName: 'Déploiement terminé !', overallPercent: 100, stagePercent: 100, processedItems: directives.length, totalItems: directives.length, currentTask: `✅ "${modlist.name}" prêt dans "${cleanDest}"`, speedBytesPerSec: 0, etaSeconds: 0, hasError: false, errorMessage: null });
+      broadcastProgress({ stage: 'completed', stageName: 'Déploiement terminé !', mac: macReport, overallPercent: 100, stagePercent: 100, processedItems: directives.length, totalItems: directives.length, currentTask: `✅ "${modlist.name}" prêt dans "${cleanDest}"`, speedBytesPerSec: 0, etaSeconds: 0, hasError: false, errorMessage: null });
 
       broadcastLog('success', `\n═══════════════════════════════════════════════════`);
       broadcastLog('success', `  🎉 Déploiement terminé — "${modlist.name}"`);

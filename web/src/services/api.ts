@@ -298,3 +298,33 @@ export async function trashDownloads(paths: string[]): Promise<{ moved: number }
   if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
   return body;
 }
+
+// ── Adaptation au Mac (moteur commun mackit, web/server/mac.js) ───────────────────────────────
+
+async function macJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${getApiBaseUrl()}${path}`, init);
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error((body as { error?: string }).error || `HTTP ${res.status}`);
+  return body as T;
+}
+const jsonPost = (body: unknown, signal?: AbortSignal): RequestInit => ({
+  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal,
+});
+
+/** Ce que l'adaptation au Mac ferait (rien n'est écrit). */
+export const fetchMacPreview = (
+  body: { destPath: string; gamePath: string; modlist: { name: string; localFilePath?: string }; update?: { dir: string } | null; bottle?: string },
+  signal?: AbortSignal,
+) => macJson<import('../types/mac').MacPreview>('/api/mac/preview', jsonPost(body, signal));
+
+/** Annule un correctif (ou tous : id « all ») d'après la sauvegarde du dossier du jeu. */
+export const undoMacFix = (dir: string, id: string) =>
+  macJson<{ fixes: import('../types/mac').MacUndoOutcome[]; applied: import('../types/mac').MacReport['applied'] }>('/api/mac/undo', jsonPost({ dir, id }));
+
+export const fetchBottledJob = () => macJson<import('../types/mac').BottledJob>('/api/mac/bottled');
+export const startBottledDownload = (downloadsPath: string, nexusApiKey: string) =>
+  macJson<import('../types/mac').BottledJob>('/api/mac/bottled/download', jsonPost({ downloadsPath, nexusApiKey }));
+
+export async function openUrl(url: string): Promise<void> {
+  await fetch(`${getApiBaseUrl()}/api/system/open-url`, jsonPost({ url })).catch(() => undefined);
+}

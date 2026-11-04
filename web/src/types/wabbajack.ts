@@ -122,6 +122,7 @@ export type InstallStage =
   | 'extracting_files'
   | 'applying_patches'
   | 'generating_mo2'
+  | 'adapting_mac'
   | 'completed'
   | 'paused'
   | 'error';
@@ -151,6 +152,8 @@ export interface InstallProgress {
   isPaused: boolean;
   hasError: boolean;
   errorMessage?: string;
+  /** Bilan Mac (adaptation au Mac faite à la fin de l'installation) ; absent si elle n'était pas demandée */
+  mac?: import('./mac').MacReport | null;
 }
 
 export interface SkyrimEnvironment {

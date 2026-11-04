@@ -60,6 +60,9 @@ cp "$ROOT/LICENSE" "$ROOT/THIRD_PARTY_NOTICES.md" "$PORTABLE/7zz-License.txt" "$
 
 echo "▶ Serveur + interface + dépendances de production"
 cp -R web/server web/package.json web/package-lock.json "$PAYLOAD/"
+# Moteur Mac commun : seul server/mackit/engine.mjs (empaqueté par « npm run build » ci-dessus) sert à l'exécution
+rm -f "$PAYLOAD"/server/mackit/*.ts "$PAYLOAD/server/macengine.ts"
+[ -f "$PAYLOAD/server/mackit/engine.mjs" ] || { echo "Moteur Mac absent (web/server/mackit/engine.mjs)"; exit 1; }
 cp -R dist "$PAYLOAD/dist"
 ( cd "$PAYLOAD" && npm ci --omit=dev --ignore-scripts --no-audit --no-fund --silent )
 

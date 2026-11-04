@@ -17,6 +17,13 @@ import type { Language } from './types';
 type Entry = [fr: string, en: string, es: string, it: string];
 
 const ENTRIES: Entry[] = [
+  // ── Adaptation au Mac (moteur commun mackit) ──
+  ['🍎 Adaptation au Mac…', '🍎 Adapting for Mac…', '🍎 Adaptando al Mac…', '🍎 Adattamento al Mac…'],
+  ['⚠ Adaptation au Mac impossible : {0}', '⚠ Mac adaptation failed: {0}', '⚠ Adaptación al Mac imposible: {0}', '⚠ Adattamento al Mac impossibile: {0}'],
+  ['⚠ Adaptation au Mac : aucun dossier de jeu à adapter.', '⚠ Mac adaptation: no game folder to adapt.', '⚠ Adaptación al Mac: ninguna carpeta de juego que adaptar.', '⚠ Adattamento al Mac: nessuna cartella di gioco da adattare.'],
+  ['✓ Adaptation au Mac : {0} correctif(s) appliqué(s), {1} échoué(s), {2} ignoré(s).', '✓ Mac adaptation: {0} fix(es) applied, {1} failed, {2} skipped.', '✓ Adaptación al Mac: {0} corrección(es) aplicada(s), {1} fallida(s), {2} omitida(s).', '✓ Adattamento al Mac: {0} correzione/i applicata/e, {1} non riuscita/e, {2} ignorata/e.'],
+  ['Adaptation de l\'installation au Mac…', 'Adapting the installation for Mac…', 'Adaptando la instalación al Mac…', 'Adattamento dell\'installazione al Mac…'],
+  ['Adaptation au Mac', 'Mac adaptation', 'Adaptación al Mac', 'Adattamento al Mac'],
   ['📄 .wabbajack téléchargé depuis la galerie : dossier dédié = {0}', '📄 .wabbajack downloaded from the gallery: list folder = {0}', '📄 .wabbajack descargado desde la galería: carpeta dedicada = {0}', '📄 .wabbajack scaricato dalla galleria: cartella dedicata = {0}'],
   ['Recherche du fichier .wabbajack d\'origine…', 'Looking for the original .wabbajack file…', 'Buscando el archivo .wabbajack original…', 'Ricerca del file .wabbajack originale…'],
   ['Enregistrement de l\'état de l\'installation…', 'Saving the installation state…', 'Guardando el estado de la instalación…', 'Salvataggio dello stato dell\'installazione…'],
