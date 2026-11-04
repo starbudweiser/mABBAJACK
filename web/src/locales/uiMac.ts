@@ -8,30 +8,51 @@ import type { MacText } from '../types/mac';
 
 export interface MacUi {
   // carte « Adaptation au Mac » (avant l’installation)
-  title: string; adapt: string; intro: string; loading: string; unsupported: string;
+  title: string; loading: string; unsupported: string;
   target: string; targetInstall: string; targetGame: string; bottle: string; noBottle: string; bottleLabel: string;
   noTarget: string; futureTarget: string; nothing: string; willDo: string; skippedTitle: string; discardedTitle: string;
-  files: string; lines: string; promise: string; off: string; details: string;
+  files: string; lines: string; promise: string; details: string;
+  // choix du mode : dossier universel (Stock) ou kit DXMT pour une bouteille CrossOver
+  modeChoose: string; rowFolder: string; rowBottle: string; rowAfter: string; rowUndo: string;
+  modeStock: string; modeStockLead: string; modeStockFolder: string; modeStockBottle: string; modeStockAfter: string; modeStockUndo: string;
+  modeKit: string; modeKitLead: string; modeKitFolder: string; modeKitBottle: string; modeKitAfter: string; modeKitUndo: string;
+  kitUnavailable: string;
   // Bottled Shaders
   bottled: string; bottledGet: string; bottledLooking: string; bottledProgress: string; bottledDone: string; bottledShow: string;
   bottledManual: string; bottledOpen: string; bottledNoKey: string; bottledNoFolder: string; bottledNoFile: string;
   bottledTooOld: string; bottledNoLink: string; bottledFailed: string; bottledHint: string;
   // carte « Bilan Mac » (après l’installation)
   report: string; reportDone: string; applied: string; failed: string; skipped: string; undo: string; undoAll: string; undoing: string;
-  undone: string; refused: string; allUndone: string; reportNothing: string; reportNoTarget: string; reportError: string;
+  undone: string; refused: string; allUndone: string; reportNothing: string; reportNoTarget: string; reportStock: string; reportStockText: string; reportNoBottle: string; reportError: string;
   backupNote: string; stageMac: string; installDone: string;
 }
 
 export const MAC_UI: Record<Language, MacUi> = {
   fr: {
-    title: 'Adaptation au Mac', adapt: 'Adapter au Mac',
-    intro: 'Rend le jeu prêt pour Skyrim sous macOS (DXMT, ENB, DLSS). Chaque correctif est annoncé ici avant d’être appliqué, et reste annulable ensuite.',
+    title: 'Adaptation au Mac',
     loading: 'Analyse du jeu…', unsupported: 'L’adaptation au Mac n’est disponible que sur macOS.',
     target: 'Dossier adapté', targetInstall: 'Le jeu embarqué par la liste', targetGame: 'Votre Skyrim', bottle: 'Bouteille', noBottle: 'Aucune bouteille CrossOver trouvée', bottleLabel: 'Bouteille CrossOver',
     noTarget: 'Aucun jeu à adapter pour le moment : indiquez le dossier de Skyrim.',
     futureTarget: 'Cette liste installe son propre jeu. Les correctifs qui dépendent de ses fichiers (pont DLSS, SSE Display Tweaks, doublons) seront examinés à la fin de l’installation et détaillés dans le bilan, où vous pourrez les annuler.',
     nothing: 'Rien à adapter pour l’instant : le jeu et sa bouteille sont déjà prêts.', willDo: 'Sera appliqué', skippedTitle: 'Ne sera pas fait', discardedTitle: 'Fichiers écartés (gardés dans la sauvegarde)',
-    files: 'Fichiers touchés', lines: 'Lignes modifiées', promise: 'Les fichiers d’origine sont copiés dans le dossier _MAC_BACKUP du jeu : tout s’annule après l’installation.', off: 'Désactivé : le jeu restera tel que la liste l’installe.', details: 'Détails',
+    files: 'Fichiers touchés', lines: 'Lignes modifiées', promise: 'Les fichiers d’origine sont copiés dans le dossier _MAC_BACKUP du jeu : tout s’annule après l’installation.', details: 'Détails',
+    rowFolder: 'Dans le dossier', rowBottle: 'Dans la bouteille', rowAfter: 'Ensuite', rowUndo: 'Annulation', modeChoose: 'Comment utiliserez-vous ce jeu ?',
+    modeStock: 'Dossier universel (Stock)',
+    modeStockLead: 'Le dossier est livré tel que la liste le produit : rien n’est ajouté ni modifié.',
+    modeStockFolder: 'Rien n’est modifié : ni pont DLSS, ni réglages, ni fichier écarté.',
+    modeStockBottle: 'Rien n’est modifié.',
+    modeStockAfter: 'Copiez le dossier où vous voulez : Windows, CrossOver, Wine… Rien de propre au Mac n’est ajouté (pas de pont DLSS).',
+    modeStockUndo: 'Rien à annuler.',
+    modeKit: 'Pour une bouteille CrossOver (kit DXMT mORTEX)',
+    modeKitLead: 'Prépare le jeu pour CrossOver sur Mac avec le kit DXMT de mORTEX : moteur graphique DXMT, pont DLSS, réglages d’affichage et DLL de la bouteille.',
+    modeKitFolder: 'Pont DLSS (d3d11.dll), réglages de SSE Display Tweaks, DLL en double écartées (gardées dans _MAC_BACKUP).',
+    modeKitBottle: 'La bouteille est modifiée : moteur DXMT, DLL forcées, compilateur de shaders de Microsoft.',
+    modeKitAfter: 'Le dossier fonctionne avec cette bouteille. Le copier vers Windows ou une autre bouteille le casserait, sauf après « Tout annuler ».',
+    modeKitUndo: 'Tout s’annule depuis le bilan, correctif par correctif ou d’un coup.',
+    kitUnavailable: 'Indisponible : aucune bouteille CrossOver n’a été trouvée. Créez-en une avec l’assistant bouteille de mORTEX, puis revenez ici.',
+    reportStock: 'Dossier universel',
+    reportStockText: 'Aucune adaptation : le dossier est tel que la liste l’a produit, rien n’a été modifié. Copiez-le où vous voulez.',
+    reportNoBottle: 'Aucune bouteille CrossOver trouvée : rien n’a été modifié. Le dossier reste universel.',
     bottled: 'Bottled Shaders', bottledGet: 'Télécharger Bottled Shaders {version}', bottledLooking: 'Recherche de la dernière version sur Nexus…', bottledProgress: 'Téléchargement de {name} : {percent} %', bottledDone: 'Téléchargé : {name}', bottledShow: 'Afficher dans le Finder',
     bottledManual: 'Compte Nexus gratuit : ouvrez la page du fichier et cliquez sur « Mod Manager Download » ; mABBAJACK reçoit alors le fichier.', bottledOpen: 'Ouvrir la page Nexus', bottledNoKey: 'Ajoutez votre clé API Nexus pour télécharger Bottled Shaders.', bottledNoFolder: 'Choisissez d’abord le dossier des téléchargements.',
     bottledNoFile: 'Nexus ne propose pas de fichier principal pour Bottled Shaders.', bottledTooOld: 'La dernière version sur Nexus ({version}) est plus ancienne que le minimum demandé.', bottledNoLink: 'Nexus n’a pas donné de lien de téléchargement.', bottledFailed: 'Le téléchargement a échoué : réessayez.', bottledHint: 'Le fichier est enregistré dans le dossier des téléchargements ; installez-le ensuite comme un mod.',
@@ -41,14 +62,30 @@ export const MAC_UI: Record<Language, MacUi> = {
     backupNote: 'Gardez le dossier _MAC_BACKUP à la racine du jeu : il contient les fichiers d’origine nécessaires pour annuler.', stageMac: 'Adaptation au Mac', installDone: 'Installation de « {name} » terminée.',
   },
   en: {
-    title: 'Mac adaptation', adapt: 'Adapt for Mac',
-    intro: 'Gets the game ready for Skyrim on macOS (DXMT, ENB, DLSS). Each fix is announced here before it is applied, and can be undone afterwards.',
+    title: 'Mac adaptation',
     loading: 'Checking the game…', unsupported: 'Mac adaptation is only available on macOS.',
     target: 'Folder adapted', targetInstall: 'The game installed by the list', targetGame: 'Your Skyrim', bottle: 'Bottle', noBottle: 'No CrossOver bottle found', bottleLabel: 'CrossOver bottle',
     noTarget: 'No game to adapt yet: choose the Skyrim folder.',
     futureTarget: 'This list installs its own game. The fixes that depend on its files (DLSS bridge, SSE Display Tweaks, duplicates) will be examined at the end of the installation and detailed in the report, where you can undo them.',
     nothing: 'Nothing to adapt for now: the game and its bottle are already ready.', willDo: 'Will be applied', skippedTitle: 'Will not be done', discardedTitle: 'Files set aside (kept in the backup)',
-    files: 'Files touched', lines: 'Lines changed', promise: 'The original files are copied into the game’s _MAC_BACKUP folder: everything can be undone after the installation.', off: 'Off: the game stays exactly as the list installs it.', details: 'Details',
+    files: 'Files touched', lines: 'Lines changed', promise: 'The original files are copied into the game’s _MAC_BACKUP folder: everything can be undone after the installation.', details: 'Details',
+    rowFolder: 'In the folder', rowBottle: 'In the bottle', rowAfter: 'Afterwards', rowUndo: 'Undo', modeChoose: 'How will you use this game?',
+    modeStock: 'Universal folder (Stock)',
+    modeStockLead: 'The folder is delivered exactly as the list produces it: nothing is added or changed.',
+    modeStockFolder: 'Nothing is changed: no DLSS bridge, no settings, no file set aside.',
+    modeStockBottle: 'Nothing is changed.',
+    modeStockAfter: 'Copy the folder wherever you like: Windows, CrossOver, Wine… Nothing Mac-specific is added (no DLSS bridge).',
+    modeStockUndo: 'Nothing to undo.',
+    modeKit: 'For a CrossOver bottle (mORTEX DXMT kit)',
+    modeKitLead: 'Gets the game ready for CrossOver on Mac with the mORTEX DXMT kit: DXMT graphics engine, DLSS bridge, display settings and bottle DLLs.',
+    modeKitFolder: 'DLSS bridge (d3d11.dll), SSE Display Tweaks settings, duplicate DLLs set aside (kept in _MAC_BACKUP).',
+    modeKitBottle: 'The bottle is changed: DXMT engine, forced DLLs, Microsoft shader compiler.',
+    modeKitAfter: 'The folder works with this bottle. Copying it to Windows or another bottle would break it, unless you use “Undo all” first.',
+    modeKitUndo: 'Everything can be undone from the report, fix by fix or all at once.',
+    kitUnavailable: 'Unavailable: no CrossOver bottle was found. Create one with the mORTEX bottle assistant, then come back here.',
+    reportStock: 'Universal folder',
+    reportStockText: 'No adaptation: the folder is exactly as the list produced it, nothing was changed. Copy it wherever you like.',
+    reportNoBottle: 'No CrossOver bottle found: nothing was changed. The folder stays universal.',
     bottled: 'Bottled Shaders', bottledGet: 'Download Bottled Shaders {version}', bottledLooking: 'Looking up the latest version on Nexus…', bottledProgress: 'Downloading {name}: {percent}%', bottledDone: 'Downloaded: {name}', bottledShow: 'Show in Finder',
     bottledManual: 'Free Nexus account: open the file page and click “Mod Manager Download”; mABBAJACK then receives the file.', bottledOpen: 'Open the Nexus page', bottledNoKey: 'Add your Nexus API key to download Bottled Shaders.', bottledNoFolder: 'Choose the downloads folder first.',
     bottledNoFile: 'Nexus has no main file for Bottled Shaders.', bottledTooOld: 'The latest version on Nexus ({version}) is older than the minimum required.', bottledNoLink: 'Nexus did not give a download link.', bottledFailed: 'The download failed: try again.', bottledHint: 'The file is saved in the downloads folder; then install it like any mod.',
@@ -58,14 +95,30 @@ export const MAC_UI: Record<Language, MacUi> = {
     backupNote: 'Keep the _MAC_BACKUP folder at the root of the game: it holds the original files needed to undo.', stageMac: 'Mac adaptation', installDone: 'Installation of “{name}” complete.',
   },
   es: {
-    title: 'Adaptación al Mac', adapt: 'Adaptar al Mac',
-    intro: 'Deja el juego listo para Skyrim en macOS (DXMT, ENB, DLSS). Cada corrección se anuncia aquí antes de aplicarse y se puede deshacer después.',
+    title: 'Adaptación al Mac',
     loading: 'Analizando el juego…', unsupported: 'La adaptación al Mac solo está disponible en macOS.',
     target: 'Carpeta adaptada', targetInstall: 'El juego que instala la lista', targetGame: 'Su Skyrim', bottle: 'Botella', noBottle: 'No se encontró ninguna botella de CrossOver', bottleLabel: 'Botella de CrossOver',
     noTarget: 'Todavía no hay ningún juego que adaptar: indique la carpeta de Skyrim.',
     futureTarget: 'Esta lista instala su propio juego. Las correcciones que dependen de sus archivos (puente DLSS, SSE Display Tweaks, duplicados) se examinarán al final de la instalación y se detallarán en el balance, donde podrá deshacerlas.',
     nothing: 'Nada que adaptar por ahora: el juego y su botella ya están listos.', willDo: 'Se aplicará', skippedTitle: 'No se hará', discardedTitle: 'Archivos apartados (guardados en la copia de seguridad)',
-    files: 'Archivos afectados', lines: 'Líneas modificadas', promise: 'Los archivos originales se copian en la carpeta _MAC_BACKUP del juego: todo se puede deshacer tras la instalación.', off: 'Desactivado: el juego quedará tal como lo instala la lista.', details: 'Detalles',
+    files: 'Archivos afectados', lines: 'Líneas modificadas', promise: 'Los archivos originales se copian en la carpeta _MAC_BACKUP del juego: todo se puede deshacer tras la instalación.', details: 'Detalles',
+    rowFolder: 'En la carpeta', rowBottle: 'En la botella', rowAfter: 'Después', rowUndo: 'Deshacer', modeChoose: '¿Cómo va a usar este juego?',
+    modeStock: 'Carpeta universal (Stock)',
+    modeStockLead: 'La carpeta se entrega tal como la produce la lista: no se añade ni se modifica nada.',
+    modeStockFolder: 'No se modifica nada: ni puente DLSS, ni ajustes, ni archivos apartados.',
+    modeStockBottle: 'No se modifica nada.',
+    modeStockAfter: 'Copie la carpeta donde quiera: Windows, CrossOver, Wine… No se añade nada propio del Mac (sin puente DLSS).',
+    modeStockUndo: 'Nada que deshacer.',
+    modeKit: 'Para una botella de CrossOver (kit DXMT de mORTEX)',
+    modeKitLead: 'Deja el juego listo para CrossOver en Mac con el kit DXMT de mORTEX: motor gráfico DXMT, puente DLSS, ajustes de pantalla y DLL de la botella.',
+    modeKitFolder: 'Puente DLSS (d3d11.dll), ajustes de SSE Display Tweaks, DLL duplicadas apartadas (guardadas en _MAC_BACKUP).',
+    modeKitBottle: 'Se modifica la botella: motor DXMT, DLL forzadas, compilador de shaders de Microsoft.',
+    modeKitAfter: 'La carpeta funciona con esta botella. Copiarla a Windows o a otra botella la rompería, salvo tras «Deshacer todo».',
+    modeKitUndo: 'Todo se deshace desde el balance, corrección por corrección o de golpe.',
+    kitUnavailable: 'No disponible: no se encontró ninguna botella de CrossOver. Cree una con el asistente de botellas de mORTEX y vuelva aquí.',
+    reportStock: 'Carpeta universal',
+    reportStockText: 'Sin adaptación: la carpeta está tal como la produjo la lista, no se ha modificado nada. Cópiela donde quiera.',
+    reportNoBottle: 'No se encontró ninguna botella de CrossOver: no se ha modificado nada. La carpeta sigue siendo universal.',
     bottled: 'Bottled Shaders', bottledGet: 'Descargar Bottled Shaders {version}', bottledLooking: 'Buscando la última versión en Nexus…', bottledProgress: 'Descargando {name}: {percent} %', bottledDone: 'Descargado: {name}', bottledShow: 'Mostrar en el Finder',
     bottledManual: 'Cuenta gratuita de Nexus: abra la página del archivo y haga clic en «Mod Manager Download»; mABBAJACK recibirá el archivo.', bottledOpen: 'Abrir la página de Nexus', bottledNoKey: 'Añada su clave API de Nexus para descargar Bottled Shaders.', bottledNoFolder: 'Elija primero la carpeta de descargas.',
     bottledNoFile: 'Nexus no ofrece un archivo principal de Bottled Shaders.', bottledTooOld: 'La última versión en Nexus ({version}) es anterior al mínimo exigido.', bottledNoLink: 'Nexus no ha dado ningún enlace de descarga.', bottledFailed: 'La descarga ha fallado: inténtelo de nuevo.', bottledHint: 'El archivo se guarda en la carpeta de descargas; instálelo después como cualquier mod.',
@@ -75,14 +128,30 @@ export const MAC_UI: Record<Language, MacUi> = {
     backupNote: 'Conserve la carpeta _MAC_BACKUP en la raíz del juego: contiene los archivos originales necesarios para deshacer.', stageMac: 'Adaptación al Mac', installDone: 'Instalación de «{name}» terminada.',
   },
   it: {
-    title: 'Adattamento al Mac', adapt: 'Adatta al Mac',
-    intro: 'Prepara il gioco per Skyrim su macOS (DXMT, ENB, DLSS). Ogni correzione viene annunciata qui prima di essere applicata e si può annullare dopo.',
+    title: 'Adattamento al Mac',
     loading: 'Analisi del gioco…', unsupported: 'L’adattamento al Mac è disponibile solo su macOS.',
     target: 'Cartella adattata', targetInstall: 'Il gioco installato dalla lista', targetGame: 'Il tuo Skyrim', bottle: 'Bottiglia', noBottle: 'Nessuna bottiglia CrossOver trovata', bottleLabel: 'Bottiglia CrossOver',
     noTarget: 'Nessun gioco da adattare per ora: indica la cartella di Skyrim.',
     futureTarget: 'Questa lista installa il proprio gioco. Le correzioni che dipendono dai suoi file (ponte DLSS, SSE Display Tweaks, duplicati) saranno esaminate alla fine dell’installazione e dettagliate nel resoconto, dove potrai annullarle.',
     nothing: 'Niente da adattare per ora: il gioco e la sua bottiglia sono già pronti.', willDo: 'Sarà applicato', skippedTitle: 'Non sarà fatto', discardedTitle: 'File messi da parte (conservati nel backup)',
-    files: 'File interessati', lines: 'Righe modificate', promise: 'I file originali vengono copiati nella cartella _MAC_BACKUP del gioco: tutto si può annullare dopo l’installazione.', off: 'Disattivato: il gioco resterà com’è installato dalla lista.', details: 'Dettagli',
+    files: 'File interessati', lines: 'Righe modificate', promise: 'I file originali vengono copiati nella cartella _MAC_BACKUP del gioco: tutto si può annullare dopo l’installazione.', details: 'Dettagli',
+    rowFolder: 'Nella cartella', rowBottle: 'Nella bottiglia', rowAfter: 'Poi', rowUndo: 'Annullamento', modeChoose: 'Come userai questo gioco?',
+    modeStock: 'Cartella universale (Stock)',
+    modeStockLead: 'La cartella viene consegnata così come la produce la lista: non viene aggiunto né modificato nulla.',
+    modeStockFolder: 'Non viene modificato nulla: né ponte DLSS, né impostazioni, né file messi da parte.',
+    modeStockBottle: 'Non viene modificato nulla.',
+    modeStockAfter: 'Copia la cartella dove vuoi: Windows, CrossOver, Wine… Non viene aggiunto nulla di specifico per Mac (nessun ponte DLSS).',
+    modeStockUndo: 'Niente da annullare.',
+    modeKit: 'Per una bottiglia CrossOver (kit DXMT di mORTEX)',
+    modeKitLead: 'Prepara il gioco per CrossOver su Mac con il kit DXMT di mORTEX: motore grafico DXMT, ponte DLSS, impostazioni dello schermo e DLL della bottiglia.',
+    modeKitFolder: 'Ponte DLSS (d3d11.dll), impostazioni di SSE Display Tweaks, DLL doppie messe da parte (conservate in _MAC_BACKUP).',
+    modeKitBottle: 'La bottiglia viene modificata: motore DXMT, DLL forzate, compilatore di shader di Microsoft.',
+    modeKitAfter: 'La cartella funziona con questa bottiglia. Copiarla su Windows o in un’altra bottiglia la romperebbe, a meno di usare prima «Annulla tutto».',
+    modeKitUndo: 'Tutto si annulla dal resoconto, correzione per correzione o in un colpo solo.',
+    kitUnavailable: 'Non disponibile: non è stata trovata nessuna bottiglia CrossOver. Creane una con l’assistente bottiglie di mORTEX, poi torna qui.',
+    reportStock: 'Cartella universale',
+    reportStockText: 'Nessun adattamento: la cartella è così come l’ha prodotta la lista, nulla è stato modificato. Copiala dove vuoi.',
+    reportNoBottle: 'Nessuna bottiglia CrossOver trovata: nulla è stato modificato. La cartella resta universale.',
     bottled: 'Bottled Shaders', bottledGet: 'Scarica Bottled Shaders {version}', bottledLooking: 'Ricerca dell’ultima versione su Nexus…', bottledProgress: 'Download di {name}: {percent}%', bottledDone: 'Scaricato: {name}', bottledShow: 'Mostra nel Finder',
     bottledManual: 'Account Nexus gratuito: apri la pagina del file e fai clic su «Mod Manager Download»; mABBAJACK riceverà il file.', bottledOpen: 'Apri la pagina Nexus', bottledNoKey: 'Aggiungi la tua chiave API Nexus per scaricare Bottled Shaders.', bottledNoFolder: 'Scegli prima la cartella dei download.',
     bottledNoFile: 'Nexus non offre un file principale per Bottled Shaders.', bottledTooOld: 'L’ultima versione su Nexus ({version}) è più vecchia del minimo richiesto.', bottledNoLink: 'Nexus non ha fornito un link di download.', bottledFailed: 'Il download non è riuscito: riprova.', bottledHint: 'Il file è salvato nella cartella dei download; installalo poi come una mod qualsiasi.',

@@ -6,15 +6,15 @@ Notes de version / release notes (EN + FR). Translations in IT and ES: see the N
 
 **English**
 
-- New "Mac adaptation" card before the installation (checked by default): it lists every fix that will be applied for Skyrim on macOS (DXMT graphics engine, DLSS bridge, SSE Display Tweaks, DLLs duplicated by Bottled Shaders, shader compiler, Wine DLL overrides). Nothing is written before the installation ends.
-- New "Mac report" card at the end of the installation: for each fix, applied, failed or skipped, with an Undo button per fix and for all. Original files are kept in the game's `_MAC_BACKUP` folder.
+- New "Mac adaptation" card before the installation. You choose how the game will be used: **Universal folder (Stock)**, preselected, where nothing is added or changed and the folder works anywhere (Windows, CrossOver, Wine…), or **For a CrossOver bottle (mORTEX DXMT kit)**, which lists every fix that will be applied (DXMT graphics engine, DLSS bridge, SSE Display Tweaks, DLLs duplicated by Bottled Shaders, shader compiler, Wine DLL overrides). Each choice says what changes in the folder, what changes in the bottle, what you can do with the folder afterwards and how to undo. The kit needs a CrossOver bottle: without one it is not offered, and the DLSS bridge is never placed on its own.
+- New "Mac report" card at the end of the installation: for each fix, applied, failed or skipped, with an Undo button per fix and for all (a Stock folder simply says nothing was changed). Original files are kept in the game's `_MAC_BACKUP` folder.
 - Bottled Shaders 1.0.26 or later can be downloaded from the report with your Nexus API key (never bundled with the app).
 - Shared Mac engine (the same one as mORTEX and mO2FLATTENER), bundled into the app's server.
 
 **Français**
 
-- Nouvelle carte « Adaptation au Mac » avant l'installation (cochée par défaut) : elle liste chaque correctif appliqué pour Skyrim sous macOS (moteur graphique DXMT, pont DLSS, SSE Display Tweaks, DLL en double avec Bottled Shaders, compilateur de shaders, substitutions de DLL Wine). Rien n'est écrit avant la fin de l'installation.
-- Nouvelle carte « Bilan Mac » à la fin de l'installation : pour chaque correctif, appliqué, échoué ou ignoré, avec un bouton Annuler par correctif et pour tout. Les fichiers d'origine sont gardés dans le dossier `_MAC_BACKUP` du jeu.
+- Nouvelle carte « Adaptation au Mac » avant l'installation. Vous choisissez comment le jeu sera utilisé : **Dossier universel (Stock)**, présélectionné, où rien n'est ajouté ni modifié et où le dossier fonctionne partout (Windows, CrossOver, Wine…), ou **Pour une bouteille CrossOver (kit DXMT mORTEX)**, qui liste chaque correctif appliqué (moteur graphique DXMT, pont DLSS, SSE Display Tweaks, DLL en double avec Bottled Shaders, compilateur de shaders, substitutions de DLL Wine). Chaque choix dit ce qui change dans le dossier, ce qui change dans la bouteille, ce qu'on peut faire du dossier ensuite et comment annuler. Le kit demande une bouteille CrossOver : sans elle il n'est pas proposé, et le pont DLSS n'est jamais posé seul.
+- Nouvelle carte « Bilan Mac » à la fin de l'installation : pour chaque correctif, appliqué, échoué ou ignoré, avec un bouton Annuler par correctif et pour tout (un dossier Stock dit simplement que rien n'a été modifié). Les fichiers d'origine sont gardés dans le dossier `_MAC_BACKUP` du jeu.
 - Bottled Shaders 1.0.26 ou plus récent se télécharge depuis le bilan avec votre clé API Nexus (jamais embarqué dans l'appli).
 - Moteur Mac commun (le même que mORTEX et mO2FLATTENER), empaqueté dans le serveur de l'appli.
 

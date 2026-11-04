@@ -156,6 +156,37 @@ try {
   assert.equal(none.target, null);
   assert.deepEqual(none.items, []);
 
+  // ── Deux modes : dossier universel (Stock, rien n'est copié) et kit DXMT pour une bouteille CrossOver ──
+  assert.equal(mac.macModeOf({ mode: 'stock' }), 'stock');
+  assert.equal(mac.macModeOf({ mode: 'crossover' }), 'crossover');
+  assert.equal(mac.macModeOf({ enabled: true }), 'crossover', 'anciens appels : « enabled » veut dire kit');
+  assert.equal(mac.macModeOf({ enabled: false }), 'stock');
+  assert.equal(mac.macModeOf({ mode: 'n’importe quoi' }), 'stock');
+  assert.equal(mac.macModeOf({}), 'stock');
+
+  const stockGame = tree(install);
+  const stockBottle = tree(bottle);
+  const stock = await mac.finishMac({ installDir: install, gamePath: '', mode: 'stock' });
+  assert.equal(stock.mode, 'stock');
+  assert.equal(stock.target.dir, install);
+  assert.deepEqual(stock.items, []);
+  assert.deepEqual(tree(install), stockGame, 'Stock : le dossier du jeu n’est pas touché');
+  assert.deepEqual(tree(bottle), stockBottle, 'Stock : la bouteille non plus');
+  assert.equal(fs.existsSync(path.join(install, '_MAC_BACKUP')), false);
+
+  // kit sans bouteille : aucune demi-mesure, rien n'est écrit, l'annonce le dit
+  const stateFile = path.join(tmp, 'data', 'bottles.json');
+  const savedState = fs.readFileSync(stateFile, 'utf8');
+  write(stateFile, JSON.stringify({ roots: [], activeBottle: path.join(tmp, 'aucune'), exclusive: true })); // aucune bouteille visible
+  const noBottlePreview = await mac.previewMac({ destPath: dest, modlist: { name: 'Test List' }, gamePath: '' });
+  assert.equal(noBottlePreview.noBottle, true);
+  assert.equal(noBottlePreview.plan, undefined);
+  const noBottle = await mac.finishMac({ installDir: install, gamePath: '', mode: 'crossover' });
+  assert.equal(noBottle.noBottle, true);
+  assert.deepEqual(noBottle.items, []);
+  assert.deepEqual(tree(install), stockGame, 'kit sans bouteille : le dossier du jeu n’est pas touché');
+  write(stateFile, savedState);
+
   // ── Bottled Shaders : fichier principal le plus récent, clé Nexus de l'utilisateur ──
   const waitFor = async (pred) => { for (let i = 0; i < 200; i++) { if (pred(mac.bottledState())) return mac.bottledState(); await new Promise((r) => setTimeout(r, 10)); } throw new Error(`attente dépassée : ${JSON.stringify(mac.bottledState())}`); };
   const nexusFiles = { files: [

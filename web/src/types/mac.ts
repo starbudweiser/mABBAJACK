@@ -6,6 +6,9 @@ export interface MacText { key: string; params?: Record<string, string | number>
 
 export interface MacIniChange { section: string; key: string; oldValue?: string; newValue: string; action: 'modify' | 'add'; }
 
+/** « stock » = dossier universel (rien n'est copié) ; « crossover » = kit DXMT pour une bouteille CrossOver. */
+export type MacMode = 'stock' | 'crossover';
+
 export interface MacBottle { name: string; kind: string; path: string; }
 
 export interface MacBottled {
@@ -25,6 +28,8 @@ export interface MacPreview {
   bottle?: MacBottle | null;
   bottles?: MacBottle[];
   bridge?: boolean;
+  /** aucune bouteille CrossOver : le kit n'est pas proposé (pas de plan) */
+  noBottle?: boolean;
   plan?: {
     gamePath: string;
     fixes: MacPlannedFix[];
@@ -50,6 +55,9 @@ export interface MacReportItem {
 
 /** Bilan Mac : dans la progression finale (`progress.mac`) ; vide si l'adaptation n'était pas demandée. */
 export interface MacReport {
+  mode?: MacMode;
+  /** mode « crossover » sans bouteille : rien n'a été modifié */
+  noBottle?: boolean;
   target: { dir: string; kind: 'install' | 'game'; exists: boolean } | null;
   bottle: MacBottle | null;
   items: MacReportItem[];

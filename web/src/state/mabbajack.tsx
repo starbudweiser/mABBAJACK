@@ -23,6 +23,7 @@ import { APP_UI } from '../locales/uiScreens';
 import { translateLog } from '../locales/logCatalog';
 import { PHOENIX_DEMO_MODLIST } from './demoModlist';
 import type { GalleryDownload } from '../components/GalleryDownloadOverlay';
+import type { MacMode } from '../types/mac';
 
 /** Étapes signalées aux écrans : modlist analysée, installation lancée, lancement refusé. */
 export type MabbajackEvent = 'loaded' | 'galleryReady' | 'installStarted' | 'installFailed';
@@ -70,8 +71,9 @@ function useMabbajackState() {
   // Mise à jour d'une installation existante de la liste (null = installation complète)
   const [updateRequest, setUpdateRequest] = useState<UpdateRequest | null>(null);
 
-  // Adaptation au Mac (moteur commun mackit) : cochée par défaut, bouteille choisie par le serveur sauf si l'utilisateur en impose une
-  const [macAdapt, setMacAdapt] = useState(true);
+  // Adaptation au Mac (moteur commun mackit) : « stock » par défaut (dossier universel, rien n'est copié) ou « crossover »
+  // (kit DXMT pour une bouteille CrossOver) ; bouteille choisie par le serveur sauf si l'utilisateur en impose une
+  const [macMode, setMacMode] = useState<MacMode>('stock');
   const [macBottle, setMacBottle] = useState('');
 
   // Configuration Paths (strictly 2 directories: DOWNLOADS and READY TO PLAY)
@@ -541,7 +543,7 @@ function useMabbajackState() {
           nexusApiKey,
           uiLanguage: language,
           options: { ...installOptions, update: updateRequest || undefined },
-          macAdapt: { enabled: macAdapt, bottle: macBottle || undefined },
+          macAdapt: { mode: macMode, bottle: macBottle || undefined },
         }),
       });
 
@@ -569,7 +571,7 @@ function useMabbajackState() {
       addLog('error', `Erreur réseau : ${err.message || err}`);
       emit('installFailed');
     }
-  }, [parsedFile, downloadsPath, destPath, gamePath, nexusApiKey, installOptions, updateRequest, macAdapt, macBottle, addLog, language]);
+  }, [parsedFile, downloadsPath, destPath, gamePath, nexusApiKey, installOptions, updateRequest, macMode, macBottle, addLog, language]);
 
 
 
@@ -640,7 +642,7 @@ function useMabbajackState() {
     loadDemoModlist: handleLoadDemoModlist,
     galleryDownload, installFromGallery,
     installOptions, setInstallOptions, updateRequest, setUpdateRequest,
-    macAdapt, setMacAdapt, macBottle, setMacBottle,
+    macMode, setMacMode, macBottle, setMacBottle,
     // dossiers et réglages
     downloadsPath, setDownloadsPath: saveDownloadsPath, destPath, setDestPath: saveDestPath,
     gamePath, setGamePath: saveGamePath, concurrency, setConcurrency: saveConcurrency,

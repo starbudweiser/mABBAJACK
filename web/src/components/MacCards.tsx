@@ -106,12 +106,49 @@ export const BottledBlock: React.FC<{ bottled: MacBottled }> = ({ bottled }) => 
   );
 };
 
-/** Carte « Adaptation au Mac » avant l'installation : case cochée par défaut, chaque correctif annoncé (plan du moteur). */
+/** Une des deux façons de rendre le jeu : titre, ce qu'elle fait, puis quatre lignes fixes (dossier, bouteille, ensuite, annulation). */
+const ModeOption: React.FC<{
+  selected: boolean; disabled?: boolean; onSelect: () => void; title: string; lead: string; rows: [string, string][]; notice?: string;
+}> = ({ selected, disabled, onSelect, title, lead, rows, notice }) => (
+  <div
+    role="radio"
+    aria-checked={selected}
+    aria-disabled={disabled || undefined}
+    tabIndex={disabled ? -1 : 0}
+    onClick={() => { if (!disabled) onSelect(); }}
+    onKeyDown={(e) => { if (!disabled && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); onSelect(); } }}
+    className={`rounded-lg border p-3 flex flex-col gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#0ea5e9] ${selected ? 'border-[#0ea5e9] bg-[#0ea5e9]/10' : 'border-[#2e2e2e] bg-[#1a1a1a]'} ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:border-[#3d3d3d]'}`}
+  >
+    <div className="flex items-start gap-2.5">
+      <span className={`mt-0.5 w-4 h-4 rounded-full border flex-shrink-0 flex items-center justify-center ${selected ? 'border-[#0ea5e9]' : 'border-[#555555]'}`}>
+        {selected && <span className="w-2 h-2 rounded-full bg-[#0ea5e9]" />}
+      </span>
+      <div className="min-w-0 flex flex-col gap-0.5">
+        <span className="text-body font-semibold text-white">{title}</span>
+        <p className="text-body text-[#aaaaaa]">{lead}</p>
+      </div>
+    </div>
+    <dl className="grid grid-cols-[9.5rem_1fr] gap-x-3 gap-y-1.5 pl-[26px]">
+      {rows.map(([label, value]) => (
+        <React.Fragment key={label}>
+          <dt className="text-caption uppercase font-bold text-[#707070] pt-0.5">{label}</dt>
+          <dd className="text-meta text-[#aaaaaa]">{value}</dd>
+        </React.Fragment>
+      ))}
+    </dl>
+    {notice && <p className="text-meta text-[#fbbf24] pl-[26px]">⚠ {notice}</p>}
+  </div>
+);
+
+/**
+ * Carte « Adaptation au Mac » avant l'installation : le choix entre le dossier universel (Stock, rien n'est copié, présélectionné)
+ * et le kit DXMT pour une bouteille CrossOver. Le détail du kit (plan du moteur) ne s'affiche que si le kit est choisi.
+ */
 export const MacCard: React.FC = () => {
   const { language } = useI18n();
   const ui = MAC_UI[language] ?? MAC_UI.fr;
   const m = useMabbajack();
-  const { parsedFile, destPath, gamePath, updateRequest, macAdapt, setMacAdapt, macBottle, setMacBottle } = m;
+  const { parsedFile, destPath, gamePath, updateRequest, macMode, setMacMode, macBottle, setMacBottle } = m;
   const [preview, setPreview] = useState<MacPreview | null>(null);
   const [loading, setLoading] = useState(false);
   const seq = useRef(0);
@@ -133,8 +170,13 @@ export const MacCard: React.FC = () => {
     return () => { clearTimeout(t); ctrl.abort(); };
   }, [name, file, destPath, gamePath, updateDir, macBottle]);
 
+  // sans bouteille CrossOver, le kit n'est pas proposé : jamais de demi-mesure
+  const kitUnavailable = !!preview?.supported && !!preview.noBottle;
+  useEffect(() => { if (kitUnavailable && macMode === 'crossover') setMacMode('stock'); }, [kitUnavailable, macMode, setMacMode]);
+
   if (!parsedFile) return null;
   if (preview && !preview.supported) return null; // hors macOS : pas de carte
+  const kit = macMode === 'crossover' && !kitUnavailable;
   const plan = preview?.plan;
   const future = preview?.target && !preview.target.exists;
   const nothing = plan && !future && plan.fixes.length === 0;
@@ -143,16 +185,30 @@ export const MacCard: React.FC = () => {
     <div className={card}>
       <div className="flex items-center justify-between gap-3">
         <span className={sectionLabel}><span>🍎</span><span>{ui.title}</span></span>
-        {preview?.target && <span className={badge.blue}>{preview.target.kind === 'install' ? ui.targetInstall : ui.targetGame}</span>}
+        {kit && preview?.target && <span className={badge.blue}>{preview.target.kind === 'install' ? ui.targetInstall : ui.targetGame}</span>}
       </div>
 
-      <label className="flex items-center gap-2 cursor-pointer select-none">
-        <input type="checkbox" className="w-4 h-4 accent-[#0ea5e9]" checked={macAdapt} onChange={(e) => setMacAdapt(e.target.checked)} />
-        <span className="text-body font-semibold text-white">{ui.adapt}</span>
-      </label>
-      <p className="text-meta text-[#8f8f8f] -mt-1">{macAdapt ? ui.intro : ui.off}</p>
+      <p className="text-meta text-[#8f8f8f] -mt-1">{ui.modeChoose}</p>
+      <div role="radiogroup" aria-label={ui.modeChoose} className="flex flex-col gap-2">
+        <ModeOption
+          selected={macMode === 'stock'}
+          onSelect={() => setMacMode('stock')}
+          title={ui.modeStock}
+          lead={ui.modeStockLead}
+          rows={[[ui.rowFolder, ui.modeStockFolder], [ui.rowBottle, ui.modeStockBottle], [ui.rowAfter, ui.modeStockAfter], [ui.rowUndo, ui.modeStockUndo]]}
+        />
+        <ModeOption
+          selected={kit}
+          disabled={kitUnavailable}
+          onSelect={() => setMacMode('crossover')}
+          title={ui.modeKit}
+          lead={ui.modeKitLead}
+          rows={[[ui.rowFolder, ui.modeKitFolder], [ui.rowBottle, ui.modeKitBottle], [ui.rowAfter, ui.modeKitAfter], [ui.rowUndo, ui.modeKitUndo]]}
+          notice={kitUnavailable ? ui.kitUnavailable : undefined}
+        />
+      </div>
 
-      {macAdapt && (
+      {kit && (
         <>
           {loading && !preview && <p className="text-body text-[#aaaaaa]">{ui.loading}</p>}
           {preview && !preview.target && <p className="text-body text-[#fbbf24]">{ui.noTarget}</p>}
@@ -232,6 +288,23 @@ export const MacReportCard: React.FC<{ report: MacReport; children?: React.React
   const [refusals, setRefusals] = useState<Record<string, MacText>>({});
   useEffect(() => { setItems(report.items); setUndoneCount(0); setRefusals({}); }, [report]);
 
+  // dossier universel (Stock) : rien n'a été copié ni modifié, le bilan le dit simplement
+  if (report.mode === 'stock') {
+    return (
+      <div className={`${card} gap-3`}>
+        <div>
+          <span className={sectionLabel}><span>📦</span><span>{ui.reportStock}</span></span>
+          <p className="text-meta text-[#8f8f8f] mt-1">{subtitle ?? ui.reportDone}</p>
+        </div>
+        <p className="text-body text-[#4ade80]">✓ {ui.reportStockText}</p>
+        {report.target && (
+          <p className="text-meta text-[#8f8f8f]">{ui.target} : <code className="font-mono text-[#aaaaaa] break-all">{report.target.dir}</code></p>
+        )}
+        {children}
+      </div>
+    );
+  }
+
   const dir = report.target?.dir;
   const undoable = items.filter((i) => i.undoable);
 
@@ -269,7 +342,8 @@ export const MacReportCard: React.FC<{ report: MacReport; children?: React.React
 
       {report.error && <p className="text-body text-[#f87171]">⚠ {ui.reportError}</p>}
       {!report.error && !report.target && <p className="text-body text-[#fbbf24]">{ui.reportNoTarget}</p>}
-      {!report.error && report.target && items.length === 0 && !undoneCount && <p className="text-body text-[#4ade80]">✓ {ui.reportNothing}</p>}
+      {!report.error && report.noBottle && <p className="text-body text-[#fbbf24]">⚠ {ui.reportNoBottle}</p>}
+      {!report.error && report.target && !report.noBottle && items.length === 0 && !undoneCount && <p className="text-body text-[#4ade80]">✓ {ui.reportNothing}</p>}
       {allUndone && <p className="text-body text-[#4ade80]">✓ {ui.allUndone}</p>}
       {undoneCount !== 0 && !allUndone && <p className="text-meta text-[#4ade80]">✓ {fillMac(ui.undone, { n: undoneCount })}</p>}
 

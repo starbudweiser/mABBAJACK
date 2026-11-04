@@ -117,7 +117,8 @@ interface IContext {
 
 type Decision = { fix: IPlannedFix } | { skipped: ISkippedFix } | undefined;
 
-const BOTTLE_ONLY: MacFixId[] = ["engine", "compiler", "overrides"];
+// le pont mDLSS ne sert qu'avec le moteur DXMT et les DLL forcées de la bouteille : sans bouteille, jamais de pont
+const BOTTLE_ONLY: MacFixId[] = ["engine", "bridge", "compiler", "overrides"];
 
 const pluginsDir = (gamePath: string) => path.join(gamePath, "Data", "SKSE", "Plugins");
 /** réglages de Bottled Shaders, où DLSS se choisit */
@@ -179,6 +180,7 @@ async function dlssOperation(gamePath: string): Promise<MacOperation | undefined
 }
 
 async function planBridge(ctx: IContext): Promise<Decision> {
+  if (ctx.bottle === undefined) return undefined; // écarté par plan, avec la raison « aucune bouteille »
   if (ctx.checks.get("bridge")?.status !== "warning") return undefined;
   const { bridgeSource } = ctx.options;
   const sourceHash = bridgeSource === undefined ? null : await fileHash(bridgeSource);

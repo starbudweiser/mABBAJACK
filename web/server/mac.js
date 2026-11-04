@@ -121,7 +121,8 @@ export function summarizePlan(plan) {
 
 /**
  * Ce que l'adaptation ferait, sans rien écrire (plan du moteur). Entrée : { destPath, modlist: { name, localFilePath },
- * gamePath, update, bottle }. Sortie JSON : { supported, target, bottle, bottles, bridge, plan? }.
+ * gamePath, update, bottle }. Sortie JSON : { supported, target, bottle, bottles, bridge, noBottle, plan? }.
+ * Le kit DXMT est pour une bouteille CrossOver : sans bouteille il n'y a pas de plan (`noBottle`), jamais de demi-mesure.
  */
 export async function previewMac(input = {}) {
   if (!macSupported()) return { supported: false };
@@ -130,8 +131,8 @@ export async function previewMac(input = {}) {
   const carriesGame = installDir ? await listCarriesGame(input.modlist?.localFilePath).catch(() => false) : false;
   const target = resolveTarget({ installDir, gamePath: input.gamePath, carriesGame });
   const { bottle, bottles } = chooseBottle(engine, [target?.dir, input.gamePath], input.bottle);
-  const out = { supported: true, target, bottle: bottleInfo(bottle), bottles: bottles.map(bottleInfo), bridge: !!findBridge() && fs.existsSync(findBridge()) };
-  if (!target) return out;
+  const out = { supported: true, target, bottle: bottleInfo(bottle), bottles: bottles.map(bottleInfo), bridge: !!findBridge() && fs.existsSync(findBridge()), noBottle: !bottle };
+  if (!target || !bottle) return out;
   const plan = await engine.plan(target.dir, bottle, { bridgeSource: findBridge(), log: engineLog });
   return { ...out, plan: summarizePlan(plan) };
 }
@@ -139,19 +140,29 @@ export async function previewMac(input = {}) {
 // ── Application (fin d'installation) ───────────────────────────────────────────────
 
 /**
- * Simule puis applique tous les correctifs sur le dossier du jeu qui vient d'être installé (ou sur le jeu de
- * l'utilisateur), et dresse le bilan : { target, bottle, items: [{ id, status: applied|failed|skipped, text?, reason?, files }],
- * discarded, bottled, applied }. Ne lève jamais : une erreur du moteur se lit dans `error`.
+ * Deux façons de rendre le jeu : « stock » (dossier universel : rien n'est copié ni modifié, le moteur n'est même pas
+ * chargé) et « crossover » (kit DXMT pour une bouteille CrossOver). Sans mode, c'est « crossover » (appels d'avant).
  */
-export async function finishMac({ installDir, gamePath, bottle: bottleName, bridgeSource = findBridge() }) {
-  const report = { target: null, bottle: null, items: [], discarded: [], bottled: null, applied: [] };
+export const MAC_MODES = ['stock', 'crossover'];
+export const macModeOf = (macAdapt) => (MAC_MODES.includes(macAdapt?.mode) ? macAdapt.mode : macAdapt?.enabled ? 'crossover' : 'stock');
+
+/**
+ * Simule puis applique tous les correctifs sur le dossier du jeu qui vient d'être installé (ou sur le jeu de
+ * l'utilisateur), et dresse le bilan : { mode, target, bottle, items: [{ id, status: applied|failed|skipped, text?, reason?, files }],
+ * discarded, bottled, applied, noBottle? }. Ne lève jamais : une erreur du moteur se lit dans `error`.
+ * Mode « stock » : bilan vide, rien n'est touché. Mode « crossover » sans bouteille : rien n'est touché non plus (`noBottle`).
+ */
+export async function finishMac({ installDir, gamePath, bottle: bottleName, bridgeSource = findBridge(), mode = 'crossover' }) {
+  const report = { mode, target: null, bottle: null, items: [], discarded: [], bottled: null, applied: [] };
   try {
+    if (mode === 'stock') { report.target = resolveTarget({ installDir, gamePath }); return report; }
     const engine = await loadEngine();
     const target = resolveTarget({ installDir, gamePath });
     if (!target) return report;
     const { bottle } = chooseBottle(engine, [target.dir, gamePath], bottleName);
     report.target = target;
     report.bottle = bottleInfo(bottle);
+    if (!bottle) { report.noBottle = true; return report; }
     const plan = await engine.plan(target.dir, bottle, { bridgeSource, log: engineLog });
     report.bottled = plan.bottled;
     report.discarded = plan.discarded;
