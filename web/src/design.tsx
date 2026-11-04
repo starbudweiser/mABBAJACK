@@ -127,7 +127,7 @@ export const badge = {
 } as const;
 
 // ── Card ──────────────────────────────────────────────────────────────────────
-export const card = 'bg-[#181818] border border-[#2e2e2e] rounded-xl p-4 shadow-sm flex flex-col gap-3';
+export const card = 'bg-[#181818] border border-[#2e2e2e] rounded-xl p-6 shadow-sm flex flex-col gap-3'; // Socle : 24 px de marge intérieure dans toute carte
 
 // ── Section Label ─────────────────────────────────────────────────────────────
 export const sectionLabel = 'text-body font-bold text-white uppercase tracking-wider flex items-center gap-1.5';

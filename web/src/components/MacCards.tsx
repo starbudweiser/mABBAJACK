@@ -66,15 +66,16 @@ export const BottledBlock: React.FC<{ bottled: MacBottled }> = ({ bottled }) => 
 
   return (
     <div className="rounded-lg border border-[#2e2e2e] bg-[#1a1a1a] p-3 flex flex-col gap-2">
-      <div className="flex items-start gap-2">
-        <span className={bottled.state === 'ok' ? 'text-[#4ade80]' : needsFix ? 'text-[#fbbf24]' : 'text-[#8f8f8f]'}>{bottled.state === 'ok' ? '✓' : needsFix ? '⚠' : '•'}</span>
-        <div className="min-w-0">
+      {/* Socle : le constat est centré, et le bouton d'action centré juste en dessous */}
+      <div className="flex flex-col items-center text-center gap-0.5 min-w-0">
+        <span className="flex items-center gap-2">
+          <span className={bottled.state === 'ok' ? 'text-[#4ade80]' : needsFix ? 'text-[#fbbf24]' : 'text-[#8f8f8f]'}>{bottled.state === 'ok' ? '✓' : needsFix ? '⚠' : '•'}</span>
           <span className="text-body font-semibold text-white">{ui.bottled}</span>
-          <p className="text-body text-[#aaaaaa]">{macText(bottled.text, language)}</p>
-        </div>
+        </span>
+        <p className="text-body text-[#aaaaaa]">{macText(bottled.text, language)}</p>
       </div>
       {needsFix && (
-        <div className="flex flex-col gap-2 pl-6">
+        <div className="flex flex-col items-center text-center gap-2">
           {job.status === 'idle' || job.status === 'error' ? (
             <>
               <div><button type="button" className={btn.secondary} onClick={start}>⬇ {fillMac(ui.bottledGet, { version: bottled.minimum })}</button></div>
@@ -83,7 +84,7 @@ export const BottledBlock: React.FC<{ bottled: MacBottled }> = ({ bottled }) => 
           ) : job.status === 'looking' ? (
             <p className="text-meta text-[#aaaaaa]">{ui.bottledLooking}</p>
           ) : job.status === 'downloading' ? (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 w-full">
               <p className="text-meta text-[#aaaaaa]">{fillMac(ui.bottledProgress, { name: job.name, percent: job.percent })}</p>
               <div className="h-1.5 rounded-full bg-[#262626] overflow-hidden"><div className="h-full rounded-full bg-[#0ea5e9] transition-all" style={{ width: `${job.percent}%` }} /></div>
             </div>
@@ -261,14 +262,9 @@ export const MacReportCard: React.FC<{ report: MacReport; children?: React.React
 
   return (
     <div className={`${card} gap-3`}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <span className={sectionLabel}><span>🍎</span><span>{title ?? ui.report}</span></span>
-          <p className="text-meta text-[#8f8f8f] mt-1">{subtitle ?? ui.reportDone}</p>
-        </div>
-        {undoable.length > 1 && (
-          <button type="button" className={btn.secondary} disabled={busy !== null} onClick={() => undo('all')}>{busy === 'all' ? ui.undoing : `↩ ${ui.undoAll}`}</button>
-        )}
+      <div>
+        <span className={sectionLabel}><span>🍎</span><span>{title ?? ui.report}</span></span>
+        <p className="text-meta text-[#8f8f8f] mt-1">{subtitle ?? ui.reportDone}</p>
       </div>
 
       {report.error && <p className="text-body text-[#f87171]">⚠ {ui.reportError}</p>}
@@ -322,7 +318,13 @@ export const MacReportCard: React.FC<{ report: MacReport; children?: React.React
 
       {report.bottled && <BottledBlock bottled={report.bottled} />}
 
-      {appliedLeft && <p className="text-meta text-[#8f8f8f]">{ui.backupNote}</p>}
+      {/* Socle : le bouton d'action d'un bilan est centré sous le texte */}
+      {undoable.length > 1 && (
+        <div className="flex justify-center pt-1">
+          <button type="button" className={btn.secondary} disabled={busy !== null} onClick={() => undo('all')}>{busy === 'all' ? ui.undoing : `↩ ${ui.undoAll}`}</button>
+        </div>
+      )}
+      {appliedLeft && <p className="text-meta text-[#8f8f8f] text-center">{ui.backupNote}</p>}
       {children}
     </div>
   );

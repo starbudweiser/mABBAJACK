@@ -96,7 +96,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
   const isActive = !hasError && !isCompleted && progress.stage !== 'idle';
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#181818] p-5 gap-4">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-[#181818] p-5 gap-4">
 
       {/* ── Top card: status + actions ──────────────────────────────── */}
       <div className="bg-[#181818] border border-[#2e2e2e] rounded-xl p-4 flex flex-col gap-3 flex-shrink-0 shadow-md">
@@ -274,13 +274,13 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
 
       {/* ── Bilan Mac : après l'installation, ce que l'adaptation au Mac a fait (annulable) ───── */}
       {isCompleted && progress.mac && (
-        <div className="flex-shrink-0 max-h-[45vh] overflow-y-auto">
+        <div className="flex-shrink-0 w-full max-w-[720px] mx-auto">
           <MacReportCard report={progress.mac} />
         </div>
       )}
 
       {/* ── Terminal logs ──────────────────────────────────────────── */}
-      <div className="flex-1 bg-[#181818] border border-[#2e2e2e] rounded-xl overflow-hidden flex flex-col shadow-inner min-h-0">
+      <div className="flex-1 bg-[#181818] border border-[#2e2e2e] rounded-xl overflow-hidden flex flex-col shadow-inner min-h-[320px]">
 
         {/* Terminal toolbar */}
         <div className="h-9 px-3 bg-[#181818] border-b border-[#2e2e2e] flex items-center justify-between gap-3 flex-shrink-0">

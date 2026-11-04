@@ -168,8 +168,8 @@ export async function removeDllOverrides(
   if (dlls.length === 0) return;
   const ours = await readOurs(bottle);
   await applyRegPlan(bottle, { add: [], remove: dlls }, run);
-  await writeOurs(
-    bottle,
-    ours.filter((dll) => !dlls.includes(dll)),
-  );
+  const left = ours.filter((dll) => !dlls.includes(dll));
+  // plus rien à retirer plus tard : le fichier d'état n'a plus de raison d'être, la bouteille redevient comme avant
+  if (left.length === 0) await rm(path.join(bottle.path, STATE_FILE), { force: true });
+  else await writeOurs(bottle, left);
 }
