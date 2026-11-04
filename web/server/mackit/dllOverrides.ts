@@ -18,7 +18,13 @@ import { execFile } from "node:child_process";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import * as path from "node:path";
 
-import { type IBottle, type IBottleLaunch, readRegString, wineCommand } from "./bottlesCore";
+import {
+  type IBottle,
+  type IBottleLaunch,
+  readRegString,
+  wineCommand,
+  wineEnv,
+} from "./bottlesCore";
 
 /** DLL que Wine fournit lui-même et que des mods remplacent à la racine du jeu */
 export const PROXY_DLLS = [
@@ -97,7 +103,7 @@ const runWine: WineRunner = (command) =>
     execFile(
       command.executable,
       command.args,
-      { env: { ...process.env, ...command.env }, timeout: 120_000 },
+      { env: wineEnv(command.env), timeout: 120_000 },
       (err) => (err ? reject(err) : resolve()),
     ),
   );

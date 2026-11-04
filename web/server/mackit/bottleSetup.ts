@@ -21,7 +21,13 @@ import * as os from "node:os";
 import * as path from "node:path";
 
 import type { IBottleLaunch } from "./bottlesCore";
-import { addBottleRoot, crossoverBinDir, crossoverBottleDir, runInBottle } from "./bottlesCore";
+import {
+  addBottleRoot,
+  crossoverBinDir,
+  crossoverBottleDir,
+  runInBottle,
+  wineEnv,
+} from "./bottlesCore";
 
 export const SETUP_BOTTLE = "Skyrim-mORTEX";
 
@@ -163,7 +169,7 @@ export function openSteam(bottleDir: string = crossoverBottleDir()): void {
     throw new Error("The prepared bottle was not found");
   }
   spawn(command.executable, command.args, {
-    env: { ...process.env, ...command.env },
+    env: wineEnv(command.env),
     detached: true,
     stdio: "ignore",
   }).unref();
@@ -193,7 +199,7 @@ const defaultTools: ISetupTools = {
       execFile(
         command.executable,
         command.args,
-        { env: { ...process.env, ...command.env }, timeout: 10 * 60_000 },
+        { env: wineEnv(command.env), timeout: 10 * 60_000 },
         (err) => {
           // 3010 et 1641 : installé, un redémarrage de Windows est demandé (sans objet ici)
           const code = (err as { code?: unknown } | null)?.code;

@@ -342,6 +342,18 @@ export function runInBottle(
   }
 }
 
+/**
+ * Environnement d'un processus wine : celui de l'appli, plus `extra`. Python (3.7+) pose LC_CTYPE=C.UTF-8 dans
+ * son environnement quand la session n'a pas de langue (appli lancée du Finder) et les processus qu'il lance
+ * l'héritent ; wine en déduit « en-US » et réécrit la langue et les noms de polices de la bouteille (vérifié sur
+ * une vraie bouteille : fr-FR devenait en-US après un simple `regedit`). On retire cette valeur de secours.
+ */
+export function wineEnv(extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
+  const env = { ...process.env, ...extra };
+  if (env.LC_CTYPE === "C.UTF-8") delete env.LC_CTYPE;
+  return env;
+}
+
 /** Commande pour lancer un outil de Wine (`regedit`, `reg`…) dans la bouteille, en attendant sa fin. */
 export function wineCommand(bottle: IBottle, args: string[]): IBottleLaunch {
   switch (bottle.kind) {

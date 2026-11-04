@@ -20,7 +20,7 @@
  *  - forgetEntries(gamePath, entries)                 retire des entrées du manifeste (et le dossier s'il est vide)
  */
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, readFile, rm, rmdir, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rm, rmdir, stat, utimes, writeFile } from "node:fs/promises";
 import * as path from "node:path";
 
 import type { IBottle } from "./bottlesCore";
@@ -124,7 +124,11 @@ export async function backupAndWrite(
   if (before !== null) {
     backup = backupName(id, file);
     await mkdir(path.dirname(path.join(backupDir(gamePath), backup)), { recursive: true });
-    await copyFile(file, path.join(backupDir(gamePath), backup));
+    const copy = path.join(backupDir(gamePath), backup);
+    await copyFile(file, copy);
+    // la copie garde la date du fichier d'origine : l'annulation la rend telle quelle (état identique, dates comprises)
+    const info = await stat(file);
+    await utimes(copy, info.atime, info.mtime);
   }
   try {
     await write();
@@ -183,7 +187,10 @@ export async function restoreFileEntry(
     return undefined;
   }
   // writeFile et non rename : l'écriture traverse les liens (dossier de préparation)
-  await writeFile(entry.file, await readFile(path.join(backupDir(gamePath), entry.backup)));
+  const copy = path.join(backupDir(gamePath), entry.backup);
+  await writeFile(entry.file, await readFile(copy));
+  const info = await stat(copy);
+  await utimes(entry.file, info.atime, info.mtime);
   return undefined;
 }
 
