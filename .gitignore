@@ -33,4 +33,3 @@ dist/
 
 # Moteur Mac empaqueté (scripts/build-mackit.mjs)
 web/server/mackit/engine.mjs
-!/icons/
