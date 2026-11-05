@@ -1,6 +1,6 @@
 {
   "name": "mabbajack",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Portage macOS et installateur automatisé de modlists Wabbajack pour Skyrim",
   "author": "Starbudweiser",
   "type": "module",
