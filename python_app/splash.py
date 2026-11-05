@@ -1,7 +1,7 @@
 """Écran de lancement animé (règle Socle « Splash animé », modèle : splash de mORTEX).
 
 Fenêtre sans cadre, transparente, centrée, 500 × 190 px. Chronologie :
-  t = 0 splash visible → t = 2 s fenêtre principale → t = 4 s sortie animée (600 ms).
+  t = 0 splash visible → t = 2 s fenêtre principale → t = 3 s sortie animée (600 ms).
 Si la fenêtre principale n'est pas prête à 2 s, elle s'ouvre dès qu'elle l'est et le splash attend
 qu'elle soit affichée avant de sortir.
 """
@@ -16,7 +16,7 @@ from pathlib import Path
 
 WIDTH, HEIGHT = 500, 190  # tokens Socle size-splash-width / size-splash-height
 MAIN_AFTER_S = 2.0
-SHOWN_S = 4.0
+SHOWN_S = 3.0
 LEAVE_S = 0.65  # sortie animée de 600 ms + marge
 
 # Le splash s'affiche avant l'interface web (et son i18n) : petit dictionnaire local, mêmes clés
