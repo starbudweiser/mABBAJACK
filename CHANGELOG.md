@@ -2,6 +2,18 @@
 
 Notes de version / release notes (EN + FR). Translations in IT and ES: see the Nexus Mods page.
 
+## 2.0.0
+
+**English**
+
+- Rebuilt as a native Swift app (no more Python or PyInstaller): same engine and same interface, your Nexus key and settings are kept.
+- Version number aligned with the Skyrim Mac Toolkit (2.0.0).
+
+**Français**
+
+- Reconstruite en appli Swift native (plus de Python ni de PyInstaller) : même moteur et même interface, votre clé Nexus et vos réglages sont conservés.
+- Numéro de version aligné sur le Skyrim Mac Toolkit (2.0.0).
+
 ## 1.4.0
 
 **English**
