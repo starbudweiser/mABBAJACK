@@ -2,6 +2,8 @@
 
 # mABBAJACK
 
+🍏 **Native Mac app written in Swift, signed and notarized by Apple.** · *Appli Mac native écrite en Swift, signée et notarisée par Apple.*
+
 🇫🇷 [Français](#-français) · 🇬🇧 [English](#-english)
 
 💬 **Support & community:** [Discord](https://discord.gg/xdDVDPQsYs) · *Aide et communauté : [Discord](https://discord.gg/xdDVDPQsYs)*
