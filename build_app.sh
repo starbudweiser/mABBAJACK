@@ -1,11 +1,11 @@
 #!/bin/bash
 # Compile mABBAJACK.app : application macOS TOTALEMENT autonome (arm64).
-#   - fenêtre native (pywebview/WKWebView) : aucun navigateur
+#   - enveloppe Swift (AppKit + WKWebView, macos/) : fenêtre native, aucun navigateur
 #   - Node.js, 7zz, unar et texconv (textures transformées) embarqués : aucune installation requise sur la machine cible
 # Usage : ./build_app.sh        → produit ./mABBAJACK.app à la racine du projet
-# Prérequis de COMPILATION : python3, npm, Xcode, accès réseau. 7zz et unar sont compilés pour macOS 13+
+# Prérequis de COMPILATION : python3 (génération des traductions), npm, Xcode, accès réseau. 7zz et unar sont compilés pour macOS 13+
 # par scripts/build_portable_tools.sh (les binaires Homebrew ne tournent que sur la version de macOS de la machine).
-# Tous les fichiers temporaires (venv, cache, __pycache__) sont supprimés en fin de build ; dist/ est conservé (preview Vite).
+# Tous les fichiers temporaires (cache, payload) sont supprimés en fin de build ; dist/ est conservé (preview Vite).
 set -euo pipefail
 
 NODE_VERSION="${NODE_VERSION:-v24.21.0}"   # LTS
@@ -13,14 +13,13 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
 BUILD="$ROOT/.build-app"
-VENV="$BUILD/venv"
 CACHE="$BUILD/cache"
 PAYLOAD="$BUILD/payload"
 APP_NAME="mABBAJACK.app"
 
 cleanup() {
-  rm -rf "$BUILD" "$ROOT/python_app/__pycache__" 2>/dev/null \
-    || { sleep 2; rm -rf "$BUILD" "$ROOT/python_app/__pycache__" 2>/dev/null \
+  rm -rf "$BUILD" 2>/dev/null \
+    || { sleep 2; rm -rf "$BUILD" 2>/dev/null \
     || echo "⚠ Nettoyage incomplet : supprimer manuellement $BUILD"; }
 }
 trap cleanup EXIT
@@ -33,10 +32,6 @@ TEXCONV="$(cd "$ROOT/.." && pwd)/_tools/texconv/texconv-mac"   # recompilation :
 
 rm -rf "$BUILD" "$ROOT/$APP_NAME"
 mkdir -p "$CACHE" "$PAYLOAD/bin"
-
-echo "▶ Environnement Python de compilation"
-python3 -m venv "$VENV"
-"$VENV/bin/python" -m pip install --quiet --upgrade pywebview pyinstaller
 
 echo "▶ Icône"
 [ -f assets/icon.icns ] || { echo "assets/icon.icns introuvable"; exit 1; }
@@ -66,37 +61,49 @@ rm -f "$PAYLOAD"/server/mackit/*.ts "$PAYLOAD/server/macengine.ts"
 cp -R dist "$PAYLOAD/dist"
 ( cd "$PAYLOAD" && npm ci --omit=dev --ignore-scripts --no-audit --no-fund --silent )
 
-echo "▶ PyInstaller"
-# Lanceur PyInstaller compilé depuis les sources, contre les faux positifs antivirus (absent hors de ce dossier d'outils : lanceur standard).
-PYI_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/_tools/pyinstaller_source.sh"
-if [ -x "$PYI_SRC" ]; then "$PYI_SRC" "$VENV/bin/python"; fi
-"$VENV/bin/python" -m PyInstaller --noconfirm --clean --windowed \
-  --name mABBAJACK \
-  --icon "$ROOT/assets/icon.icns" \
-  --osx-bundle-identifier com.mabbajack.app \
-  --add-data "$ROOT/python_app/splash_assets:splash_assets" \
-  --distpath "$BUILD/dist" --workpath "$BUILD/work" --specpath "$BUILD" \
-  "$ROOT/python_app/mabbajack_app.py" >/dev/null
+echo "▶ Enveloppe Swift"
+python3 macos/gen_strings.py
+swift test --package-path macos -q 2>&1 | tail -3
+swift build --package-path macos -c release -q
+BIN="$(swift build --package-path macos -c release --show-bin-path)/mABBAJACK"
 
 APP="$BUILD/dist/$APP_NAME"
-mkdir -p "$APP/Contents/Resources"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+cp "$BIN" "$APP/Contents/MacOS/mABBAJACK"
+cp assets/icon.icns "$APP/Contents/Resources/icon.icns"
+cp macos/Resources/splash.html macos/Resources/splash-icon.png "$APP/Contents/Resources/"
 cp -R "$PAYLOAD" "$APP/Contents/Resources/payload"
 
 VERSION="$(node -p "require('$ROOT/web/package.json').version")"
 PLIST="$APP/Contents/Info.plist"
-/usr/libexec/PlistBuddy -c "Delete :LSMinimumSystemVersion" "$PLIST" 2>/dev/null || true
-/usr/libexec/PlistBuddy -c "Add :LSMinimumSystemVersion string 13.5" "$PLIST"   # Node 24 : macOS 13.5+
-/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST"
-/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $VERSION" "$PLIST"
+cat > "$PLIST" <<PL
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>CFBundleIdentifier</key><string>com.mabbajack.app</string>
+  <key>CFBundleName</key><string>mABBAJACK</string>
+  <key>CFBundleDisplayName</key><string>mABBAJACK</string>
+  <key>CFBundleExecutable</key><string>mABBAJACK</string>
+  <key>CFBundleIconFile</key><string>icon.icns</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+  <key>CFBundleShortVersionString</key><string>$VERSION</string>
+  <key>CFBundleVersion</key><string>$VERSION</string>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
+  <key>LSMinimumSystemVersion</key><string>14.0</string>
+  <key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
+  <key>NSHighResolutionCapable</key><true/>
+  <key>NSPrincipalClass</key><string>NSApplication</string>
+  <key>NSAppTransportSecurity</key><dict><key>NSAllowsLocalNetworking</key><true/></dict>
+</dict></plist>
+PL
 # Liens nxm:// (bouton « Mod Manager Download » de Nexus) : mABBAJACK les reçoit
-/usr/libexec/PlistBuddy -c "Delete :CFBundleURLTypes" "$PLIST" 2>/dev/null || true
 /usr/libexec/PlistBuddy -c "Add :CFBundleURLTypes array" \
   -c "Add :CFBundleURLTypes:0 dict" \
   -c "Add :CFBundleURLTypes:0:CFBundleURLName string com.mabbajack.nxm" \
   -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes array" \
   -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes:0 string nxm" "$PLIST"
 # Langues de l'appli : sans elles, macOS écrit en anglais les entrées qu'il ajoute aux menus (Dictée, Emoji…)
-/usr/libexec/PlistBuddy -c "Delete :CFBundleLocalizations" "$PLIST" 2>/dev/null || true
 /usr/libexec/PlistBuddy -c "Add :CFBundleLocalizations array" "$PLIST"
 for lang in fr en es it; do
   mkdir -p "$APP/Contents/Resources/$lang.lproj"
