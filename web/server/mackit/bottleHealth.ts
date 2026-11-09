@@ -7,7 +7,7 @@
  *  - parseMountType(mountOutput, mountPoint): string | undefined
  *  - setBottleEnv(conf, name, value): string                    cxbottle.conf modifié
  *
- * Contrôles : version de CrossOver (ou Whisky), moteur graphique, MSync, Rosetta 2, système de
+ * Contrôles : version de CrossOver, moteur graphique, MSync, Rosetta 2, système de
  * fichiers du jeu (APFS : liens et clones ; exFAT/FAT : pas de liens), place libre, overrides DLL
  * manquants pour les DLL de substitution du jeu. Le correctif des overrides est dans
  * dllOverrides.syncDllOverrides.
@@ -73,7 +73,7 @@ async function filesystemOf(p: string): Promise<string | undefined> {
 }
 
 async function runtimeVersion(bottle: IBottle): Promise<string> {
-  if (bottle.kind !== "crossover") return bottle.kind === "whisky" ? "Whisky" : "Wine";
+  if (bottle.kind !== "crossover") return "Wine";
   const plist = await readFile(CROSSOVER, "utf8").catch(() => "");
   const version = /<key>CFBundleShortVersionString<\/key>\s*<string>([^<]+)<\/string>/.exec(
     plist,

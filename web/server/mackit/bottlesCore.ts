@@ -1,11 +1,11 @@
 /**
- * Moteur Mac commun (mORTEX, mABBAJACK, mO2FLATTENER) : bouteilles Wine (CrossOver, Whisky, Wine brut).
+ * Moteur Mac commun (mORTEX, mABBAJACK, mO2FLATTENER) : bouteilles Wine (CrossOver, Wine brut).
  * Source unique : _tools/shared/mackit/src, recopiée par _tools/sync_shared.sh. Pur : ne dépend ni de
  * l'interface, ni du journal, ni du dossier de données de l'appli (voir configureBottles).
  *
  * Interface :
  *  - configureBottles({ statePath?, log? })         injecte le fichier d'état et le journal (muet par défaut)
- *  - listBottles(): IBottle[]                       énumération (CrossOver, Whisky, $WINEPREFIX, ~/.wine, roots de bottles.json)
+ *  - listBottles(): IBottle[]                       énumération (CrossOver, $WINEPREFIX, ~/.wine, roots de bottles.json)
  *  - bottleForPath(p): IBottle | undefined          bouteille contenant un chemin hôte
  *  - winPathToHost(bottle, "C:\\x") / hostToWinPath un chemin Windows <-> hôte
  *  - readRegString(bottle, hive, key, value)        lit system.reg / user.reg
@@ -26,7 +26,7 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 
-export type BottleKind = "crossover" | "whisky" | "wine";
+export type BottleKind = "crossover" | "wine";
 
 export interface IBottle {
   path: string;
@@ -59,7 +59,6 @@ export interface IBottlesConfig {
 }
 
 const CX_APPS = ["/Applications/CrossOver.app", "/Applications/CrossOver Preview.app"];
-const WHISKY_ID = "com.isaacmarovitz.Whisky";
 
 let stateFile: () => string = () =>
   path.join(os.homedir(), "Library/Application Support/mackit/bottles.json");
@@ -158,28 +157,6 @@ export function addBottleRoot(dir: string): void {
   if (!roots.includes(dir)) writeState({ roots: [...roots, dir] });
 }
 
-function whiskyRoots(): string[] {
-  const base = path.join(os.homedir(), "Library/Containers", WHISKY_ID);
-  const roots = [path.join(base, "Bottles")];
-  const plist = path.join(base, "Data/Library/Application Support", WHISKY_ID, "BottleVM.plist");
-  const json = fs.existsSync(plist) ? run("plutil", ["-convert", "json", "-o", "-", plist]) : "";
-  if (json) {
-    // emplacements personnalisés : toute chaîne qui est un dossier existant
-    const walk = (v: unknown) => {
-      if (typeof v === "string") {
-        if (v.startsWith("/") && isDir(v)) roots.push(v);
-      } else if (Array.isArray(v)) v.forEach(walk);
-      else if (v && typeof v === "object") Object.values(v).forEach(walk);
-    };
-    try {
-      walk(JSON.parse(json));
-    } catch {
-      /* plist illisible */
-    }
-  }
-  return roots;
-}
-
 function pickUser(bottle: string): string {
   const usersDir = path.join(bottle, "drive_c/users");
   let users: string[] = [];
@@ -194,7 +171,6 @@ function pickUser(bottle: string): string {
 }
 
 function kindOf(bottle: string): BottleKind {
-  if (bottle.includes(`/Containers/${WHISKY_ID}/`)) return "whisky";
   if (fs.existsSync(path.join(bottle, "cxbottle.conf"))) return "crossover";
   return "wine";
 }
@@ -226,7 +202,6 @@ export function listBottles(): IBottle[] {
   [
     ...(state.roots ?? []),
     ...crossoverRoots(),
-    ...whiskyRoots(),
     ...(process.env.WINEPREFIX ? [process.env.WINEPREFIX] : []),
     path.join(os.homedir(), ".wine"),
   ].forEach(scanRoot);
@@ -322,17 +297,6 @@ export function runInBottle(
         args: ["--bottle", bottle.name, ...(cwd ? ["--workdir", cwd] : []), exe, ...args],
         env: { CX_BOTTLE_PATH: path.dirname(bottle.path) },
       };
-    case "whisky":
-      return {
-        executable: path.join(
-          os.homedir(),
-          "Library/Application Support",
-          WHISKY_ID,
-          "Libraries/Wine/bin/wine64",
-        ),
-        args: ["start", "/unix", exe, ...args],
-        env: { WINEPREFIX: bottle.path },
-      };
     default:
       return {
         executable: "wine64",
@@ -362,17 +326,6 @@ export function wineCommand(bottle: IBottle, args: string[]): IBottleLaunch {
         executable: path.join(cxBin(bottle), "wine"),
         args: ["--bottle", bottle.name, ...args],
         env: { CX_BOTTLE_PATH: path.dirname(bottle.path) },
-      };
-    case "whisky":
-      return {
-        executable: path.join(
-          os.homedir(),
-          "Library/Application Support",
-          WHISKY_ID,
-          "Libraries/Wine/bin/wine64",
-        ),
-        args,
-        env: { WINEPREFIX: bottle.path },
       };
     default:
       return { executable: "wine64", args, env: { WINEPREFIX: bottle.path } };
