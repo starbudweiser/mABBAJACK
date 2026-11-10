@@ -2,13 +2,11 @@
 
 # mABBAJACK
 
-[![Listed on OpenMacApps](https://openmacapps.com/badge.svg)](https://openmacapps.com/apps/mabbajack/)
+[![Listed on OpenMacApps](https://openmacapps.com/badge.svg)](https://openmacapps.com/apps/mabbajack/) [![Latest release](https://img.shields.io/github/v/release/starbudweiser/mABBAJACK)](https://github.com/starbudweiser/mABBAJACK/releases/latest) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-🍏 **Native Mac app written in Swift, signed and notarized by Apple.** · *Appli Mac native écrite en Swift, signée et notarisée par Apple.*
+**Native Wabbajack modlist installer for macOS — no Windows virtual machine.**
 
-🇫🇷 [Français](#-français) · 🇬🇧 [English](#-english)
-
-💬 **Support & community:** [Discord](https://discord.gg/xdDVDPQsYs) · *Aide et communauté : [Discord](https://discord.gg/xdDVDPQsYs)*
+🇬🇧 English · 🇫🇷 [Français](#français)
 
 ## About
 
@@ -17,9 +15,88 @@ Authors: **Starbudweiser & Claude Code (Anthropic)**. MIT License, © 2026 Starb
 Provided as is, without warranty. Inspired by Wabbajack, not affiliated with its authors.
 In the app: **mABBAJACK › About mABBAJACK**.
 
+🍏 **Native Mac app written in Swift, signed and notarized by Apple.**
+
+**mABBAJACK** is a native **macOS** installer for **Wabbajack** modlists. It installs mod lists (Skyrim SE/AE/VR, Enderal and many other games) directly on a Mac, with no Windows virtual machine.
+
+### Why?
+
+Wabbajack only runs on Windows. Mac users had to rely on a heavy, slow VM. mABBAJACK provides a native, simple, VM-free install producing files ready to use (e.g. through CrossOver).
+
+## Features
+
+- Gallery of official modlists (≈ 226) with game filters (SE, AE, VR, Enderal, "Other games"), tags, search and sorting (size, name, date).
+- `.wabbajack` file inspector (drag & drop).
+- Full install: extraction (7zz / unar, native BSA reader), OctoDiff patches, transformed textures converted with texconv (native DirectXTex), native BSA writer, original game files copied without decompression.
+- Updating an installed list: when a new version is loaded, mods added / removed / changed and archives to download are listed; only new or changed files are reinstalled, removed files are deleted (installation state saved in `.mabbajack/`).
+- Automatic Nexus downloads (**Premium** account); with a free account, Nexus's **Mod Manager Download** button sends the file straight to mABBAJACK (`nxm://` links). Wabbajack CDN, Google Drive, MediaFire, ModDB and Mega sources are supported.
+- Nexus API key stored in the **macOS Keychain**.
+- zEdit merges (`MergedPatch`) are created.
+- Vortex-style download layout (`<folder>/skyrimse`).
+- Automatic game detection (Steam, CrossOver, `/Volumes/*/GAMES`).
+- Live log (All / Warnings / Errors filters); logs saved in `~/Library/Logs/mABBAJACK/`.
+- Mac adaptation (DXMT, ENB, DLSS), announced before the installation and undoable afterwards: a "Mac adaptation" card lists every fix, a "Mac report" card says what was applied, failed or skipped, with an Undo button (original files are kept in `_MAC_BACKUP`). Bottled Shaders (1.0.26 or later) is downloaded with your Nexus key.
+- 4 UI languages: French, English, Spanish, Italian.
+- Standalone app: native window, bundled Node, 7zz, unar and texconv.
+
+![Galerie](docs/screenshots/gallery.png)
+
+### What's new in 1.1.0
+
+- Nexus API key stored in the macOS Keychain (an existing key is moved automatically).
+- Free accounts: `nxm://` links (Mod Manager Download). The manual download window warns you if another app (Vortex, mORTEX…) receives Nexus links.
+- zEdit merges (`MergedPatch`) are now created; they used to be skipped without a message.
+- Fix: MediaFire and ModDB downloaded the web page instead of the file. New: Mega.
+- New-version notice (GitHub, once a day). History: [CHANGELOG.md](CHANGELOG.md).
+
+### Limitations
+
+- Not affiliated with Wabbajack. A legitimate copy of the game is required.
+- Recreated BSAs (`CreateBSA`) are uncompressed.
+- Skyrim SE cannot read files stored past 2 GB inside a BSA: in a larger recreated BSA, those files are installed as loose files next to the archive (they override BSAs).
+- Large modlists (40–65 GB each).
+- Stock Game masters may differ from the manifest (kept with a warning).
+
+## Install
+
+**[Download the latest notarized release](https://github.com/starbudweiser/mABBAJACK/releases/latest)** · requires **macOS 14 Sonoma** or later on Apple Silicon.
+
+### Quick start
+
+1. Open `mABBAJACK.app`.
+2. **Settings**: enter your Nexus API key and pick the *DOWNLOADS* and *READY TO PLAY* folders.
+3. Pick a modlist in the **gallery** (or drop a `.wabbajack` file).
+4. **Install** tab: check the 3 folders and the game folder (auto-detected).
+5. Start the install and follow the **log** in the console.
+6. Free account: manually download the listed archives into DOWNLOADS, then restart.
+
+![Console](docs/screenshots/console.png)
+
+## Build
+
+Requires the Swift toolchain (Xcode or Command Line Tools). From the repository folder, run the build script (`./build_app.sh`); it builds, signs and bundles `mABBAJACK.app`.
+
+## Languages
+
+English, French, Spanish and Italian. The app follows your Mac's preferred language automatically (English if it is none of these four).
+
+## Support
+
+💬 Help and community: [Skyrim Mac Toolkit Discord](https://discord.gg/jRS4rvynx6) · bug reports: [GitHub Issues](https://github.com/starbudweiser/mABBAJACK/issues).
+
+## License
+
+Released under the **MIT License**, © 2026 Starbudweiser. See [LICENSE](LICENSE). Not affiliated with Wabbajack.
+
 ---
 
-## 🇫🇷 Français
+## Français
+
+**Installateur natif de modlists Wabbajack pour macOS, sans machine virtuelle Windows.**
+
+🍏 *Appli Mac native écrite en Swift, signée et notarisée par Apple.*
+
+💬 Aide et communauté : [Discord du Skyrim Mac Toolkit](https://discord.gg/jRS4rvynx6)
 
 ### Présentation
 **mABBAJACK** est un installateur de modlists **Wabbajack** natif pour **macOS**. Il permet d'installer des listes de mods (Skyrim SE/AE/VR, Enderal et de nombreux autres jeux) directement sur un Mac, sans machine virtuelle Windows.
@@ -68,53 +145,3 @@ Wabbajack est uniquement disponible sous Windows. Les utilisateurs de Mac devaie
 - Skyrim SE ne lit pas les fichiers rangés au-delà de 2 Go dans un BSA : ceux d'un BSA recréé plus gros sont installés en fichiers libres à côté de l'archive (prioritaires sur les BSA).
 - Modlists volumineuses (40 à 65 Go chacune).
 - Les masters du Stock Game peuvent différer du manifeste (conservés avec avertissement).
-
----
-
-## 🇬🇧 English
-
-### Overview
-**mABBAJACK** is a native **macOS** installer for **Wabbajack** modlists. It installs mod lists (Skyrim SE/AE/VR, Enderal and many other games) directly on a Mac, with no Windows virtual machine.
-
-Features:
-- Gallery of official modlists (≈ 226) with game filters (SE, AE, VR, Enderal, "Other games"), tags, search and sorting (size, name, date).
-- `.wabbajack` file inspector (drag & drop).
-- Full install: extraction (7zz / unar, native BSA reader), OctoDiff patches, transformed textures converted with texconv (native DirectXTex), native BSA writer, original game files copied without decompression.
-- Updating an installed list: when a new version is loaded, mods added / removed / changed and archives to download are listed; only new or changed files are reinstalled, removed files are deleted (installation state saved in `.mabbajack/`).
-- Automatic Nexus downloads (**Premium** account); with a free account, Nexus's **Mod Manager Download** button sends the file straight to mABBAJACK (`nxm://` links). Wabbajack CDN, Google Drive, MediaFire, ModDB and Mega sources are supported.
-- Nexus API key stored in the **macOS Keychain**.
-- zEdit merges (`MergedPatch`) are created.
-- Vortex-style download layout (`<folder>/skyrimse`).
-- Automatic game detection (Steam, CrossOver, `/Volumes/*/GAMES`).
-- Live log (All / Warnings / Errors filters); logs saved in `~/Library/Logs/mABBAJACK/`.
-- Mac adaptation (DXMT, ENB, DLSS), announced before the installation and undoable afterwards: a "Mac adaptation" card lists every fix, a "Mac report" card says what was applied, failed or skipped, with an Undo button (original files are kept in `_MAC_BACKUP`). Bottled Shaders (1.0.26 or later) is downloaded with your Nexus key.
-- 4 UI languages: French, English, Spanish, Italian.
-- Standalone app: native window, bundled Node, 7zz, unar and texconv.
-
-### What's new in 1.1.0
-
-- Nexus API key stored in the macOS Keychain (an existing key is moved automatically).
-- Free accounts: `nxm://` links (Mod Manager Download). The manual download window warns you if another app (Vortex, mORTEX…) receives Nexus links.
-- zEdit merges (`MergedPatch`) are now created; they used to be skipped without a message.
-- Fix: MediaFire and ModDB downloaded the web page instead of the file. New: Mega.
-- New-version notice (GitHub, once a day). History: [CHANGELOG.md](CHANGELOG.md).
-
-### Why?
-Wabbajack only runs on Windows. Mac users had to rely on a heavy, slow VM. mABBAJACK provides a native, simple, VM-free install producing files ready to use (e.g. through CrossOver).
-
-### Quick start
-1. Open `mABBAJACK.app`.
-2. **Settings**: enter your Nexus API key and pick the *DOWNLOADS* and *READY TO PLAY* folders.
-3. Pick a modlist in the **gallery** (or drop a `.wabbajack` file).
-4. **Install** tab: check the 3 folders and the game folder (auto-detected).
-5. Start the install and follow the **log** in the console.
-6. Free account: manually download the listed archives into DOWNLOADS, then restart.
-
-![Console](docs/screenshots/console.png)
-
-### Limitations
-- Not affiliated with Wabbajack. A legitimate copy of the game is required.
-- Recreated BSAs (`CreateBSA`) are uncompressed.
-- Skyrim SE cannot read files stored past 2 GB inside a BSA: in a larger recreated BSA, those files are installed as loose files next to the archive (they override BSAs).
-- Large modlists (40–65 GB each).
-- Stock Game masters may differ from the manifest (kept with a warning).
