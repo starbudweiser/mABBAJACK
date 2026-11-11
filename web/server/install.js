@@ -22,6 +22,7 @@ import { getNexusDownloadUrl, nexusFetch } from './nexus.js';
 import { makeDirResilient, testWriteAccess, find7z, findUnar, findTexconvBin } from './tools.js';
 import { prepareUpdate, processDirectives } from './directives.js';
 import { finishMac, macModeOf, macSupported } from './mac.js';
+import { cleanMacMetadataIfNeeded } from './macjunk.js';
 import { resolveMediaFire, resolveModDB, downloadFromMirrors, downloadMega } from './mirrors.js';
 
 const DOWNLOAD_CONCURRENCY = 3; // archives téléchargées en même temps
@@ -1141,6 +1142,10 @@ export async function startInstall(req, res) {
         else if (macReport.noBottle) broadcastLog('warn', '⚠ Adaptation au Mac : aucune bouteille CrossOver trouvée, rien n\'a été modifié.');
         else broadcastLog(counts('failed') ? 'warn' : 'success', `✓ Adaptation au Mac : ${counts('applied')} correctif(s) appliqué(s), ${counts('failed')} échoué(s), ${counts('skipped')} ignoré(s).`);
       }
+
+      // ── Disque exFAT ou FAT : retrait des fichiers « ._ » de macOS (SKSE les chargerait comme plugins) ──
+      const macJunk = cleanMacMetadataIfNeeded(cleanDest);
+      if (macJunk) broadcastLog('info', `🧹 Disque sans attributs macOS : ${macJunk} fichier(s) « ._ » retiré(s) de l'installation.`);
 
       // ── TERMINÉ ────────────────────────────────────────────────────
       broadcastProgress({ stage: 'completed', stageName: 'Déploiement terminé !', mac: macReport, overallPercent: 100, stagePercent: 100, processedItems: directives.length, totalItems: directives.length, currentTask: `✅ "${modlist.name}" prêt dans "${cleanDest}"`, speedBytesPerSec: 0, etaSeconds: 0, hasError: false, errorMessage: null });

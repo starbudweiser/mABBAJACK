@@ -2,6 +2,16 @@
 
 Notes de version / release notes (EN + FR). Translations in IT and ES: see the Nexus Mods page.
 
+## 2.0.1
+
+**English**
+
+- Installing to a drive formatted exFAT or FAT: at the end of the install, mABBAJACK removes the hidden "._" files macOS creates there. SKSE tried to load them as plugins ("._EngineFixes.dll") and Skyrim crashed. Nothing changes on APFS drives.
+
+**Français**
+
+- Installation sur un disque formaté en exFAT ou FAT : en fin d'installation, mABBAJACK retire les fichiers cachés « ._ » que macOS y crée. SKSE essayait de les charger comme plugins (« ._EngineFixes.dll ») et Skyrim plantait. Rien ne change sur un disque APFS.
+
 ## 2.0.0
 
 **English**

@@ -18,6 +18,7 @@ type Entry = [fr: string, en: string, es: string, it: string];
 
 const ENTRIES: Entry[] = [
   // ── Adaptation au Mac (moteur commun mackit) ──
+  ['🧹 Disque sans attributs macOS : {0} fichier(s) « ._ » retiré(s) de l\'installation.', '🧹 Disk without macOS attributes: {0} "._" file(s) removed from the installation.', '🧹 Disco sin atributos de macOS: {0} archivo(s) «._» quitado(s) de la instalación.', '🧹 Disco senza attributi macOS: {0} file «._» rimosso/i dall\'installazione.'],
   ['🍎 Adaptation au Mac…', '🍎 Adapting for Mac…', '🍎 Adaptando al Mac…', '🍎 Adattamento al Mac…'],
   ['⚠ Adaptation au Mac impossible : {0}', '⚠ Mac adaptation failed: {0}', '⚠ Adaptación al Mac imposible: {0}', '⚠ Adattamento al Mac impossibile: {0}'],
   ['⚠ Adaptation au Mac : aucun dossier de jeu à adapter.', '⚠ Mac adaptation: no game folder to adapt.', '⚠ Adaptación al Mac: ninguna carpeta de juego que adaptar.', '⚠ Adattamento al Mac: nessuna cartella di gioco da adattare.'],
