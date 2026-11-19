@@ -228,5 +228,15 @@
   "Unable to launch the server: {m}",
   "Impossibile avviare il server: {m}",
   "No se puede iniciar el servidor: {m}"
+ ],
+ "{n} octet": [
+  "{n} byte",
+  "{n} byte",
+  "{n} byte"
+ ],
+ "{n} octets": [
+  "{n} bytes",
+  "{n} byte",
+  "{n} bytes"
  ]
 }

@@ -47,4 +47,6 @@ let translations: [String: [String]] = [
     "Le serveur ne répond pas après 30 s.": ["The server does not respond after 30 s.", "Il server non risponde dopo 30 s.", "El servidor no responde tras 30 s."],
     "Aucun port local disponible.": ["No local port available.", "Nessuna porta locale disponibile.", "Ningún puerto local disponible."],
     "Impossible de lancer le serveur : {m}": ["Unable to launch the server: {m}", "Impossibile avviare il server: {m}", "No se puede iniciar el servidor: {m}"],
+    "{n} octet": ["{n} byte", "{n} byte", "{n} byte"],
+    "{n} octets": ["{n} bytes", "{n} byte", "{n} bytes"],
 ]
