@@ -2,6 +2,16 @@
 
 Notes de version / release notes (EN + FR). Translations in IT and ES: see the Nexus Mods page.
 
+## 2.0.2
+
+**English**
+
+- Nexus API key: spaces, line breaks and quotes picked up when pasting are removed before the key is checked and saved. When Nexus refuses, mABBAJACK now says why: rejected key (with the HTTP code), request limit reached, or a Nexus-side error, instead of always "Invalid or expired API key".
+
+**Français**
+
+- Clé API Nexus : les espaces, retours à la ligne et guillemets ramassés au collage sont retirés avant la vérification et l'enregistrement. Quand Nexus refuse, mABBAJACK dit pourquoi : clé refusée (avec le code HTTP), limite de requêtes atteinte ou incident côté Nexus, au lieu de toujours « Clé invalide ou expirée ».
+
 ## 2.0.1
 
 **English**
