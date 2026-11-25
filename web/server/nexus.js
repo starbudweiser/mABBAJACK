@@ -49,7 +49,16 @@ export async function isNexusPremium(apiKey) {
   return nexusPremiumCache.get(apiKey);
 }
 
+// Nom de jeu Wabbajack → domaine de l'API Nexus. Les « Modding Tools » de Nexus ont pour domaine « site »
+// (www.nexusmods.com/site/mods/…) : /v1/games/moddingtools/… répond 404.
+const NEXUS_DOMAINS = { moddingtools: 'site' };
+export const nexusDomain = (gameName) => {
+  const g = String(gameName || '').toLowerCase();
+  return NEXUS_DOMAINS[g] || g;
+};
+
 export async function getNexusDownloadUrl(gameName, modId, fileId, apiKey) {
+  gameName = nexusDomain(gameName);
   if (!apiKey || !modId || !fileId) return { url: null, requiresManual: true };
   try {
     if (!(await isNexusPremium(apiKey))) {

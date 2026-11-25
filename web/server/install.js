@@ -18,7 +18,7 @@ import { isTempPath, locateWabbajack } from './locate.js';
 import { resolveDirectivePath, detectGameRootFolders, setGameRootFolders, getGameRootFolders, KNOWN_GAME_ROOT_NAMES } from './paths.js';
 import { installDirName, writeSnapshot, removeFiles } from './update.js';
 import { getExpectedSkyrimVersion, isGameFileArchive, isIgnorableGameFile, gameFileRel, GAME_EXES, isGameRoot, gameSearchDirs, expectedGameFilePath } from './gamefiles.js';
-import { getNexusDownloadUrl, nexusFetch } from './nexus.js';
+import { getNexusDownloadUrl, nexusDomain, nexusFetch } from './nexus.js';
 import { makeDirResilient, testWriteAccess, find7z, findUnar, findTexconvBin } from './tools.js';
 import { prepareUpdate, processDirectives } from './directives.js';
 import { finishMac, macModeOf, macSupported } from './mac.js';
@@ -233,12 +233,15 @@ export async function startInstall(req, res) {
       // ── Fichiers ORIGINAUX du jeu (GameFileSource) : identifiés EN PREMIER ──
       // Ils ne sont jamais téléchargés ni décompressés : lus dans le dossier du jeu.
       const fileSizeOf = (p) => { try { return fs.statSync(p).size; } catch { return -1; } };
-      // Un seul dossier du jeu, choisi parce que ses fichiers ont la taille attendue par le
+      // Un dossier du jeu principal, choisi parce que ses fichiers ont la taille attendue par le
       // manifeste : les patchs s'appliquent sur ces fichiers, une autre version donnerait des
-      // fichiers faux. Un fichier qui ne correspond pas n'est jamais déployé.
+      // fichiers faux. Un fichier absent de ce dossier est cherché dans les autres dossiers candidats
+      // (celui de l'utilisateur d'abord), toujours à la taille attendue. Un fichier qui ne correspond
+      // pas n'est jamais déployé.
       const resolveGameFiles = (list) => {
         const games = list.filter((a) => isGameFileArchive(a) && !isIgnorableGameFile(a));
         let chosenRoot = null;
+        let otherRoots = [];
         if (games.length > 0) {
           const gameName = games[0]?.State?.Game;
           const exes = GAME_EXES[String(gameName || '').toLowerCase()] || GAME_EXES.skyrimspecialedition;
@@ -265,6 +268,9 @@ export async function startInstall(req, res) {
             const ties = ranking.filter((r) => r.matched === best.matched && r.root !== best.root);
             if (ties.length > 0) broadcastLog('info', `  ℹ Autre(s) dossier(s) du jeu équivalent(s) : ${ties.map((r) => r.root).join(', ')}`);
           }
+          // Dossiers de secours, dans l'ordre : celui de l'utilisateur, puis le classement
+          otherRoots = ranking.map((r) => r.root).filter((r) => r !== chosenRoot && ranking.find((x) => x.root === r).matched > 0);
+          if (userRoot) otherRoots.sort((a, b) => Number(b === userRoot || b.startsWith(`${userRoot}/`)) - Number(a === userRoot || a.startsWith(`${userRoot}/`)));
           if (ranking.length > 0) debugLog(`Dossiers du jeu (version ${ver}) : ${ranking.map((r) => `${r.root} = ${r.matched}/${games.length}`).join(' · ')}`);
         }
         const downloads = fs.existsSync(cleanDownloads) ? cleanDownloads : null;
@@ -273,6 +279,7 @@ export async function startInstall(req, res) {
           if (!isGameFileArchive(a)) return a;
           if (a.status === 'ready' && a.localPath && (!a.Size || fileSizeOf(a.localPath) === a.Size)) return { ...a, sourceKind: 'game' };
           let p = chosenRoot ? matchInRoot(chosenRoot, a) : null;
+          for (const r of otherRoots) { if (p) break; p = matchInRoot(r, a); }
           if (!p && downloads) {
             p = [a.Name, path.basename(gameFileRel(a))].filter(Boolean).map((n) => path.join(downloads, n))
               .find((c) => { const sz = fileSizeOf(c); return sz > 0 && (!a.Size || sz === a.Size); }) || null;
@@ -443,8 +450,8 @@ export async function startInstall(req, res) {
             if (modId && fileId) {
               const r = await getNexusDownloadUrl(state.GameName, modId, fileId, nexusApiKey);
               if (r.url) { url = r.url; }
-              else { requiresManual = true; manualUrl = r.manualUrl; if (!r.isPremium) broadcastLog('warn', `  → Nexus Standard : téléchargement manuel requis`); }
-            } else { requiresManual = true; manualUrl = `https://www.nexusmods.com/${state.GameName || 'skyrimspecialedition'}/mods/${modId}`; }
+              else { requiresManual = true; manualUrl = r.manualUrl || `https://www.nexusmods.com/${nexusDomain(state.GameName)}/mods/${modId}?tab=files&file_id=${fileId}`; if (r.error) broadcastLog('warn', `  → Nexus : lien de téléchargement refusé (${r.error}) — téléchargement manuel requis`); else if (r.isPremium === false) broadcastLog('warn', `  → Nexus Standard : téléchargement manuel requis`); }
+            } else { requiresManual = true; manualUrl = `https://www.nexusmods.com/${nexusDomain(state.GameName) || 'skyrimspecialedition'}/mods/${modId}`; }
           } else { requiresManual = true; }
 
           if (requiresManual) {
