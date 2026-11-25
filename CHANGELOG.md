@@ -2,6 +2,18 @@
 
 Notes de version / release notes (EN + FR). Translations in IT and ES: see the Nexus Mods page.
 
+## 2.0.3
+
+**English**
+
+- Original game files: when a file is missing from the main game folder, mABBAJACK now also looks in the other game folders it found, starting with the one you chose (always at the expected size). Files that were present and correct were sometimes reported as missing.
+- Nexus "Modding Tools" mods (such as LOOT Warning Checker) download automatically again with a Premium account. They were asked for at the wrong address and the log wrongly said "Nexus Standard".
+
+**Français**
+
+- Fichiers originaux du jeu : quand un fichier manque dans le dossier du jeu principal, mABBAJACK le cherche aussi dans les autres dossiers du jeu trouvés, en commençant par celui que vous avez choisi (toujours à la taille attendue). Des fichiers présents et conformes étaient parfois déclarés manquants.
+- Les mods de la section « Modding Tools » de Nexus (comme LOOT Warning Checker) se téléchargent de nouveau automatiquement avec un compte Premium. Ils étaient demandés à la mauvaise adresse et le journal affichait à tort « Nexus Standard ».
+
 ## 2.0.2
 
 **English**
