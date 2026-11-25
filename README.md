@@ -23,6 +23,12 @@ In the app: **mABBAJACK › About mABBAJACK**.
 
 Wabbajack only runs on Windows. Mac users had to rely on a heavy, slow VM. mABBAJACK provides a native, simple, VM-free install producing files ready to use (e.g. through CrossOver).
 
+## Demo
+
+Installing the Legends of the Frost modlist on a Mac, then launching it in CrossOver (63 s).
+
+https://github.com/user-attachments/assets/4e47487f-c097-4696-8624-56e5d77f7179
+
 ## Features
 
 - Gallery of official modlists (≈ 226) with game filters (SE, AE, VR, Enderal, "Other games"), tags, search and sorting (size, name, date).
@@ -91,6 +97,12 @@ Released under the **MIT License**, © 2026 Starbudweiser. See [LICENSE](LICENSE
 ---
 
 ## Français
+
+### Démo
+
+Installation de la liste Legends of the Frost sur un Mac, puis lancement dans CrossOver (63 s).
+
+https://github.com/user-attachments/assets/4e47487f-c097-4696-8624-56e5d77f7179
 
 **Installateur natif de modlists Wabbajack pour macOS, sans machine virtuelle Windows.**
 
