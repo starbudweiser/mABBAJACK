@@ -171,6 +171,9 @@ export interface NexusAccount {
   valid: boolean;
   /** Nexus injoignable : clé non vérifiée (ni valide ni invalide) */
   offline?: boolean;
+  /** Refus : code HTTP de Nexus et cause (clé refusée, limite atteinte, incident Nexus) */
+  status?: number;
+  reason?: 'invalid' | 'rateLimited' | 'nexusError';
   name?: string;
   isPremium?: boolean;
   dailyLimit?: number;

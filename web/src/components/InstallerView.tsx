@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useI18n } from '../locales';
 import { fmtBytes } from '../locales/uiScreens';
-import { INSTALLER_UI } from '../locales/uiExtra';
+import { INSTALLER_UI, keyRefusalMessage } from '../locales/uiExtra';
 import { ParsedWabbajackFile, NexusAccount, InstallOptions, UpdateRequest } from '../types/wabbajack';
 import OptionalModsCard from './OptionalModsCard';
 import UpdateCard from './UpdateCard';
@@ -138,7 +138,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
       setNexusApiKey(apiKeyInput.trim());
       setKeyMsg(acc.valid
         ? `✓ ${acc.name} — ${acc.isPremium ? ui.premiumAuto : ui.standardManual}`
-        : acc.offline ? ui.keyOffline : ui.keyInvalid);
+        : keyRefusalMessage(ui, acc, ui.keyInvalid));
     } catch { setKeyMsg(ui.keyError); }
     finally { setIsVerifyingKey(false); }
   };

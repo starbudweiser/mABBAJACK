@@ -773,7 +773,7 @@ app.post('/api/downloads/trash', async (req, res) => {
 // Clé Nexus : rangée dans le trousseau macOS (l'interface ne la garde plus dans son stockage local).
 app.get('/api/nexus/key', async (_req, res) => res.json({ key: await readKey() }));
 app.put('/api/nexus/key', async (req, res) => {
-  const key = String(req.body?.key || '').trim();
+  const key = String(req.body?.key || '').replace(/\s+/g, '').replace(/^["'`]+|["'`]+$/g, '');
   try { await (key ? saveKey(key) : deleteKey()); res.json({ ok: true }); }
   catch (err) { res.status(400).json({ ok: false, error: String(err.message || err) }); }
 });
@@ -794,16 +794,20 @@ app.post('/api/nexus/nxm-handler', async (_req, res) => res.json(await claimNxmH
 app.put('/api/nexus/nxm-target', (req, res) => { setNxmTarget(String(req.body?.downloadsPath || '')); res.json({ ok: true }); });
 
 app.post('/api/nexus/check-key', async (req, res) => {
-  const { key } = req.body;
-  if (!key?.trim()) return res.status(400).json({ valid: false, error: 'Clé absente' });
+  // Clé collée : espaces, retours à la ligne et guillemets retirés (copie depuis une page ou un courriel)
+  const key = String(req.body?.key || '').replace(/\s+/g, '').replace(/^["'`]+|["'`]+$/g, '');
+  if (!key) return res.status(400).json({ valid: false, error: 'Clé absente' });
   try {
     const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 8000);
     const r = await fetch('https://api.nexusmods.com/v1/users/validate.json', {
-      headers: { apikey: key.trim(), ...NEXUS_APP_HEADERS }, signal: ctrl.signal,
+      headers: { apikey: key, ...NEXUS_APP_HEADERS }, signal: ctrl.signal,
     });
     clearTimeout(t);
-    if (r.ok) { const d = await r.json(); nexusPremiumCache.set(key.trim(), Boolean(d.is_premium)); return res.json({ valid: true, name: d.name, isPremium: Boolean(d.is_premium), dailyLimit: d.daily_limit, dailyRemaining: d.daily_remaining, hourlyLimit: d.hourly_limit, hourlyRemaining: d.hourly_remaining }); }
-    res.json({ valid: false, error: `HTTP ${r.status}` });
+    if (r.ok) { const d = await r.json(); nexusPremiumCache.set(key, Boolean(d.is_premium)); return res.json({ valid: true, name: d.name, isPremium: Boolean(d.is_premium), dailyLimit: d.daily_limit, dailyRemaining: d.daily_remaining, hourlyLimit: d.hourly_limit, hourlyRemaining: d.hourly_remaining }); }
+    // 401/403 : clé refusée ; 429 : limite de requêtes atteinte ; autre : incident côté Nexus (la clé n'est pas en cause)
+    const reason = r.status === 401 || r.status === 403 ? 'invalid' : r.status === 429 ? 'rateLimited' : 'nexusError';
+    broadcastLog('warn', `⚠ Vérification de la clé Nexus : HTTP ${r.status} (${reason})`);
+    res.json({ valid: false, status: r.status, reason, error: `HTTP ${r.status}` });
   } catch { res.json({ valid: false, offline: true, error: 'Nexus injoignable' }); } // statut inconnu : rien d'inventé
 });
 

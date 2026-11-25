@@ -3,7 +3,7 @@ import { useUiMode } from '../state/uiMode';
 import { SIMPLE_UI } from '../locales/uiSimple';
 import { useI18n } from '../locales';
 import { useEscapeKey } from '../design';
-import { INSTALLER_UI } from '../locales/uiExtra';
+import { INSTALLER_UI, keyRefusalMessage } from '../locales/uiExtra';
 import { NexusAccount } from '../types/wabbajack';
 import { pickNativeFolder, getNativeClipboard } from '../services/api';
 import { SETTINGS_UI } from '../locales/uiScreens';
@@ -111,7 +111,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       if (acc.valid) {
         setVerifyMessage(`✓ ${t.settings.keyValid} ${acc.name} (${acc.isPremium ? 'Premium ⭐' : 'Standard'})`);
       } else {
-        setVerifyMessage(acc.offline ? INSTALLER_UI[language]?.keyOffline ?? INSTALLER_UI.fr.keyOffline : `✕ ${t.settings.keyInvalid}`);
+        setVerifyMessage(keyRefusalMessage(INSTALLER_UI[language] ?? INSTALLER_UI.fr, acc, `✕ ${t.settings.keyInvalid}`));
       }
     } catch {
       setVerifyMessage(`✕ ${t.settings.keyInvalid}`);

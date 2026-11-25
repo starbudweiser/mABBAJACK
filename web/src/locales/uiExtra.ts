@@ -10,7 +10,7 @@ export interface InstallerUi {
   previewOpenBtn: string; downloadsTitle: string; downloadsHint: string; downloadsSelect: string;
   cache: string; archivesReady: string; missing: string; allPresent: string; destTitle: string; destBadge: string;
   destHint: string; destSelect: string; nexusInfoPremium: string; nexusInfoStandard: string; pasteKeyPrompt: string;
-  keyPasted: string; keyInvalid: string; keyError: string; keyOffline: string; premiumAuto: string; standardManual: string;
+  keyPasted: string; keyInvalid: string; keyError: string; keyOffline: string; keyRateLimited: string; keyNexusError: string; premiumAuto: string; standardManual: string;
   blockedTitle: string; blockedBody: string; archivesN: string; launch: string; footer: string; pathPrompt: string; pastePrompt: string;
 }
 
@@ -38,7 +38,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     destHint: 'Les fichiers seront extraits ici selon les directives Wabbajack. Copiez ensuite dans votre Skyrim/Data.',
     destSelect: 'Sélectionnez le dossier READY TO PLAY',
     nexusInfoPremium: 'Compte Premium : téléchargements automatiques.', nexusInfoStandard: 'Compte Standard : URLs manuelles générées dans le journal.',
-    pasteKeyPrompt: 'Collez votre clé API Nexus Mods :', keyPasted: '✓ Clé collée', keyInvalid: '✕ Clé invalide', keyError: '✕ Erreur de validation', keyOffline: '⚠ Nexus injoignable : clé non vérifiée',
+    pasteKeyPrompt: 'Collez votre clé API Nexus Mods :', keyPasted: '✓ Clé collée', keyInvalid: '✕ Clé invalide', keyError: '✕ Erreur de validation', keyOffline: '⚠ Nexus injoignable : clé non vérifiée', keyRateLimited: '⚠ Limite de requêtes Nexus atteinte : réessayez dans une heure', keyNexusError: '⚠ Nexus a répondu HTTP {n} : incident côté Nexus, la clé n\'est pas en cause',
     premiumAuto: 'Premium ⭐ (téléchargements automatiques)', standardManual: 'Standard (URLs manuelles générées)',
     blockedTitle: '⛔ Installation bloquée',
     blockedBody: 'Aucun fichier .wabbajack réel chargé. Chargez d\'abord le vrai fichier pour débloquer l\'installation.', archivesN: '{n} archives',
@@ -62,7 +62,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     destHint: 'Files are extracted here following Wabbajack directives. Then copy them into your Skyrim/Data.',
     destSelect: 'Select the READY TO PLAY folder',
     nexusInfoPremium: 'Premium account: automatic downloads.', nexusInfoStandard: 'Standard account: manual URLs listed in the log.',
-    pasteKeyPrompt: 'Paste your Nexus Mods API key:', keyPasted: '✓ Key pasted', keyInvalid: '✕ Invalid key', keyError: '✕ Validation error', keyOffline: '⚠ Nexus unreachable: key not verified',
+    pasteKeyPrompt: 'Paste your Nexus Mods API key:', keyPasted: '✓ Key pasted', keyInvalid: '✕ Invalid key', keyError: '✕ Validation error', keyOffline: '⚠ Nexus unreachable: key not verified', keyRateLimited: '⚠ Nexus request limit reached: try again in an hour', keyNexusError: '⚠ Nexus answered HTTP {n}: a Nexus-side problem, your key is not the cause',
     premiumAuto: 'Premium ⭐ (automatic downloads)', standardManual: 'Standard (manual URLs generated)',
     blockedTitle: '⛔ Installation blocked',
     blockedBody: 'No real .wabbajack file loaded. Load the actual file first to unlock the installation.', archivesN: '{n} archives',
@@ -86,7 +86,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     destHint: 'Los archivos se extraen aquí según las directivas de Wabbajack. Luego cópielos en su Skyrim/Data.',
     destSelect: 'Seleccione la carpeta READY TO PLAY',
     nexusInfoPremium: 'Cuenta Premium: descargas automáticas.', nexusInfoStandard: 'Cuenta Standard: URL manuales indicadas en el registro.',
-    pasteKeyPrompt: 'Pegue su clave API de Nexus Mods:', keyPasted: '✓ Clave pegada', keyInvalid: '✕ Clave no válida', keyError: '✕ Error de validación', keyOffline: '⚠ Nexus inaccesible: clave no verificada',
+    pasteKeyPrompt: 'Pegue su clave API de Nexus Mods:', keyPasted: '✓ Clave pegada', keyInvalid: '✕ Clave no válida', keyError: '✕ Error de validación', keyOffline: '⚠ Nexus inaccesible: clave no verificada', keyRateLimited: '⚠ Límite de solicitudes de Nexus alcanzado: inténtelo de nuevo en una hora', keyNexusError: '⚠ Nexus respondió HTTP {n}: problema de Nexus, la clave no es la causa',
     premiumAuto: 'Premium ⭐ (descargas automáticas)', standardManual: 'Standard (URL manuales generadas)',
     blockedTitle: '⛔ Instalación bloqueada',
     blockedBody: 'No se ha cargado ningún archivo .wabbajack real. Cargue primero el archivo real para desbloquear la instalación.', archivesN: '{n} archivos',
@@ -110,7 +110,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     destHint: 'I file vengono estratti qui secondo le direttive Wabbajack. Copiarli poi in Skyrim/Data.',
     destSelect: 'Seleziona la cartella READY TO PLAY',
     nexusInfoPremium: 'Account Premium: download automatici.', nexusInfoStandard: 'Account Standard: URL manuali indicati nel registro.',
-    pasteKeyPrompt: 'Incollare la chiave API di Nexus Mods:', keyPasted: '✓ Chiave incollata', keyInvalid: '✕ Chiave non valida', keyError: '✕ Errore di convalida', keyOffline: '⚠ Nexus irraggiungibile: chiave non verificata',
+    pasteKeyPrompt: 'Incollare la chiave API di Nexus Mods:', keyPasted: '✓ Chiave incollata', keyInvalid: '✕ Chiave non valida', keyError: '✕ Errore di convalida', keyOffline: '⚠ Nexus irraggiungibile: chiave non verificata', keyRateLimited: '⚠ Limite di richieste Nexus raggiunto: riprovare tra un\'ora', keyNexusError: '⚠ Nexus ha risposto HTTP {n}: problema di Nexus, la chiave non è la causa',
     premiumAuto: 'Premium ⭐ (download automatici)', standardManual: 'Standard (URL manuali generati)',
     blockedTitle: '⛔ Installazione bloccata',
     blockedBody: 'Nessun vero file .wabbajack caricato. Caricare prima il file reale per sbloccare l\'installazione.', archivesN: '{n} archivi',
@@ -397,3 +397,11 @@ export const CLEANUP_UI: Record<Language, CleanupUi> = {
     confirm: 'Spostare {n} archivio/i ({size}) nel Cestino?\nVerifica che nessun altro strumento (Vortex, MO2) li utilizzi.', error: 'Errore: {msg}', more: '… e altri {n}',
   },
 };
+
+/** Message d'un refus de clé : limite atteinte ou incident Nexus plutôt que « clé invalide » quand ce n'est pas la clé. */
+export function keyRefusalMessage(ui: InstallerUi, acc: { offline?: boolean; reason?: string; status?: number }, invalid: string): string {
+  if (acc.offline) return ui.keyOffline;
+  if (acc.reason === 'rateLimited') return ui.keyRateLimited;
+  if (acc.reason === 'nexusError') return ui.keyNexusError.replace('{n}', String(acc.status ?? '?'));
+  return acc.status ? `${invalid} (HTTP ${acc.status})` : invalid;
+}
