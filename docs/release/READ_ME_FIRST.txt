@@ -1,4 +1,4 @@
-mABBAJACK — Wabbajack modlist installer for macOS (Apple Silicon, macOS 13.5 or later)
+mABBAJACK — Wabbajack modlist installer for macOS (Apple Silicon, macOS 14 or later)
 ==========================================================================================
 
 INSTALL
@@ -12,7 +12,7 @@ The app only listens on 127.0.0.1 (port 38300) and refuses requests from web pag
 
 ------------------------------------------------------------------------------------------
 
-mABBAJACK — installateur de modlists Wabbajack pour macOS (Apple Silicon, macOS 13.5 ou plus récent)
+mABBAJACK — installateur de modlists Wabbajack pour macOS (Apple Silicon, macOS 14 ou plus récent)
 
 INSTALLATION
 1. Placez mABBAJACK.app dans le dossier Applications.

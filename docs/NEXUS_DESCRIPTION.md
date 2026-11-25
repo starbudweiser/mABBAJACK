@@ -31,7 +31,7 @@ Wabbajack is Windows-only. **mABBAJACK** is an unofficial macOS port of the modl
 ![Details](screenshots/details.png)
 
 ## Requirements (Mac)
-- **macOS 13.5 or later on Apple Silicon** (M1 or later, arm64 only).
+- **macOS 14 or later on Apple Silicon** (M1 or later, arm64 only).
 - **Nothing else to install** for the standalone app (no Node, 7zz or unar needed).
 - A **legitimate copy of the game** installed on the Mac (Steam, CrossOver).
 - A **Nexus Mods API key**; **Premium account** recommended (free accounts get manual download links).
@@ -60,6 +60,6 @@ Wabbajack team and modlist authors. Local server on port 38300; your API key is 
 # 🇫🇷 Version française
 **mABBAJACK** installe les modlists Wabbajack nativement sur Mac, sans VM Windows. Galerie officielle, inspecteur `.wabbajack`, téléchargements Nexus automatiques (Premium), détection du jeu, journal en direct, interface FR/EN/ES/IT.
 
-**Pré-requis Mac** : macOS 13.5+ sur Apple Silicon, copie légale du jeu (Steam/CrossOver), clé API Nexus (Premium recommandé), plusieurs dizaines de Go libres, couche de compatibilité Windows pour lancer le jeu.
+**Pré-requis Mac** : macOS 14+ sur Apple Silicon, copie légale du jeu (Steam/CrossOver), clé API Nexus (Premium recommandé), plusieurs dizaines de Go libres, couche de compatibilité Windows pour lancer le jeu.
 
 **Installation** : ouvrez `mABBAJACK.app` → Paramètres (clé Nexus, dossiers) → choisissez une modlist → onglet Installation → lancez.
