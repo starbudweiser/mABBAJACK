@@ -29,9 +29,9 @@ export const Header: React.FC<HeaderProps> = ({
   const { setMode } = useUiMode();
   const simpleLabel = (SIMPLE_UI[language] ?? SIMPLE_UI.fr).modeSimple;
 
-  const TAB_BASE = 'px-3 py-1.5 rounded-md text-body font-medium flex items-center gap-1.5 transition-all duration-150 cursor-pointer whitespace-nowrap';
-  const TAB_ACTIVE = `${TAB_BASE} bg-[#0369a1] text-white font-semibold shadow-sm shadow-[#0369a1]/30`;
-  const TAB_IDLE = `${TAB_BASE} text-[#aaaaaa] hover:text-white hover:bg-[#262626]`;
+  const TAB_BASE = 'px-3 py-1.5 rounded-md text-body font-medium flex items-center gap-1.5 transition-colors duration-150 cursor-pointer whitespace-nowrap';
+  const TAB_ACTIVE = `${TAB_BASE} bg-[#35353a] text-white font-semibold`; // onglet courant : fond « sélectionné » Socle, sans aplat bleu
+  const TAB_IDLE = `${TAB_BASE} text-[#aaaaaa] hover:text-white hover:bg-[#2c2c31]`;
 
   const TABS: Array<{ id: ActiveTab; icon: string; label: string }> = [
     { id: 'gallery',   icon: '🏪', label: t.header.tabs.gallery },
@@ -48,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0369a1] to-[#0369a1] flex items-center justify-center text-white font-black text-body shadow-md shadow-[#0369a1]/20 flex-shrink-0">
           ⚡
         </div>
-        <div className="hidden sm:block">
+        <div className="hidden sm:block min-w-0">
           <h1 className="text-title font-extrabold text-white tracking-wide flex items-center gap-1.5">
             <span>mABBAJACK</span>
             <span className="text-caption font-mono px-1 py-0.5 rounded bg-[#0369a1]/15 text-[#38bdf8] border border-[#0ea5e9]/30">

@@ -84,14 +84,14 @@ export const PrepareStep: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     <div className="flex-1 overflow-y-auto p-6 select-text">
       <div className="max-w-2xl mx-auto flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
-          <div>
+          <div className="min-w-0">
             <h2 className="text-display font-bold text-white">{ui.prepareTitle}</h2>
-            <p className="text-body-lg text-[#aaaaaa] mt-1">
+            <p className="text-body-lg text-[#aaaaaa] mt-1 [overflow-wrap:anywhere]">
               <span className="text-white font-semibold">{parsedFile.name}</span>
               {parsedFile.author ? ` · ${ui.by} ${parsedFile.author}` : ''}{parsedFile.version ? ` · v${parsedFile.version}` : ''}
             </p>
           </div>
-          <button type="button" className={btn.ghost} onClick={onBack}>← {ui.changeModlist}</button>
+          <button type="button" className={`${btn.ghost} shrink-0`} onClick={onBack}>← {ui.changeModlist}</button>
         </div>
 
         {isDemo && <div className={`${card} border-[#ef4444]/40 text-[#f87171] text-body`}>{ui.preview}</div>}
@@ -100,9 +100,9 @@ export const PrepareStep: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <div className={card}>
           <span className={sectionLabel}><span>🎮</span><span>{ui.yourGame}</span></span>
           {game.found
-            ? <p className="text-body text-[#4ade80]">✓ {fillText(ui.gameDetected, { edition: game.edition })}</p>
+            ? <p className="text-body text-[#4ade80]">✓ {fillText(ui.gameDetected, { edition: game.edition }, language)}</p>
             : game.loaded && <p className="text-body text-[#fbbf24]">{gamePath.trim() ? ui.gameFolderInvalid : ui.gameNotFound}</p>}
-          {mismatch && <p className="text-body text-[#fbbf24]">⚠ {fillText(ui.gameMismatch, { need: need!, have: game.edition })}</p>}
+          {mismatch && <p className="text-body text-[#fbbf24]">⚠ {fillText(ui.gameMismatch, { need: need!, have: game.edition }, language)}</p>}
           {(!game.found || !game.auto) && game.loaded && (
             <FieldRow label={ui.gameFolder} icon="📂" value={gamePath} onChange={m.setGamePath}
               onPaste={() => paste(m.setGamePath)} onBrowse={() => pick(ui.gameFolder, gamePath, m.setGamePath)}
@@ -123,8 +123,8 @@ export const PrepareStep: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           {needed > 0 && (
             <p className={`text-body ${low ? 'text-[#fbbf24]' : 'text-[#aaaaaa]'}`}>
               {low
-                ? `⚠ ${fillText(ui.diskLow, { need: fmtBytes(needed, language, 'gb'), free: fmtBytes(freeSize ?? 0, language, 'gb') })}`
-                : fillText(ui.diskNeed, { size: fmtBytes(needed, language, 'gb') }) + (freeSize !== null ? ` ${fillText(ui.diskFree, { size: fmtBytes(freeSize, language, 'gb') })}` : '')}
+                ? `⚠ ${fillText(ui.diskLow, { need: fmtBytes(needed, language, 'gb'), free: fmtBytes(freeSize ?? 0, language, 'gb') }, language)}`
+                : fillText(ui.diskNeed, { size: fmtBytes(needed, language, 'gb') }, language) + (freeSize !== null ? ` ${fillText(ui.diskFree, { size: fmtBytes(freeSize, language, 'gb') }, language)}` : '')}
             </p>
           )}
         </div>
@@ -133,7 +133,7 @@ export const PrepareStep: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <div className={card}>
           <span className={sectionLabel}><span>🛡️</span><span>{ui.nexusTitle}</span></span>
           {nexusAccount?.valid ? (
-            <p className="text-body text-[#4ade80]">✓ {nexusAccount.name} — {nexusAccount.isPremium ? ui.nexusPremium : ui.nexusFree}</p>
+            <p className="text-body text-[#4ade80] [overflow-wrap:anywhere]">✓ {nexusAccount.name} — {nexusAccount.isPremium ? ui.nexusPremium : ui.nexusFree}</p>
           ) : (
             <>
               <p className="text-body text-[#aaaaaa]">{ui.nexusNoKey}</p>
@@ -157,8 +157,8 @@ export const PrepareStep: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </details>
         )}
 
-        <div className="flex items-center justify-end gap-3 pt-2 pb-6">
-          {!ready && !isDemo && <span className="text-meta text-[#8f8f8f]">{ui.startHint}</span>}
+        <div className="flex flex-wrap items-center justify-end gap-3 pt-2 pb-6">
+          {!ready && !isDemo && <span className="text-meta text-[#8f8f8f] min-w-0">{ui.startHint}</span>}
           <button type="button" disabled={!ready} onClick={m.startInstall} className={ready ? btn.primary : btn.disabled}>🚀 {ui.start}</button>
         </div>
       </div>

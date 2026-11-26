@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useI18n } from '../locales';
+import { fillText } from '../locales/plural.ts';
 import { fmtBytes } from '../locales/uiScreens';
 import { CLEANUP_UI } from '../locales/uiExtra';
 import { findUnusedDownloads, trashDownloads, UnusedDownloads } from '../services/api';
@@ -10,7 +11,6 @@ interface Props {
   destPath: string;
 }
 
-const fill = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
 const SHOWN = 50;
 
 
@@ -18,6 +18,7 @@ const SHOWN = 50;
 export const DownloadsCleanup: React.FC<Props> = ({ downloadsPath, destPath }) => {
   const { language } = useI18n();
   const ui = CLEANUP_UI[language] ?? CLEANUP_UI.fr;
+  const fill = (s: string, v: Record<string, string | number>) => fillText(s, v, language);
   const fr = language === 'fr';
   const [result, setResult] = useState<UnusedDownloads | null>(null);
   const [busy, setBusy] = useState<'scan' | 'trash' | null>(null);
@@ -51,11 +52,11 @@ export const DownloadsCleanup: React.FC<Props> = ({ downloadsPath, destPath }) =
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <span className="text-white block font-medium">{ui.title}</span>
           <span className="text-caption text-[#aaaaaa]">{ui.hint}</span>
         </div>
-        <button type="button" className={btn.secondary} onClick={scan} disabled={!canScan}>
+        <button type="button" className={`${btn.secondary} shrink-0`} onClick={scan} disabled={!canScan}>
           {busy === 'scan' ? ui.scanning : ui.scan}
         </button>
       </div>
@@ -65,14 +66,14 @@ export const DownloadsCleanup: React.FC<Props> = ({ downloadsPath, destPath }) =
           {result.blocked === 'no-install' && <span className="text-[#fbbf24]">{ui.noInstall}</span>}
           {result.blocked === 'legacy' && <span className="text-[#fbbf24] break-all">{fill(ui.legacy, { dirs: result.legacy.map((d) => d.split('/').pop()).join(', ') })}</span>}
           {result.installs.length > 0 && (
-            <span className="text-caption text-[#aaaaaa]">{fill(ui.lists, { names: result.installs.map((i) => `${i.name} ${i.version}`).join(', ') })}</span>
+            <span className="text-caption text-[#aaaaaa] [overflow-wrap:anywhere]">{fill(ui.lists, { names: result.installs.map((i) => `${i.name} ${i.version}`).join(', ') })}</span>
           )}
           {!result.blocked && (result.unused.length === 0 ? <span className="text-[#4ade80]">{ui.none}</span> : (
             <>
               <details>
-                <summary className="cursor-pointer select-none text-white">{fill(ui.found, { n: result.unused.length, size: fmtBytes(result.totalSize, language) })}</summary>
+                <summary className="cursor-pointer select-none text-white tabular-nums">{fill(ui.found, { n: result.unused.length, size: fmtBytes(result.totalSize, language) })}</summary>
                 <ul className="mt-1 ml-4 flex flex-col gap-0.5 text-caption text-[#cccccc] max-h-48 overflow-y-auto font-mono">
-                  {result.unused.slice(0, SHOWN).map((u) => <li key={u.path} className="break-all">{u.name} <span className="text-[#707070]">({fmtBytes(u.size, language)})</span></li>)}
+                  {result.unused.slice(0, SHOWN).map((u) => <li key={u.path} className="break-all" title={u.name}>{u.name} <span className="text-[#707070]">({fmtBytes(u.size, language)})</span></li>)}
                   {result.unused.length > SHOWN && <li className="text-[#707070]">{fill(ui.more, { n: result.unused.length - SHOWN })}</li>}
                 </ul>
               </details>
@@ -95,7 +96,7 @@ export const DownloadsCleanup: React.FC<Props> = ({ downloadsPath, destPath }) =
           ))}
         </div>
       )}
-      {message && <span className="text-caption text-[#aaaaaa] block">{message}</span>}
+      {message && <span className="text-caption text-[#aaaaaa] block [overflow-wrap:anywhere]">{message}</span>}
     </div>
   );
 };

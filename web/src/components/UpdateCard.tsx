@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useI18n } from '../locales';
-import { fmtBytes } from '../locales/uiScreens';
+import { fmtBytes, fmtNum } from '../locales/uiScreens';
+import { fillText } from '../locales/plural.ts';
 import { UPDATE_UI } from '../locales/uiExtra';
 import { adoptInstalled, compareInstalled, pickNativeFile } from '../services/api';
 import { InstalledComparison, UpdateRequest } from '../types/wabbajack';
@@ -29,16 +30,15 @@ export function compare(filePath: string, destPath: string, previousFile?: strin
 }
 
 
-const fill = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
-
-const NameList: React.FC<{ title: string; items: React.ReactNode[]; total: number; more: string; color: string }> = ({ title, items, total, more, color }) => {
+// Liste repliable ; les noms très longs (sans espace) passent à la ligne au lieu de déborder
+const NameList: React.FC<{ title: string; items: React.ReactNode[]; total: number; more: (n: number) => string; color: string }> = ({ title, items, total, more, color }) => {
   if (total === 0) return null;
   return (
     <details className="text-body">
-      <summary className="cursor-pointer select-none" style={{ color }}>{title}</summary>
+      <summary className="cursor-pointer select-none [overflow-wrap:anywhere]" style={{ color }}>{title}</summary>
       <ul className="mt-1 ml-4 flex flex-col gap-0.5 text-caption text-[#cccccc] max-h-64 overflow-y-auto">
-        {items.map((it, i) => <li key={i}>{it}</li>)}
-        {total > items.length && <li className="text-[#707070]">{fill(more, { n: total - items.length })}</li>}
+        {items.map((it, i) => <li key={i} className="[overflow-wrap:anywhere]">{it}</li>)}
+        {total > items.length && <li className="text-[#707070]">{more(total - items.length)}</li>}
       </ul>
     </details>
   );
@@ -48,6 +48,8 @@ const NameList: React.FC<{ title: string; items: React.ReactNode[]; total: numbe
 export const UpdateCard: React.FC<Props> = ({ filePath, destPath, value, onChange }) => {
   const { language } = useI18n();
   const ui = UPDATE_UI[language] ?? UPDATE_UI.fr;
+  const fill = (s: string, v: Record<string, string | number>) => fillText(s, v, language);
+  const more = (n: number) => fill(ui.more, { n });
   const fr = language === 'fr';
   const interactive = !!onChange;
 
@@ -81,7 +83,7 @@ export const UpdateCard: React.FC<Props> = ({ filePath, destPath, value, onChang
 
   if (!filePath || !destPath) return null;
   if (loading) return <div className={card}><span className="text-body text-[#aaaaaa]">{ui.checking}</span></div>;
-  if (error) return <div className={card}><span className="text-body text-[#f87171]">{fill(ui.error, { msg: error })}</span></div>;
+  if (error) return <div className={card}><span className="text-body text-[#f87171] [overflow-wrap:anywhere]">{fill(ui.error, { msg: error })}</span></div>;
   if (!result?.installed) return null;
 
   const inst = result.installed;
@@ -105,12 +107,12 @@ export const UpdateCard: React.FC<Props> = ({ filePath, destPath, value, onChang
 
   return (
     <div className={card}>
-      <div className="flex items-center justify-between gap-2">
-        <span className={sectionLabel}><span>🔄</span><span>{ui.title}</span></span>
-        <span className={result.status === 'same' ? badge.green : badge.amber}>v{result.version}</span>
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <span className={`${sectionLabel} min-w-0`}><span>🔄</span><span>{ui.title}</span></span>
+        <span className={`${result.status === 'same' ? badge.green : badge.amber} shrink-0 max-w-[50%] truncate`} title={`v${result.version}`}>v{result.version}</span>
       </div>
       <div className="flex flex-col gap-1 text-body">
-        <span className="text-white font-semibold">{headline}</span>
+        <span className="text-white font-semibold [overflow-wrap:anywhere]">{headline}</span>
         {sameNumber && <span className="text-[#fbbf24]">{ui.sameVersionNumber}</span>}
         <span className="text-caption text-[#aaaaaa] font-mono break-all">{fill(ui.installedIn, { dir: inst.dir })}</span>
         <span className="text-caption text-[#aaaaaa]">
@@ -122,24 +124,24 @@ export const UpdateCard: React.FC<Props> = ({ filePath, destPath, value, onChang
 
       {diff && (
         <div className="flex flex-col gap-1.5">
-          <NameList title={fill(ui.modsChanged, { n: diff.mods.changedCount })} total={diff.mods.changedCount} more={ui.more} color="#fbbf24"
+          <NameList title={fill(ui.modsChanged, { n: diff.mods.changedCount })} total={diff.mods.changedCount} more={more} color="#fbbf24"
             items={diff.mods.changed.map((m) => (
               <span>
                 <span className="text-white">{m.name}</span>
-                <span className="text-[#707070]"> — +{m.added} −{m.removed} ~{m.changed}</span>
+                <span className="text-[#707070]"> — +{fmtNum(m.added, language)} −{fmtNum(m.removed, language)} ~{fmtNum(m.changed, language)}</span>
                 {(m.archivesBefore.length > 0 || m.archivesAfter.length > 0) && (
-                  <span className="block ml-3 text-[#888888] font-mono">{m.archivesBefore.join(', ') || '∅'} → {m.archivesAfter.join(', ') || '∅'}</span>
+                  <span className="block ml-3 text-[#888888] font-mono [overflow-wrap:anywhere]">{m.archivesBefore.join(', ') || '∅'} → {m.archivesAfter.join(', ') || '∅'}</span>
                 )}
               </span>
             ))} />
-          <NameList title={fill(ui.modsAdded, { n: diff.mods.addedCount })} total={diff.mods.addedCount} more={ui.more} color="#4ade80"
-            items={diff.mods.added.map((m) => <span><span className="text-white">{m.name}</span><span className="text-[#707070]"> — {m.files} · {fmtBytes(m.size, language)}</span></span>)} />
-          <NameList title={fill(ui.modsRemoved, { n: diff.mods.removedCount })} total={diff.mods.removedCount} more={ui.more} color="#f87171"
-            items={diff.mods.removed.map((m) => <span><span className="text-white">{m.name}</span><span className="text-[#707070]"> — {m.files}</span></span>)} />
+          <NameList title={fill(ui.modsAdded, { n: diff.mods.addedCount })} total={diff.mods.addedCount} more={more} color="#4ade80"
+            items={diff.mods.added.map((m) => <span><span className="text-white">{m.name}</span><span className="text-[#707070]"> — {fmtNum(m.files, language)} · {fmtBytes(m.size, language)}</span></span>)} />
+          <NameList title={fill(ui.modsRemoved, { n: diff.mods.removedCount })} total={diff.mods.removedCount} more={more} color="#f87171"
+            items={diff.mods.removed.map((m) => <span><span className="text-white">{m.name}</span><span className="text-[#707070]"> — {fmtNum(m.files, language)}</span></span>)} />
           <span className="text-caption text-[#aaaaaa]">{fill(ui.modsUnchanged, { n: diff.mods.unchangedCount })}</span>
           <span className="text-caption text-[#aaaaaa]">{fill(ui.files, { a: diff.files.added, r: diff.files.removed, c: diff.files.changed, u: diff.files.unchanged })}</span>
           <NameList title={fill(ui.archives, { a: diff.archives.addedCount, size: fmtBytes(diff.archives.downloadSize, language), r: diff.archives.removedCount })}
-            total={diff.archives.addedCount} more={ui.more} color="#aaaaaa"
+            total={diff.archives.addedCount} more={more} color="#aaaaaa"
             items={diff.archives.added.map((a) => <span className="font-mono">{a.name} <span className="text-[#707070]">({fmtBytes(a.size, language)})</span></span>)} />
         </div>
       )}
@@ -156,7 +158,7 @@ export const UpdateCard: React.FC<Props> = ({ filePath, destPath, value, onChang
         <label className="flex items-start gap-2 text-body cursor-pointer">
           <input type="checkbox" className="mt-1" checked={!!value}
             onChange={(e) => onChange!(e.target.checked ? { dir: inst.dir, previousFile: result.previousFile } : null)} />
-          <span className="flex flex-col">
+          <span className="flex flex-col min-w-0">
             <span className="text-white font-semibold">{ui.toggle}</span>
             <span className="text-caption text-[#aaaaaa]">{result.status === 'same' ? ui.repairHint : ui.toggleHint}</span>
           </span>

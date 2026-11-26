@@ -3,6 +3,7 @@ import { getApiBaseUrl } from '../services/api';
 import { useI18n } from '../locales';
 import { useEscapeKey } from '../design';
 import { fmtBytes, colon } from '../locales/uiScreens';
+import { fillText } from '../locales/plural.ts';
 import { MANUAL_UI } from '../locales/uiExtra';
 import { ModlistArchive } from '../types/wabbajack';
 
@@ -60,13 +61,13 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
         const data = JSON.parse(event.data);
         if (data.type !== 'nxm') return;
         const { status, name = '', error = '' } = data.nxm || {};
-        if (status === 'downloading') setNxmStatus({ kind: 'info', text: ui.nxmDownloading.replace('{name}', name) });
-        else if (status === 'done') { setNxmStatus({ kind: 'success', text: ui.nxmDone.replace('{name}', name) }); onScanDownloads(); }
-        else if (status === 'error') setNxmStatus({ kind: 'error', text: ui.nxmError.replace('{error}', error) });
+        if (status === 'downloading') setNxmStatus({ kind: 'info', text: fillText(ui.nxmDownloading, { name }, language) });
+        else if (status === 'done') { setNxmStatus({ kind: 'success', text: fillText(ui.nxmDone, { name }, language) }); onScanDownloads(); }
+        else if (status === 'error') setNxmStatus({ kind: 'error', text: fillText(ui.nxmError, { error }, language) });
       } catch { /* message d'un autre type */ }
     };
     return () => sse.close();
-  }, [isOpen, ui, onScanDownloads]);
+  }, [isOpen, ui, language, onScanDownloads]);
 
   if (!isOpen) return null;
 
@@ -111,30 +112,28 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-[#181818] border border-[#2e2e2e] rounded-2xl max-w-4xl w-full h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
         {/* Header */}
-        <div className="p-4 bg-[#181818] border-b border-[#2e2e2e] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#0369a1]/20 border border-[#0ea5e9]/40 flex items-center justify-center text-[#38bdf8] text-lg">
+        <div className="p-4 bg-[#181818] border-b border-[#2e2e2e] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 shrink-0 rounded-xl bg-[#0369a1]/20 border border-[#0ea5e9]/40 flex items-center justify-center text-[#38bdf8] text-lg">
               📥
             </div>
-            <div>
-              <h2 className="text-title font-bold text-white flex items-center gap-2">
+            <div className="min-w-0">
+              <h2 className="text-title font-bold text-white flex items-center gap-2 flex-wrap">
                 <span>{ui.title}</span>
-                <span className="text-caption font-mono px-2 py-0.5 rounded-full bg-[#ef4444]/20 text-[#f87171] border border-[#ef4444]/30">
-                  {ui.missingCount
-                    .replace('{n}', String(missingArchives.length))
-                    .replace('{size}', fmtBytes(totalMissingSize, language))}
+                <span className="text-caption font-mono px-2 py-0.5 rounded-full bg-[#ef4444]/20 text-[#f87171] border border-[#ef4444]/30 whitespace-nowrap tabular-nums">
+                  {fillText(ui.missingCount, { n: missingArchives.length, size: fmtBytes(totalMissingSize, language) }, language)}
                 </span>
               </h2>
               <p className="text-meta text-[#8f8f8f]">{ui.subtitle}</p>
               <p className="text-meta text-[#8f8f8f] mt-1">{ui.nxmHint}</p>
               {nxmOwner && !nxmOwner.isDefault && (
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <p className="text-meta text-[#f59e0b]">{ui.nxmOther.replace('{app}', nxmOwner.current || '?')}</p>
+                  <p className="text-meta text-[#f59e0b] [overflow-wrap:anywhere]">{fillText(ui.nxmOther, { app: nxmOwner.current || '?' }, language)}</p>
                   <button onClick={claimNxm} className="text-meta px-2 py-0.5 rounded border border-[#f59e0b] text-[#f59e0b] hover:bg-[#f59e0b]/10">{ui.nxmClaim}</button>
                 </div>
               )}
               {nxmStatus && (
-                <p className={`text-meta mt-1 ${nxmStatus.kind === 'error' ? 'text-[#f87171]' : nxmStatus.kind === 'success' ? 'text-[#4ade80]' : 'text-[#0ea5e9]'}`}>{nxmStatus.text}</p>
+                <p className={`text-meta mt-1 ${nxmStatus.kind === 'error' ? 'text-[#f87171]' : nxmStatus.kind === 'success' ? 'text-[#4ade80]' : 'text-[#0ea5e9]'} [overflow-wrap:anywhere]`}>{nxmStatus.text}</p>
               )}
             </div>
           </div>
@@ -143,7 +142,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label={ui.close}
-            className="w-8 h-8 rounded-lg bg-[#222222] hover:bg-[#303030] text-[#8f8f8f] hover:text-white flex items-center justify-center text-body-lg transition-colors cursor-pointer"
+            className="w-8 h-8 shrink-0 rounded-lg bg-[#222222] hover:bg-[#303030] text-[#8f8f8f] hover:text-white flex items-center justify-center text-body-lg transition-colors cursor-pointer"
           >
             ✕
           </button>
@@ -161,7 +160,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
               onClick={onScanDownloads}
@@ -187,10 +186,21 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
         {/* Archives List */}
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {filteredArchives.length === 0 ? (
+            // Liste vide : tout est prêt, ou la recherche ne trouve rien (avec « Tout afficher »)
             <div className="h-full flex flex-col items-center justify-center text-center p-8">
-              <span className="text-3xl mb-2">🎉</span>
-              <h3 className="text-title font-bold text-white">{ui.allReady}</h3>
-              <p className="text-body text-[#666666] mt-1">{ui.noMatch}</p>
+              {missingArchives.length === 0 ? (
+                <>
+                  <span className="text-3xl mb-2">🎉</span>
+                  <h3 className="text-title font-bold text-white">{ui.allReady}</h3>
+                </>
+              ) : (
+                <>
+                  <p className="text-body text-[#aaaaaa] [overflow-wrap:anywhere]">{ui.noMatch}</p>
+                  <button type="button" onClick={() => setSearch('')} className="mt-3 h-8 px-3 bg-[#262626] hover:bg-[#333333] border border-[#444444] text-[#dddddd] hover:text-white rounded-lg text-body font-semibold cursor-pointer transition-colors">
+                    {ui.showAll}
+                  </button>
+                </>
+              )}
             </div>
           ) : (
             filteredArchives.map((archive) => {
@@ -199,16 +209,16 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
               return (
                 <div
                   key={(archive.Hash || '') + archive.Name}
-                  className={`bg-[#181818] border ${isGame ? 'border-[#f59e0b]/40' : 'border-[#2e2e2e]'} hover:border-[#333333] rounded-xl p-3 flex items-center justify-between gap-4 transition-all`}
+                  className={`sc-selectable !cursor-default bg-[#181818] border ${isGame ? 'border-[#f59e0b]/40' : 'border-[#2e2e2e]'} rounded-xl p-3 flex items-center justify-between gap-4 [content-visibility:auto] [contain-intrinsic-size:auto_64px]`}
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-body-lg font-semibold text-white truncate">{archive.Name}</span>
-                      <span className="text-caption font-mono px-2 py-0.5 rounded bg-[#262626] text-[#aaaaaa]">
+                      <span className="text-body-lg font-semibold text-white truncate min-w-0" title={archive.Name}>{archive.Name}</span>
+                      <span className="text-caption font-mono px-2 py-0.5 rounded bg-[#262626] text-[#aaaaaa] shrink-0 whitespace-nowrap tabular-nums">
                         {fmtBytes(archive.Size, language)}
                       </span>
                       {isGame && (
-                        <span className="text-caption font-semibold px-2 py-0.5 rounded bg-[#f59e0b]/20 text-[#fbbf24] border border-[#f59e0b]/40">
+                        <span className="text-caption font-semibold px-2 py-0.5 rounded bg-[#f59e0b]/20 text-[#fbbf24] border border-[#f59e0b]/40 shrink-0 whitespace-nowrap">
                           🎮 {ui.gameFile}
                         </span>
                       )}
@@ -227,7 +237,7 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                         <span>File ID{colon(language)} <strong className="text-[#aaaaaa]">{archive.State.FileID}</strong></span>
                       )}
                       {archive.State?.Author && (
-                        <span>{ui.author}{colon(language)} <strong className="text-[#aaaaaa]">{archive.State.Author}</strong></span>
+                        <span className="[overflow-wrap:anywhere]">{ui.author}{colon(language)} <strong className="text-[#aaaaaa]">{archive.State.Author}</strong></span>
                       )}
                     </div>
 
@@ -244,16 +254,17 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
                   </div>
 
                   {!isGame && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0 max-w-[40%]">
                       {url ? (
                         <a
                           href={url}
                           target="_blank"
                           rel="noreferrer"
-                          className="h-8 px-3 bg-[#0369a1]/20 hover:bg-[#0369a1]/30 border border-[#0ea5e9]/50 text-[#38bdf8] rounded-lg text-body font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                          className="h-8 px-3 min-w-0 bg-[#0369a1]/20 hover:bg-[#0369a1]/30 border border-[#0ea5e9]/50 text-[#38bdf8] rounded-lg text-body font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                          title={url}
                         >
-                          <span>🔗</span>
-                          <span>{linkLabel(url)}</span>
+                          <span className="shrink-0">🔗</span>
+                          <span className="truncate">{linkLabel(url)}</span>
                         </a>
                       ) : (
                         <a
@@ -275,16 +286,16 @@ export const ManualDownloadModal: React.FC<ManualDownloadModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-[#181818] border-t border-[#2e2e2e] flex items-center justify-between">
-          <div className="text-meta text-[#666666] flex items-center gap-2">
-            <span>💡</span>
+        <div className="p-3 bg-[#181818] border-t border-[#2e2e2e] flex items-center justify-between gap-3">
+          <div className="text-meta text-[#666666] flex items-center gap-2 min-w-0">
+            <span className="shrink-0">💡</span>
             <span>{ui.footer}</span>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-[#222222] hover:bg-[#303030] text-white rounded-lg text-body font-semibold transition-colors cursor-pointer"
+            className="px-4 py-1.5 shrink-0 bg-[#222222] hover:bg-[#303030] text-white rounded-lg text-body font-semibold transition-colors cursor-pointer"
           >
             {ui.close}
           </button>

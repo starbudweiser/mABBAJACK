@@ -133,10 +133,10 @@ export const card = 'bg-[#181818] border border-[#2e2e2e] rounded-xl p-6 shadow-
 export const sectionLabel = 'text-body font-bold text-white uppercase tracking-wider flex items-center gap-1.5';
 
 // ── Input field ───────────────────────────────────────────────────────────────
-export const inputField = 'flex-1 h-8 px-3 bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] transition-colors select-text';
+export const inputField = 'flex-1 min-w-0 h-8 px-3 bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] transition-colors select-text';
 
 // ── Shortcut chip (path presets) ─────────────────────────────────────────────
-export const chip = 'text-caption font-mono px-2 py-0.5 rounded-md bg-[#1e1e1e] text-[#aaaaaa] hover:text-white border border-[#2e2e2e] cursor-pointer transition-colors';
+export const chip = 'text-caption font-mono px-2 py-0.5 rounded-md bg-[#1e1e1e] text-[#aaaaaa] hover:text-white border border-[#2e2e2e] cursor-pointer transition-colors max-w-full truncate';
 
 // ── Divider (vertical, for button groups) ────────────────────────────────────
 export const Divider: React.FC = () => (
@@ -177,8 +177,8 @@ export const FieldRow: React.FC<FieldRowProps> = ({
   const ui = COMMON_UI[language] ?? COMMON_UI.fr;
   return (
   <div className={`flex flex-col gap-1.5 ${className}`}>
-    <div className="flex items-center justify-between">
-      <span className={sectionLabel}>
+    <div className="flex items-center justify-between gap-2">
+      <span className={`${sectionLabel} min-w-0`}>
         {icon && <span>{icon}</span>}
         <span>{label}</span>
       </span>
@@ -195,12 +195,13 @@ export const FieldRow: React.FC<FieldRowProps> = ({
         }}
         placeholder={placeholder}
         className={inputField}
+        title={value}
       />
-      <button type="button" onClick={onPaste} className={btn.secondary} title={ui.pastePath}>
+      <button type="button" onClick={onPaste} className={`${btn.secondary} shrink-0`} title={ui.pastePath}>
         <span>📋</span>
         <span>{ui.paste}</span>
       </button>
-      <button type="button" onClick={onBrowse} className={btn.subtle} title={ui.browse}>
+      <button type="button" onClick={onBrowse} className={`${btn.subtle} shrink-0`} title={ui.browse}>
         <span>📁</span>
         <span>{isBrowsing ? '…' : ui.browse}</span>
       </button>
@@ -212,6 +213,7 @@ export const FieldRow: React.FC<FieldRowProps> = ({
           <button
             key={p.value}
             type="button"
+            title={p.value}
             className={chip}
             onClick={() => onPreset?.(p.value)}
           >
@@ -252,8 +254,8 @@ export const ApiKeyRow: React.FC<ApiKeyRowProps> = ({
   const ui = COMMON_UI[language] ?? COMMON_UI.fr;
   return (
   <div className="flex flex-col gap-1.5">
-    <div className="flex items-center justify-between">
-      <span className={sectionLabel}>
+    <div className="flex items-center justify-between gap-2">
+      <span className={`${sectionLabel} min-w-0`}>
         <span>🛡️</span>
         <span>{ui.apiKeyLabel}</span>
         <span className="text-[#666666] font-normal normal-case text-caption">{ui.optional}</span>
@@ -274,10 +276,10 @@ export const ApiKeyRow: React.FC<ApiKeyRowProps> = ({
         placeholder={ui.apiKeyPlaceholder}
         className={inputField}
       />
-      <button type="button" onClick={onToggleShow} className={btn.icon} title={showKey ? ui.hide : ui.show}>
+      <button type="button" onClick={onToggleShow} className={`${btn.icon} shrink-0`} title={showKey ? ui.hide : ui.show}>
         {showKey ? '🔒' : '👁️'}
       </button>
-      <button type="button" onClick={onPaste} className={btn.secondary}>
+      <button type="button" onClick={onPaste} className={`${btn.secondary} shrink-0`}>
         <span>📋</span>
         <span>{ui.paste}</span>
       </button>
@@ -285,13 +287,13 @@ export const ApiKeyRow: React.FC<ApiKeyRowProps> = ({
         type="button"
         onClick={onVerify}
         disabled={isVerifying || !value.trim()}
-        className={value.trim() && !isVerifying ? btn.primary : btn.disabled}
+        className={`${value.trim() && !isVerifying ? btn.primary : btn.disabled} shrink-0`}
       >
         {isVerifying ? ui.validating : ui.validate}
       </button>
     </div>
     {message && (
-      <p className="text-body text-[#38bdf8] font-medium pl-1">{message}</p>
+      <p className="text-body text-[#38bdf8] font-medium pl-1 [overflow-wrap:anywhere]">{message}</p>
     )}
   </div>
   );

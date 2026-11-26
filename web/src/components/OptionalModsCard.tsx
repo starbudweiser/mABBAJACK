@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '../locales';
-import { fmtBytes } from '../locales/uiScreens';
+import { fmtBytes, fmtNum } from '../locales/uiScreens';
+import { fillText } from '../locales/plural.ts';
 import { OPTIONS_UI } from '../locales/uiExtra';
 import { fetchModlistOptions } from '../services/api';
 import { compare } from './UpdateCard';
@@ -126,8 +127,8 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, o
   const pick = (c: ModlistChoice, id: string) => commit(new Set(value.enable), { ...picked, [c.id]: id });
   const screen = detectScreenFormat();
   const choiceTitle = (c: ModlistChoice) => c.kind === 'format' ? ui.format
-    : c.kind === 'family' ? ui.family.replace('{tag}', c.label)
-    : ui.variant.replace('{label}', c.label);
+    : c.kind === 'family' ? fillText(ui.family, { tag: c.label }, language)
+    : fillText(ui.variant, { label: c.label }, language);
 
   const set = (names: string[], on: boolean) => {
     const next = new Set(value.enable);
@@ -145,8 +146,8 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, o
     return (
       <details key={g.separator} className="bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg">
         <summary className="px-3 py-2 cursor-pointer text-body text-white flex items-center justify-between gap-2 select-none">
-          <span className="truncate">{g.separator}</span>
-          <span className="text-caption text-[#666666] shrink-0">{nSel} / {g.mods.length}</span>
+          <span className="truncate min-w-0" title={g.separator}>{g.separator}</span>
+          <span className="text-caption text-[#666666] shrink-0 tabular-nums">{fmtNum(nSel, language)} / {fmtNum(g.mods.length, language)}</span>
         </summary>
         <div className="px-3 pb-2 flex flex-col gap-1">
           {selectable.length > 1 && (
@@ -160,11 +161,11 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, o
             const off = missing.length > 0;
             return (
               <label key={m.name} className={`text-body flex items-center gap-2 py-0.5 ${off ? 'text-[#666666]' : 'text-[#dddddd]'}`}
-                title={off ? ui.requires.replace('{deps}', missing.join(', ')) : undefined}>
+                title={off ? fillText(ui.requires, { deps: missing.join(', ') }, language) : undefined}>
                 <input type="checkbox" disabled={off} checked={enabled.has(m.name) && !off} onChange={(e) => set([m.name], e.target.checked)} />
-                <span className="truncate flex-1">{m.name}</span>
-                {off && <span className="text-caption text-[#666666] shrink-0 truncate max-w-[40%]">{ui.requires.replace('{deps}', missing.join(', '))}</span>}
-                <span className="text-caption text-[#666666] shrink-0">{fmtBytes(m.size, language)}</span>
+                <span className="truncate flex-1 min-w-0" title={m.name}>{m.name}</span>
+                {off && <span className="text-caption text-[#666666] truncate min-w-0 max-w-[40%]">{fillText(ui.requires, { deps: missing.join(', ') }, language)}</span>}
+                <span className="text-caption text-[#666666] shrink-0 tabular-nums">{fmtBytes(m.size, language)}</span>
               </label>
             );
           })}
@@ -175,10 +176,10 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, o
 
   return (
     <div className={card}>
-      <div className="flex items-center justify-between gap-2">
-        <span className={sectionLabel}><span>🎛</span><span>{ui.title}</span></span>
-        <span className={badge.blue}>
-          {ui.selected.replace('{n}', String(enabled.size)).replace('{total}', String(profile.optionalCount)).replace('{size}', fmtBytes(selectedBytes, language))}
+      <div className="flex items-center justify-between gap-x-2 gap-y-1 flex-wrap">
+        <span className={`${sectionLabel} min-w-0`}><span>🎛</span><span>{ui.title}</span></span>
+        <span className={`${badge.blue} shrink-0 tabular-nums`}>
+          {fillText(ui.selected, { n: enabled.size, total: profile.optionalCount, size: fmtBytes(selectedBytes, language) }, language)}
         </span>
       </div>
       <p className="text-meta text-[#666666] -mt-1">{ui.hint}</p>
@@ -191,7 +192,7 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, o
             <label key={p.name} className="text-body text-[#dddddd] flex items-center gap-2 py-0.5">
               <input type="radio" name="mabba-profile" checked={p.name === profile.name}
                 onChange={() => onChange({ profile: p.name, enable: [], choices: defaultChoices(p) })} />
-              <span className="truncate">{p.name}</span>
+              <span className="truncate min-w-0" title={p.name}>{p.name}</span>
             </label>
           ))}
         </div>
@@ -205,14 +206,14 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, o
             return (
               <div key={c.id} className="bg-[#1a1a1a] border border-[#2e2e2e] rounded-lg px-3 py-2 flex flex-col gap-1" role="radiogroup" aria-label={choiceTitle(c)}>
                 <span className="text-body text-white flex items-center justify-between gap-2">
-                  <span className="truncate">{choiceTitle(c)}</span>
-                  {c.kind === 'format' && <span className="text-caption text-[#666666] shrink-0">{ui.formatDetected.replace('{ratio}', screen.ratio)}</span>}
+                  <span className="truncate min-w-0" title={choiceTitle(c)}>{choiceTitle(c)}</span>
+                  {c.kind === 'format' && <span className="text-caption text-[#666666] shrink-0">{fillText(ui.formatDetected, { ratio: screen.ratio }, language)}</span>}
                 </span>
                 <div className="flex flex-wrap gap-x-4 gap-y-1">
                   {c.options.map((o) => (
                     <label key={o.id} className="text-body text-[#dddddd] flex items-center gap-1.5 py-0.5" title={o.mods.join('\n')}>
                       <input type="radio" name={`mabba-${c.id}`} checked={cur === o.id} onChange={() => pick(c, o.id)} />
-                      <span>{c.kind === 'exclusive' && o.id === 'none' ? ui.none : o.label}</span>
+                      <span className="min-w-0 [overflow-wrap:anywhere]">{c.kind === 'exclusive' && o.id === 'none' ? ui.none : o.label}</span>
                       {o.size >= 1048576 && <span className="text-caption text-[#666666]">{fmtBytes(o.size, language)}</span>}
                     </label>
                   ))}
@@ -240,7 +241,7 @@ export const OptionalModsCard: React.FC<Props> = ({ filePath, destPath, value, o
       )}
 
       {(profile.lockedGroups ?? []).map((l) => (
-        <p key={l.separator} className="text-meta text-[#8f8f8f]">🔒 {ui.locked.replace('{n}', String(l.count)).replace('{sep}', l.separator)}</p>
+        <p key={l.separator} className="text-meta text-[#8f8f8f] [overflow-wrap:anywhere]">🔒 {fillText(ui.locked, { n: l.count, sep: l.separator }, language)}</p>
       ))}
       <p className="text-caption text-[#666666]">{ui.note}</p>
     </div>

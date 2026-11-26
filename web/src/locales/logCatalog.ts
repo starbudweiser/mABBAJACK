@@ -13,6 +13,7 @@
  * ⚠ Maintenance : toute modification d'un texte de log côté serveur doit être reportée ici.
  */
 import type { Language } from './types';
+import { fillText, pluralizeText } from './plural.ts';
 
 type Entry = [fr: string, en: string, es: string, it: string];
 
@@ -80,11 +81,11 @@ const ENTRIES: Entry[] = [
   // ── App (client) ───────────────────────────────────────────────────────────
   ['mABBAJACK Initialisé - Moteur macOS prêt', 'mABBAJACK initialized - macOS engine ready', 'mABBAJACK inicializado - Motor macOS listo', 'mABBAJACK inizializzato - Motore macOS pronto'],
   ['Récupération du catalogue Wabbajack…', 'Fetching Wabbajack catalog…', 'Obteniendo el catálogo de Wabbajack…', 'Recupero del catalogo Wabbajack…'],
-  ['{0} modlists chargées depuis le serveur local.', '{0} modlists loaded from the local server.', '{0} modlists cargadas desde el servidor local.', '{0} modlist caricate dal server locale.'],
+  ['{0} modlist(s) chargée(s) depuis le serveur local.', '{0} modlist(s) loaded from the local server.', '{0} modlist(s) cargada(s) desde el servidor local.', '{0} modlist caricata/e dal server locale.'],
   ['Serveur local indisponible — agrégation directe depuis GitHub…', 'Local server unavailable — aggregating directly from GitHub…', 'Servidor local no disponible — agregando directamente desde GitHub…', 'Server locale non disponibile — aggregazione diretta da GitHub…'],
-  ['{0} modlists agrégées depuis GitHub ({1} dépôts).', '{0} modlists aggregated from GitHub ({1} repositories).', '{0} modlists agregadas desde GitHub ({1} repositorios).', '{0} modlist aggregate da GitHub ({1} repository).'],
+  ['{0} modlist(s) agrégée(s) depuis GitHub ({1} dépôt(s)).', '{0} modlist(s) aggregated from GitHub ({1} repo(s)).', '{0} modlist(s) agregada(s) desde GitHub ({1} repositorio(s)).', '{0} modlist aggregata/e da GitHub ({1} repository).'],
   ['GitHub inaccessible : {0}', 'GitHub unreachable: {0}', 'GitHub inaccesible: {0}', 'GitHub irraggiungibile: {0}'],
-  ['Catalogue partiel : {0} modlists officielles seulement.', 'Partial catalog: {0} official modlists only.', 'Catálogo parcial: solo {0} modlists oficiales.', 'Catalogo parziale: solo {0} modlist ufficiali.'],
+  ['Catalogue partiel : {0} modlist(s) officielle(s) seulement.', 'Partial catalog: {0} official modlist(s) only.', 'Catálogo parcial: solo {0} modlist(s) oficial(es).', 'Catalogo parziale: solo {0} modlist ufficiale/i.'],
   ['Impossible de charger le catalogue. Vérifiez votre connexion internet.', 'Unable to load the catalog. Check your internet connection.', 'No se pudo cargar el catálogo. Compruebe su conexión a internet.', 'Impossibile caricare il catalogo. Verificare la connessione internet.'],
   ['Validation de la clé API Nexus Mods / Vortex...', 'Validating Nexus Mods / Vortex API key...', 'Validando la clave API de Nexus Mods / Vortex...', 'Verifica della chiave API Nexus Mods / Vortex...'],
   ['Compte Nexus vérifié : {0} ({1})', 'Nexus account verified: {0} ({1})', 'Cuenta Nexus verificada: {0} ({1})', 'Account Nexus verificato: {0} ({1})'],
@@ -101,7 +102,7 @@ const ENTRIES: Entry[] = [
   ['Erreur lors de l\'analyse du fichier .wabbajack : {0}', 'Error while analyzing the .wabbajack file: {0}', 'Error al analizar el archivo .wabbajack: {0}', 'Errore durante l\'analisi del file .wabbajack: {0}'],
   ['Modlist de démonstration "{0}" chargée avec succès.', 'Demo modlist "{0}" loaded successfully.', 'Modlist de demostración "{0}" cargada correctamente.', 'Modlist demo "{0}" caricata con successo.'],
   ['🔄 Scan DOWNLOADS : {0}...', '🔄 Scanning DOWNLOADS: {0}...', '🔄 Escaneando DOWNLOADS: {0}...', '🔄 Scansione DOWNLOADS: {0}...'],
-  ['✓ {0}/{1} archives détectées dans DOWNLOADS.', '✓ {0}/{1} archives detected in DOWNLOADS.', '✓ {0}/{1} archivos detectados en DOWNLOADS.', '✓ {0}/{1} archivi rilevati in DOWNLOADS.'],
+  ['✓ {0}/{1} archive(s) détectée(s) dans DOWNLOADS.', '✓ {0}/{1} archive(s) detected in DOWNLOADS.', '✓ {0}/{1} archivo(s) detectado(s) en DOWNLOADS.', '✓ {0}/{1} archivio/i rilevato/i in DOWNLOADS.'],
   ['⚠ Aucune archive trouvée dans {0}. Vérifiez le chemin.', '⚠ No archive found in {0}. Check the path.', '⚠ No se encontró ningún archivo en {0}. Compruebe la ruta.', '⚠ Nessun archivio trovato in {0}. Verificare il percorso.'],
   ['⚠ {0} fichier(s) original(aux) du jeu introuvable(s) : {1}', '⚠ {0} original game file(s) not found: {1}', '⚠ {0} archivo(s) original(es) del juego no encontrado(s): {1}', '⚠ {0} file originale/i del gioco non trovato/i: {1}'],
   ['→ Renseignez « Dossier du jeu Skyrim » (dossier contenant Data/).', '→ Fill in "Skyrim game folder" (the folder containing Data/).', '→ Indique «Carpeta del juego Skyrim» (la carpeta que contiene Data/).', '→ Compilare «Cartella del gioco Skyrim» (la cartella che contiene Data/).'],
@@ -412,7 +413,8 @@ const cache = new Map<string, string>();
 /** Traduit un message de journal (FR source) dans la langue de l'interface. */
 export function translateLog(message: string | undefined | null, lang: Language, depth = 0): string {
   if (!message) return message ?? '';
-  if (lang === 'fr') return message;
+  // Français : le message du serveur est affiché tel quel, seules les marques « (s) » sont accordées
+  if (lang === 'fr') return pluralizeText(message, 'fr');
   const key = `${lang}\u0000${message}`;
   const hit = cache.get(key);
   if (hit !== undefined) return hit;
@@ -424,12 +426,13 @@ export function translateLog(message: string | undefined | null, lang: Language,
     const m = c.re.exec(body);
     if (!m) continue;
     const tpl = c.entry[LANG_INDEX[lang]];
-    out = lead + tpl.replace(/\{(\d+)\}/g, (_, n: string) => {
-      const idx = c.order.indexOf(Number(n));
-      const val = idx >= 0 ? (m[idx + 1] ?? '') : '';
-      // Valeur insérée elle-même traduisible (ex. message d'erreur serveur) — profondeur limitée
-      return depth < 2 && /[A-Za-zÀ-ÿ]{3,}\s/.test(val) ? translateLog(val, lang, depth + 1) : val;
+    // Valeurs capturées (nombres, noms, chemins) ; celles qui sont elles-mêmes des messages sont traduites (profondeur limitée)
+    const values: Record<string, string> = {};
+    c.order.forEach((n, idx) => {
+      const val = m[idx + 1] ?? '';
+      values[String(n)] = depth < 2 && /[A-Za-zÀ-ÿ]{3,}\s/.test(val) ? translateLog(val, lang, depth + 1) : val;
     });
+    out = lead + fillText(tpl, values, lang);
     break;
   }
   if (cache.size > 5000) cache.clear();
@@ -442,7 +445,7 @@ export const PROGRESS_UI: Record<Language, {
   all: string; warnings: string; errors: string; waitingOps: string; files: string; data: string;
   copied: string; editRetry: string; edit: string; interruptedAt: string; diskError: string;
   commonFixes: string; fixVolume: string; fixVolumeDesc: string; fixNtfs: string; fixNtfsDesc: string;
-  fixPerms: string; fixPermsDesc: string; processing: string;
+  fixPerms: string; fixPermsDesc: string; processing: string; noLogs: string;
 }> = {
   fr: {
     all: 'Tous', warnings: 'Avertissements', errors: 'Erreurs', waitingOps: 'En attente d\'opérations…',
@@ -451,7 +454,7 @@ export const PROGRESS_UI: Record<Language, {
     commonFixes: 'Solutions courantes :', fixVolume: 'Volume non monté', fixVolumeDesc: 'vérifiez que le disque est visible dans le Finder.',
     fixNtfs: 'NTFS en lecture seule', fixNtfsDesc: 'reformatez en APFS ou ExFAT.',
     fixPerms: 'Permissions macOS', fixPermsDesc: 'Réglages Système › Confidentialité › Accès complet au disque.',
-    processing: 'Traitement en cours…',
+    processing: 'Traitement en cours…', noLogs: 'Aucun message pour ce filtre.',
   },
   en: {
     all: 'All', warnings: 'Warnings', errors: 'Errors', waitingOps: 'Waiting for operations…',
@@ -460,7 +463,7 @@ export const PROGRESS_UI: Record<Language, {
     commonFixes: 'Common fixes:', fixVolume: 'Volume not mounted', fixVolumeDesc: 'make sure the disk is visible in Finder.',
     fixNtfs: 'Read-only NTFS', fixNtfsDesc: 'reformat as APFS or ExFAT.',
     fixPerms: 'macOS permissions', fixPermsDesc: 'System Settings › Privacy › Full Disk Access.',
-    processing: 'Processing…',
+    processing: 'Processing…', noLogs: 'No message for this filter.',
   },
   es: {
     all: 'Todos', warnings: 'Avisos', errors: 'Errores', waitingOps: 'Esperando operaciones…',
@@ -469,7 +472,7 @@ export const PROGRESS_UI: Record<Language, {
     commonFixes: 'Soluciones habituales:', fixVolume: 'Volumen no montado', fixVolumeDesc: 'compruebe que el disco aparece en el Finder.',
     fixNtfs: 'NTFS de solo lectura', fixNtfsDesc: 'formatee en APFS o ExFAT.',
     fixPerms: 'Permisos de macOS', fixPermsDesc: 'Ajustes del Sistema › Privacidad › Acceso total al disco.',
-    processing: 'Procesando…',
+    processing: 'Procesando…', noLogs: 'Ningún mensaje para este filtro.',
   },
   it: {
     all: 'Tutti', warnings: 'Avvisi', errors: 'Errori', waitingOps: 'In attesa di operazioni…',
@@ -478,6 +481,6 @@ export const PROGRESS_UI: Record<Language, {
     commonFixes: 'Soluzioni comuni:', fixVolume: 'Volume non montato', fixVolumeDesc: 'verificare che il disco sia visibile nel Finder.',
     fixNtfs: 'NTFS in sola lettura', fixNtfsDesc: 'riformattare in APFS o ExFAT.',
     fixPerms: 'Permessi macOS', fixPermsDesc: 'Impostazioni di Sistema › Privacy › Accesso completo al disco.',
-    processing: 'Elaborazione in corso…',
+    processing: 'Elaborazione in corso…', noLogs: 'Nessun messaggio per questo filtro.',
   },
 };

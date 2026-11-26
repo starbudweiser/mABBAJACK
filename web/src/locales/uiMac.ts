@@ -5,6 +5,7 @@
  */
 import type { Language } from './types';
 import type { MacText } from '../types/mac';
+import { fillText } from './plural.ts';
 
 export interface MacUi {
   // carte « Adaptation au Mac » (avant l’installation)
@@ -322,14 +323,14 @@ export const MAC_TEXTS: Record<Language, Record<string, string>> = {
   },
 };
 
-const fill = (s: string, v?: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v?.[k] ?? ''));
+const fill = (s: string, v: Record<string, string | number> | undefined, lang: Language) => fillText(s, v, lang);
 
 /** Un texte du moteur dans la langue de l’interface ; une clé inconnue s’affiche telle quelle (jamais vide). */
 export function macText(text: MacText | undefined | null, language: Language): string {
   if (!text) return '';
   const raw = (MAC_TEXTS[language] ?? MAC_TEXTS.fr)[text.key];
   if (raw === undefined) return text.key;
-  return fill(raw, text.params);
+  return fill(raw, text.params, language);
 }
 
 export const fillMac = fill;

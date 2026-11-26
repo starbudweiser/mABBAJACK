@@ -1,6 +1,7 @@
 import React from 'react';
 import { useI18n } from '../locales';
 import { translateLog } from '../locales/logCatalog';
+import { fmtNum } from '../locales/uiScreens';
 import { SIMPLE_UI, fillText } from '../locales/uiSimple';
 import { MAC_UI, fillMac } from '../locales/uiMac';
 import { MacReportCard } from '../components/MacCards';
@@ -36,9 +37,9 @@ export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, o
   if (p.stage === 'completed') {
     const missing = p.missingArchivesCount > 0 && (
       <div className="rounded-lg border border-[#f59e0b]/40 bg-[#3f2a0c]/30 p-3 text-body text-[#fbbf24] flex flex-col gap-2 items-center text-center">
-        <p>⚠ {fillText(ui.doneMissing, { n: p.missingArchivesCount })}</p>
+        <p>⚠ {fillText(ui.doneMissing, { n: p.missingArchivesCount }, language)}</p>
         <p className="text-meta text-[#aaaaaa]">{ui.doneRelaunch}</p>
-        <button type="button" className={btn.warning} onClick={onOpenManual}>{fillText(ui.manualDownloads, { n: p.missingArchivesCount })}</button>
+        <button type="button" className={btn.warning} onClick={onOpenManual}>{fillText(ui.manualDownloads, { n: p.missingArchivesCount }, language)}</button>
       </div>
     );
     const actions = (
@@ -56,7 +57,7 @@ export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, o
       return (
         <div className="flex-1 overflow-y-auto p-6 select-text">
           <div className="max-w-2xl mx-auto">
-            <MacReportCard report={p.mac} subtitle={fillMac(macUi.installDone, { name: m.parsedFile?.name || '' })}>
+            <MacReportCard report={p.mac} subtitle={fillMac(macUi.installDone, { name: m.parsedFile?.name || '' }, language)}>
               {missing}
               {actions}
             </MacReportCard>
@@ -69,12 +70,12 @@ export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, o
         <div className={`${card} max-w-lg w-full items-center text-center gap-4 p-8`}>
           <div className="text-[48px]">✅</div>
           <h2 className="text-display font-bold text-white">{p.missingArchivesCount > 0 ? ui.doneTitleMissing : ui.doneTitle}</h2>
-          <p className="text-body-lg text-[#dddddd]">{fillText(ui.doneBody, { name: m.parsedFile?.name || '' })}</p>
+          <p className="text-body-lg text-[#dddddd] [overflow-wrap:anywhere]">{fillText(ui.doneBody, { name: m.parsedFile?.name || '' }, language)}</p>
           {p.missingArchivesCount > 0 && (
-            <div className="rounded-lg border border-[#f59e0b]/40 bg-[#3f2a0c]/30 p-3 text-body text-[#fbbf24] flex flex-col gap-2 items-center">
-              <p>⚠ {fillText(ui.doneMissing, { n: p.missingArchivesCount })}</p>
+            <div className="rounded-lg border border-[#f59e0b]/40 bg-[#3f2a0c]/30 p-3 text-body text-[#fbbf24] flex flex-col gap-2 items-center text-center">
+              <p>⚠ {fillText(ui.doneMissing, { n: p.missingArchivesCount }, language)}</p>
               <p className="text-meta text-[#aaaaaa]">{ui.doneRelaunch}</p>
-              <button type="button" className={btn.warning} onClick={onOpenManual}>{fillText(ui.manualDownloads, { n: p.missingArchivesCount })}</button>
+              <button type="button" className={btn.warning} onClick={onOpenManual}>{fillText(ui.manualDownloads, { n: p.missingArchivesCount }, language)}</button>
             </div>
           )}
           <p className="text-body text-[#aaaaaa]">{ui.doneHow}</p>
@@ -94,7 +95,7 @@ export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, o
         <div className={`${card} max-w-lg w-full items-center text-center gap-4 p-8 border-[#ef4444]/40`}>
           <div className="text-[48px]">⚠️</div>
           <h2 className="text-display font-bold text-white">{ui.failTitle}</h2>
-          {p.errorMessage && <p className="text-body-lg text-[#f87171] break-words">{translateLog(p.errorMessage, language)}</p>}
+          {p.errorMessage && <p className="text-body-lg text-[#f87171] [overflow-wrap:anywhere]">{translateLog(p.errorMessage, language)}</p>}
           <p className="text-body text-[#aaaaaa]">{ui.failHint}</p>
           <button type="button" className={btn.primary} onClick={onBack}>{ui.retry}</button>
         </div>
@@ -111,21 +112,22 @@ export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, o
     <div className="flex-1 overflow-y-auto p-6 select-text">
       <div className="max-w-2xl mx-auto flex flex-col gap-4">
         <h2 className="text-display font-bold text-white">{ui.installTitle}</h2>
-        <p className="text-body-lg text-[#aaaaaa]">{m.parsedFile?.name}</p>
+        <p className="text-body-lg text-[#aaaaaa] [overflow-wrap:anywhere]">{m.parsedFile?.name}</p>
 
         <div className={`${card} gap-3`}>
-          <div className="flex items-baseline justify-between">
-            <span className="text-heading font-bold text-white">{p.isPaused ? ui.paused : stageLabel(p.stage)}</span>
-            <span className="text-heading font-bold text-[#38bdf8] font-mono">{indeterminate ? '' : `${pct.toFixed(0)} %`}</span>
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="text-heading font-bold text-white min-w-0 truncate">{p.isPaused ? ui.paused : stageLabel(p.stage)}</span>
+            <span className="text-heading font-bold text-[#38bdf8] font-mono tabular-nums shrink-0 min-w-[4.5rem] text-right">{indeterminate ? '' : `${fmtNum(Math.round(pct), language)} %`}</span>
           </div>
           <div className="h-3 rounded-full bg-[#262626] overflow-hidden">
-            <div className={`h-full rounded-full bg-[#0ea5e9] transition-all duration-500 ${indeterminate ? 'animate-pulse' : ''}`} style={{ width: indeterminate ? '100%' : `${pct}%` }} />
+            <div className={`h-full rounded-full bg-[#0ea5e9] transition-[width] duration-500 ${indeterminate ? 'animate-pulse' : ''}`} style={{ width: indeterminate ? '100%' : `${pct}%` }} />
           </div>
-          <div className="flex flex-wrap justify-between gap-2 text-body text-[#aaaaaa]">
-            <span>{p.totalItems > 0 && !(scanning && p.processedItems === 0) ? `${p.processedItems.toLocaleString(language)} / ${p.totalItems.toLocaleString(language)}` : ''}</span>
-            <span>{p.etaSeconds > 0 ? fillText(ui.eta, { time: mmss(p.etaSeconds) }) : ''}</span>
+          {/* hauteur réservée : les compteurs apparaissent sans pousser le reste */}
+          <div className="flex flex-wrap justify-between gap-2 text-body text-[#aaaaaa] min-h-[1.5em] tabular-nums">
+            <span>{p.totalItems > 0 && !(scanning && p.processedItems === 0) ? `${fmtNum(p.processedItems, language)} / ${fmtNum(p.totalItems, language)}` : ''}</span>
+            <span>{p.etaSeconds > 0 ? fillText(ui.eta, { time: mmss(p.etaSeconds) }, language) : ''}</span>
           </div>
-          {p.currentTask && <p className="text-meta text-[#8f8f8f] break-words">{translateLog(p.currentTask, language)}</p>}
+          <p className="text-meta text-[#8f8f8f] truncate min-h-[1.4em]" title={p.currentTask ? translateLog(p.currentTask, language) : undefined}>{p.currentTask ? translateLog(p.currentTask, language) : ''}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -134,8 +136,8 @@ export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, o
             : <button type="button" className={btn.secondary} onClick={m.pauseInstall}>⏸ {ui.pause}</button>}
           <button type="button" className={btn.danger} onClick={() => { m.cancelInstall(); onBack(); }}>✕ {ui.cancel}</button>
           {p.missingArchivesCount > 0 && (
-            <button type="button" className={`${btn.warning} ml-auto`} onClick={onOpenManual}>
-              {fillText(ui.manualDownloads, { n: p.missingArchivesCount })}
+            <button type="button" className={`${btn.warning} ml-auto tabular-nums`} onClick={onOpenManual}>
+              {fillText(ui.manualDownloads, { n: p.missingArchivesCount }, language)}
             </button>
           )}
         </div>
@@ -144,7 +146,7 @@ export const InstallStep: React.FC<Props> = ({ onOpenManual, onOpenPluginsTxt, o
           <summary className="cursor-pointer select-none text-body text-[#8f8f8f] hover:text-white">{ui.showDetails}</summary>
           <div className="mt-2 max-h-72 overflow-y-auto rounded-lg bg-[#181818] border border-[#2e2e2e] p-3 font-mono text-meta text-[#aaaaaa] space-y-0.5">
             {m.logs.slice(-100).map((l) => (
-              <div key={l.id} className={l.level === 'error' ? 'text-[#f87171]' : l.level === 'warn' ? 'text-[#fbbf24]' : l.level === 'success' ? 'text-[#4ade80]' : ''}>
+              <div key={l.id} className={`[overflow-wrap:anywhere] ${l.level === 'error' ? 'text-[#f87171]' : l.level === 'warn' ? 'text-[#fbbf24]' : l.level === 'success' ? 'text-[#4ade80]' : ''}`}>
                 {translateLog(l.message, language)}
               </div>
             ))}

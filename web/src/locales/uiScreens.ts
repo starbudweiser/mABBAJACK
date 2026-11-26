@@ -188,7 +188,7 @@ export const SETTINGS_UI: Record<Language, SettingsUi> = {
 // ── plugins.txt ──────────────────────────────────────────────────────────────
 export interface PluginsUi {
   title: string; subtitle: string; filter: string; copied: string; copyAll: string; download: string;
-  noMatch: string; footerHint: string; close: string;
+  noMatch: string; footerHint: string; close: string; count: string; empty: string; showAll: string;
 }
 
 export const PLUGINS_UI: Record<Language, PluginsUi> = {
@@ -196,21 +196,25 @@ export const PLUGINS_UI: Record<Language, PluginsUi> = {
     title: 'plugins.txt • Ordre de chargement post-LOOT', subtitle: 'Généré selon l’ordre optimal défini par la modlist « {name} »',
     filter: 'Filtrer les plugins (ex. : SkyUI, Dawnguard)…', copied: 'Copié !', copyAll: 'Tout copier', download: 'Télécharger plugins.txt',
     noMatch: 'Aucun plugin ne correspond à votre filtre.', footerHint: 'Sous macOS / Wine, ce fichier se place généralement dans :', close: 'Fermer',
+    count: '{n} plugin(s)', empty: 'Aucun plugin dans cette liste.', showAll: 'Tout afficher',
   },
   en: {
     title: 'plugins.txt • Post-LOOT load order', subtitle: 'Generated from the optimal order defined by the modlist "{name}"',
     filter: 'Filter plugins (e.g. SkyUI, Dawnguard)…', copied: 'Copied!', copyAll: 'Copy all', download: 'Download plugins.txt',
     noMatch: 'No plugin matches your filter.', footerHint: 'On macOS / Wine, this file usually goes in:', close: 'Close',
+    count: '{n} plugin(s)', empty: 'No plugin in this list.', showAll: 'Show all',
   },
   es: {
     title: 'plugins.txt • Orden de carga post-LOOT', subtitle: 'Generado según el orden óptimo definido por la modlist «{name}»',
     filter: 'Filtrar plugins (p. ej.: SkyUI, Dawnguard)…', copied: '¡Copiado!', copyAll: 'Copiar todo', download: 'Descargar plugins.txt',
     noMatch: 'Ningún plugin coincide con su filtro.', footerHint: 'En macOS / Wine, este archivo suele colocarse en:', close: 'Cerrar',
+    count: '{n} plugin(s)', empty: 'Ningún plugin en esta lista.', showAll: 'Mostrar todo',
   },
   it: {
     title: 'plugins.txt • Ordine di caricamento post-LOOT', subtitle: 'Generato secondo l\'ordine ottimale definito dalla modlist «{name}»',
     filter: 'Filtra i plugin (es.: SkyUI, Dawnguard)…', copied: 'Copiato!', copyAll: 'Copia tutto', download: 'Scarica plugins.txt',
     noMatch: 'Nessun plugin corrisponde al filtro.', footerHint: 'Su macOS / Wine, questo file si trova di solito in:', close: 'Chiudi',
+    count: '{n} plugin', empty: 'Nessun plugin in questa lista.', showAll: 'Mostra tutto',
   },
 };
 

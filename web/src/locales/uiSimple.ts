@@ -9,7 +9,7 @@ export interface SimpleUi {
   stepsLabel: string; stepChoose: string; stepPrepare: string; stepInstall: string; stepDone: string;
   expertMode: string; settings: string;
   // 1. choisir
-  chooseTitle: string; chooseSubtitle: string; search: string; loading: string; none: string;
+  chooseTitle: string; chooseSubtitle: string; search: string; loading: string; none: string; showAll: string;
   sortLabel: string; sortName: string; sortSizeAsc: string; sortSizeDesc: string; sortUpdated: string; sortNewest: string; hideNsfw: string; openFile: string; onDisk: string; install: string; by: string;
   compatible: string; needsAE: string; needsSE: string; gameLine: string; noGameLine: string;
   // 2. préparer
@@ -36,7 +36,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     expertMode: 'Mode expert', settings: 'Paramètres',
     chooseTitle: 'Choisissez une modlist',
     chooseSubtitle: 'Une modlist est une collection de mods prête à jouer. mABBAJACK la télécharge et l’installe pour vous.',
-    search: 'Rechercher une modlist…', loading: 'Chargement du catalogue…', none: 'Aucune modlist ne correspond.',
+    search: 'Rechercher une modlist…', loading: 'Chargement du catalogue…', none: 'Aucune modlist ne correspond.', showAll: 'Tout afficher',
     sortLabel: 'Trier par', sortName: 'Nom (A → Z)', sortSizeAsc: 'Taille croissante', sortSizeDesc: 'Taille décroissante', sortUpdated: 'Mise à jour récente', sortNewest: 'Création récente', hideNsfw: 'Masquer les modlists pour adultes', openFile: 'Ouvrir un fichier .wabbajack…', onDisk: 'sur disque', install: 'Installer', by: 'par',
     compatible: 'Compatible avec votre jeu', needsAE: 'Demande Skyrim AE', needsSE: 'Demande Skyrim SE',
     gameLine: 'Votre jeu : Skyrim {edition}', noGameLine: 'Skyrim n’a pas été trouvé sur ce Mac.',
@@ -74,7 +74,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     expertMode: 'Expert mode', settings: 'Settings',
     chooseTitle: 'Choose a modlist',
     chooseSubtitle: 'A modlist is a ready-to-play collection of mods. mABBAJACK downloads and installs it for you.',
-    search: 'Search for a modlist…', loading: 'Loading the catalog…', none: 'No modlist matches.',
+    search: 'Search for a modlist…', loading: 'Loading the catalog…', none: 'No modlist matches.', showAll: 'Show all',
     sortLabel: 'Sort by', sortName: 'Name (A → Z)', sortSizeAsc: 'Size, smallest first', sortSizeDesc: 'Size, largest first', sortUpdated: 'Recently updated', sortNewest: 'Newest', hideNsfw: 'Hide adult modlists', openFile: 'Open a .wabbajack file…', onDisk: 'on disk', install: 'Install', by: 'by',
     compatible: 'Compatible with your game', needsAE: 'Needs Skyrim AE', needsSE: 'Needs Skyrim SE',
     gameLine: 'Your game: Skyrim {edition}', noGameLine: 'Skyrim was not found on this Mac.',
@@ -112,7 +112,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     expertMode: 'Modo experto', settings: 'Ajustes',
     chooseTitle: 'Elija una modlist',
     chooseSubtitle: 'Una modlist es una colección de mods lista para jugar. mABBAJACK la descarga y la instala por usted.',
-    search: 'Buscar una modlist…', loading: 'Cargando el catálogo…', none: 'Ninguna modlist coincide.',
+    search: 'Buscar una modlist…', loading: 'Cargando el catálogo…', none: 'Ninguna modlist coincide.', showAll: 'Mostrar todo',
     sortLabel: 'Ordenar por', sortName: 'Nombre (A → Z)', sortSizeAsc: 'Tamaño ascendente', sortSizeDesc: 'Tamaño descendente', sortUpdated: 'Actualización reciente', sortNewest: 'Creación reciente', hideNsfw: 'Ocultar modlists para adultos', openFile: 'Abrir un archivo .wabbajack…', onDisk: 'en disco', install: 'Instalar', by: 'por',
     compatible: 'Compatible con su juego', needsAE: 'Requiere Skyrim AE', needsSE: 'Requiere Skyrim SE',
     gameLine: 'Su juego: Skyrim {edition}', noGameLine: 'No se encontró Skyrim en este Mac.',
@@ -150,7 +150,7 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
     expertMode: 'Modalità esperto', settings: 'Impostazioni',
     chooseTitle: 'Scegli una modlist',
     chooseSubtitle: 'Una modlist è una raccolta di mod pronta da giocare. mABBAJACK la scarica e la installa per te.',
-    search: 'Cerca una modlist…', loading: 'Caricamento del catalogo…', none: 'Nessuna modlist corrisponde.',
+    search: 'Cerca una modlist…', loading: 'Caricamento del catalogo…', none: 'Nessuna modlist corrisponde.', showAll: 'Mostra tutto',
     sortLabel: 'Ordina per', sortName: 'Nome (A → Z)', sortSizeAsc: 'Dimensione crescente', sortSizeDesc: 'Dimensione decrescente', sortUpdated: 'Aggiornamento recente', sortNewest: 'Creazione recente', hideNsfw: 'Nascondi le modlist per adulti', openFile: 'Apri un file .wabbajack…', onDisk: 'su disco', install: 'Installa', by: 'di',
     compatible: 'Compatibile con il tuo gioco', needsAE: 'Richiede Skyrim AE', needsSE: 'Richiede Skyrim SE',
     gameLine: 'Il tuo gioco: Skyrim {edition}', noGameLine: 'Skyrim non è stato trovato su questo Mac.',
@@ -185,4 +185,4 @@ export const SIMPLE_UI: Record<Language, SimpleUi> = {
   },
 };
 
-export const fillText = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ''));
+export { fillText } from './plural.ts';

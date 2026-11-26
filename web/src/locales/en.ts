@@ -31,7 +31,7 @@ export const en: Translations = {
     filterLabel: 'Filter',
     sortName: 'Name',
     sortUpdated: 'Last Updated',
-    archivesCount: 'archives',
+    archivesCount: 'archive(s)',
     totalSize: 'Mod Size',
     installedSize: 'Installed Size',
     installBtn: 'Install',

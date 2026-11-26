@@ -70,7 +70,7 @@ export const ChooseStep: React.FC = () => {
           <h2 className="text-display font-bold text-white">{ui.chooseTitle}</h2>
           <p className="text-body-lg text-[#aaaaaa] mt-1">{ui.chooseSubtitle}</p>
           <p className="text-meta text-[#8f8f8f] mt-1">
-            {game.found ? fillText(ui.gameLine, { edition: game.edition }) : game.loaded ? ui.noGameLine : ''}
+            {game.found ? fillText(ui.gameLine, { edition: game.edition }, language) : game.loaded ? ui.noGameLine : ''}
           </p>
         </div>
 
@@ -92,27 +92,35 @@ export const ChooseStep: React.FC = () => {
         </div>
 
         {m.isLoadingModlists && !list.length && <p className="text-body-lg text-[#8f8f8f] py-10 text-center">{ui.loading}</p>}
-        {!m.isLoadingModlists && !list.length && <p className="text-body-lg text-[#8f8f8f] py-10 text-center">{ui.none}</p>}
+        {!m.isLoadingModlists && !list.length && (
+          <div className="py-10 flex flex-col items-center gap-3 text-center">
+            <p className="text-body-lg text-[#8f8f8f] [overflow-wrap:anywhere]">{ui.none}</p>
+            {(search.trim() !== '' || hideNsfw) && m.galleryModlists.length > 0 && (
+              <button type="button" className={btn.secondary}
+                onClick={() => { setSearch(''); setHideNsfw(false); localStorage.setItem('mabbajack_gallery_hide_nsfw', '0'); }}>{ui.showAll}</button>
+            )}
+          </div>
+        )}
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(260px, 100%), 1fr))' }}>
           {list.map((x) => {
             const dl = x.download_metadata;
             const total = (dl?.SizeOfArchives || 0) + (dl?.SizeOfInstalledFiles || 0);
             const b = badge(x);
             return (
-              <div key={`${x.repositoryName}-${x.title}`} className="bg-[#222222] border border-[#2e2e2e] rounded-xl overflow-hidden flex flex-col">
+              <div key={`${x.repositoryName}-${x.title}`} className="sc-selectable !cursor-default bg-[#222222] border border-[#2e2e2e] rounded-xl overflow-hidden flex flex-col min-w-0">
                 <div className="aspect-video bg-[#181818]">
                   {x.links?.image && <img src={x.links.image} alt="" loading="lazy" className="w-full h-full object-cover" />}
                 </div>
                 <div className="p-3 flex flex-col gap-2 flex-1">
-                  <div>
-                    <h3 className="text-body-lg font-bold text-white leading-tight">{x.title}</h3>
-                    <p className="text-meta text-[#8f8f8f]">{ui.by} {x.author}</p>
+                  <div className="min-w-0">
+                    <h3 className="text-body-lg font-bold text-white leading-tight line-clamp-2 [overflow-wrap:anywhere]" title={x.title}>{x.title}</h3>
+                    {x.author && <p className="text-meta text-[#8f8f8f] truncate" title={x.author}>{ui.by} {x.author}</p>}
                   </div>
-                  {b && <span className={`self-start text-caption font-semibold px-2 py-0.5 rounded border ${b.cls}`}>{b.text}</span>}
+                  {b && <span className={`self-start max-w-full truncate text-caption font-semibold px-2 py-0.5 rounded border ${b.cls}`}>{b.text}</span>}
                   <div className="mt-auto flex items-center justify-between gap-2 pt-1">
-                    <span className="text-meta text-[#aaaaaa]">{total ? `${fmtBytes(total, language, 'gb')} ${ui.onDisk}` : ''}</span>
-                    <button type="button" className={btn.primary} onClick={() => m.installFromGallery(x)}>⬇️ {ui.install}</button>
+                    <span className="text-meta text-[#aaaaaa] min-w-0 truncate tabular-nums">{total ? `${fmtBytes(total, language, 'gb')} ${ui.onDisk}` : ''}</span>
+                    <button type="button" className={`${btn.primary} shrink-0`} onClick={() => m.installFromGallery(x)}>⬇️ {ui.install}</button>
                   </div>
                 </div>
               </div>

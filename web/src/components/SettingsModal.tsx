@@ -7,6 +7,7 @@ import { INSTALLER_UI, keyRefusalMessage } from '../locales/uiExtra';
 import { NexusAccount } from '../types/wabbajack';
 import { pickNativeFolder, getNativeClipboard } from '../services/api';
 import { SETTINGS_UI } from '../locales/uiScreens';
+import { fillText } from '../locales/plural.ts';
 import { DownloadsCleanup } from './DownloadsCleanup';
 
 interface SettingsModalProps {
@@ -68,7 +69,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       return;
     }
 
-    const manual = prompt(ui.manualPathPrompt.replace('{title}', title), currentVal || '');
+    const manual = prompt(fillText(ui.manualPathPrompt, { title }, language), currentVal || '');
     if (manual !== null && manual.trim()) {
       setter(manual.trim());
     }
@@ -138,12 +139,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-[#181818] border border-[#2e2e2e] rounded-xl max-w-xl w-full flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
+      <div className="bg-[#181818] border border-[#2e2e2e] rounded-xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
         {/* Modal Header */}
-        <div className="p-4 bg-[#181818] border-b border-[#2e2e2e] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">⚙️</span>
-            <div>
+        <div className="p-4 bg-[#181818] border-b border-[#2e2e2e] flex items-center justify-between gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-lg shrink-0">⚙️</span>
+            <div className="min-w-0">
               <h3 className="text-title font-bold text-white">{t.settings.title}</h3>
               <p className="text-meta text-[#8f8f8f]">{t.settings.subtitle}</p>
             </div>
@@ -151,7 +152,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-[#aaaaaa] hover:text-white px-2 py-1 text-heading cursor-pointer"
+            className="text-[#aaaaaa] hover:text-white px-2 py-1 text-heading cursor-pointer shrink-0"
           >
             ✕
           </button>
@@ -163,10 +164,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* Présentation de l'interface */}
           <div className="space-y-2">
             <span className="text-body font-bold text-white uppercase tracking-wider flex items-center gap-1.5"><span>🧭</span><span>{simpleUi.modeLabel}</span></span>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {(['simple', 'expert'] as const).map((md) => (
                 <button key={md} type="button" onClick={() => setUiMode(md)} aria-pressed={uiMode === md}
-                  className={`h-8 px-4 rounded-lg border text-body font-semibold cursor-pointer transition-colors ${uiMode === md ? 'bg-[#0369a1] border-[#0369a1] text-white' : 'bg-[#262626] border-[#444444] text-[#dddddd] hover:bg-[#333333]'}`}>
+                  className={`sc-selectable h-8 px-4 rounded-lg text-body font-semibold whitespace-nowrap bg-[#262626] text-[#dddddd] ${uiMode === md ? 'is-selected' : ''}`}>
                   {md === 'simple' ? simpleUi.modeSimple : simpleUi.modeExpert}
                 </button>
               ))}
@@ -199,7 +200,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   }
                 }}
                 placeholder={ui.keyPlaceholder}
-                className="flex-1 h-9 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
+                className="flex-1 min-w-0 h-9 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
               />
 
               <button
@@ -215,7 +216,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="button"
                 onClick={handlePaste}
                 title={ui.pasteFromClipboard}
-                className="h-9 px-3 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white font-semibold text-body rounded-md transition-colors cursor-pointer flex-shrink-0 flex items-center gap-1"
+                className="h-9 px-3 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white font-semibold text-body rounded-md transition-colors cursor-pointer flex-shrink-0 whitespace-nowrap flex items-center gap-1"
               >
                 <span>📋</span>
                 <span>{ui.paste}</span>
@@ -225,7 +226,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="button"
                 onClick={handleVerify}
                 disabled={isVerifying || !keyInput.trim()}
-                className="h-9 px-3 rounded-md bg-[#0369a1] hover:bg-[#0369a1] disabled:bg-[#2c2c2c] disabled:text-[#666666] text-white font-bold text-body transition-colors cursor-pointer flex-shrink-0"
+                className="h-9 px-3 rounded-md bg-[#0369a1] hover:bg-[#0369a1] disabled:bg-[#2c2c2c] disabled:text-[#666666] text-white font-bold text-body transition-colors cursor-pointer flex-shrink-0 whitespace-nowrap"
               >
                 {isVerifying ? ui.verifying : t.settings.verifyKeyBtn}
               </button>
@@ -233,7 +234,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {verifyMessage && (
               <div
-                className={`p-2 rounded text-body font-medium ${
+                className={`p-2 rounded text-body font-medium [overflow-wrap:anywhere] ${
                   verifyMessage.startsWith('✓')
                     ? 'bg-[#262626] text-[#4ade80] border border-[#22c55e]'
                     : 'bg-[#1e1e1e] text-[#f87171] border border-[#ef4444]'
@@ -243,8 +244,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             )}
 
-            <div className="flex items-center justify-between text-body pt-1">
-              <span className="text-[#666666]">
+            <div className="flex items-center justify-between gap-x-3 gap-y-1 flex-wrap text-body pt-1">
+              <span className="text-[#666666] min-w-0">
                 {nexusAccount?.isPremium
                   ? t.settings.nexusPremiumActive
                   : nexusAccount?.valid ? t.settings.nexusStandardAccount : ''}
@@ -253,7 +254,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 href="https://www.nexusmods.com/users/myaccount?tab=api"
                 target="_blank"
                 rel="noreferrer"
-                className="text-[#38bdf8] hover:underline"
+                className="text-[#38bdf8] hover:underline shrink-0"
               >
                 {t.settings.getKeyLink}
               </a>
@@ -279,12 +280,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     if (text) setDownloadsInput(text.trim());
                   }}
                   placeholder="/Volumes/Disk/DOWNLOADS"
-                  className="flex-1 h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
+                  className="flex-1 min-w-0 h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
                 />
                 <button
                   type="button"
                   onClick={() => handlePastePath(setDownloadsInput, downloadsInput)}
-                  className="h-8 px-2.5 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-md text-body font-semibold cursor-pointer"
+                  className="h-8 px-2.5 shrink-0 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-md text-body font-semibold cursor-pointer"
                   title={ui.pastePath}
                 >
                   📋
@@ -292,7 +293,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button
                   type="button"
                   onClick={() => pickFolder(ui.downloadsPickTitle, downloadsInput, setDownloadsInput)}
-                  className="h-8 px-3 bg-[#262626] hover:bg-[#333333] border border-[#333333] text-white rounded-md text-body font-semibold cursor-pointer"
+                  className="h-8 px-3 shrink-0 whitespace-nowrap bg-[#262626] hover:bg-[#333333] border border-[#333333] text-white rounded-md text-body font-semibold cursor-pointer"
                 >
                   {isBrowsing === ui.downloadsPickTitle ? ui.selecting : ui.browse}
                 </button>
@@ -311,12 +312,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     if (text) setDestInput(text.trim());
                   }}
                   placeholder="/Volumes/Disk/READY_TO_PLAY"
-                  className="flex-1 h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
+                  className="flex-1 min-w-0 h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body font-mono text-white placeholder-[#666666] focus:outline-none focus:border-[#0ea5e9] select-text"
                 />
                 <button
                   type="button"
                   onClick={() => handlePastePath(setDestInput, destInput)}
-                  className="h-8 px-2.5 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-md text-body font-semibold cursor-pointer"
+                  className="h-8 px-2.5 shrink-0 bg-[#262626] hover:bg-[#404040] border border-[#444444] text-white rounded-md text-body font-semibold cursor-pointer"
                   title={ui.pastePath}
                 >
                   📋
@@ -324,7 +325,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button
                   type="button"
                   onClick={() => pickFolder(ui.destPickTitle, destInput, setDestInput)}
-                  className="h-8 px-3 bg-[#262626] hover:bg-[#333333] border border-[#333333] text-white rounded-md text-body font-semibold cursor-pointer"
+                  className="h-8 px-3 shrink-0 whitespace-nowrap bg-[#262626] hover:bg-[#333333] border border-[#333333] text-white rounded-md text-body font-semibold cursor-pointer"
                 >
                   {isBrowsing === ui.destPickTitle ? ui.selecting : ui.browse}
                 </button>
@@ -343,8 +344,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <span>{t.settings.performanceSection}</span>
             </span>
 
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
                 <span className="text-white block font-medium">{t.settings.concurrencyThreads}</span>
                 <span className="text-meta text-[#666666]">
                   {ui.threadsHint}
@@ -353,7 +354,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <select
                 value={concurrency}
                 onChange={(e) => setConcurrency(parseInt(e.target.value, 10))}
-                className="h-8 px-3 bg-[#1e1e1e] border border-[#333333] rounded-md text-body text-white focus:outline-none focus:border-[#0ea5e9]"
+                className="h-8 px-3 shrink-0 bg-[#1e1e1e] border border-[#333333] rounded-md text-body text-white focus:outline-none focus:border-[#0ea5e9]"
               >
                 <option value={2}>2 {ui.threads}</option>
                 <option value={4}>4 {ui.threads} ({ui.recommended})</option>
@@ -365,7 +366,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 bg-[#181818] border-t border-[#2e2e2e] flex items-center justify-end gap-2">
+        <div className="p-4 bg-[#181818] border-t border-[#2e2e2e] flex items-center justify-end gap-2 flex-wrap flex-shrink-0">
           <button
             type="button"
             onClick={onClose}

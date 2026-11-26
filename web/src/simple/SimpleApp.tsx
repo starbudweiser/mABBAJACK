@@ -66,7 +66,7 @@ export const SimpleApp: React.FC = () => {
               <React.Fragment key={s}>
                 {i > 0 && <span className="text-[#444444]">›</span>}
                 <button type="button" disabled={!reachable(s) && !active} onClick={() => setStep(s)} aria-current={active ? 'step' : undefined}
-                  className={`px-3 py-1.5 rounded-md text-body font-medium whitespace-nowrap transition-colors ${active ? 'bg-[#0369a1] text-white font-semibold' : reachable(s) ? 'text-[#aaaaaa] hover:text-white hover:bg-[#262626] cursor-pointer' : 'text-[#555555] cursor-default'}`}>
+                  className={`px-3 py-1.5 rounded-md text-body font-medium whitespace-nowrap transition-colors ${active ? 'bg-[#35353a] text-white font-semibold' : reachable(s) ? 'text-[#aaaaaa] hover:text-white hover:bg-[#2c2c31] cursor-pointer' : 'text-[#555555] cursor-default'}`}>
                   <span className="font-mono mr-1.5 opacity-70">{i + 1}</span>{labels[s]}
                 </button>
               </React.Fragment>

@@ -109,7 +109,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
               <span>{t.progress.title}</span>
             </h2>
             {progress.stage !== 'idle' && (
-              <span className={`text-caption font-mono font-bold px-2 py-0.5 rounded-md border flex-shrink-0 ${
+              <span title={tr(progress.stageName)} className={`text-caption font-mono font-bold px-2 py-0.5 rounded-md border min-w-0 max-w-[40%] truncate ${
                 hasError     ? 'bg-[#ef4444]/15 text-[#f87171] border-[#ef4444]/40'
                 : isCompleted ? 'bg-[#22c55e]/15 text-[#4ade80] border-[#22c55e]/40'
                 : 'bg-[#0369a1]/15 text-[#38bdf8] border-[#0ea5e9]/30'
@@ -121,7 +121,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
           </div>
 
           {/* Action toolbar — grouped, separated by dividers */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
             {/* Group A: install controls (only while active) */}
             {isActive && (
               <>
@@ -170,12 +170,12 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
           <div className="bg-[#181818] border border-[#2e2e2e] rounded-lg px-3 py-2 flex flex-col md:flex-row md:items-center gap-1.5 text-body font-mono">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
               <span className="text-[#38bdf8] font-bold flex-shrink-0">📥 DL:</span>
-              <span className="text-[#666666] truncate">{downloadsPath || '—'}</span>
+              <span className="text-[#666666] truncate" title={downloadsPath}>{downloadsPath || '—'}</span>
             </div>
             <div className="hidden md:block w-px h-3 bg-[#333333] flex-shrink-0 mx-1" />
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
               <span className="text-[#4ade80] font-bold flex-shrink-0">🚀 RTP:</span>
-              <span className="text-white truncate">{destPath || '—'}</span>
+              <span className="text-white truncate" title={destPath}>{destPath || '—'}</span>
             </div>
           </div>
         )}
@@ -211,17 +211,17 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
         {/* Row 4: progress bar */}
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between text-body">
-            <span className={`font-medium truncate max-w-[70%] ${hasError ? 'text-[#f87171]' : 'text-[#aaaaaa]'}`}>
+            <span title={tr(progress.currentTask)} className={`font-medium truncate min-w-0 max-w-[70%] ${hasError ? 'text-[#f87171]' : 'text-[#aaaaaa]'}`}>
               {tr(progress.currentTask) || t.progress.overallProgress}
             </span>
-            <span className={`font-mono font-bold text-title flex-shrink-0 ${hasError ? 'text-[#f87171]' : 'text-[#38bdf8]'}`}>
+            <span className={`font-mono font-bold text-title flex-shrink-0 min-w-[5.5rem] text-right tabular-nums ${hasError ? 'text-[#f87171]' : 'text-[#38bdf8]'}`}>
               {fmtNum(progress.overallPercent, language, 1)}%
             </span>
           </div>
           {/* Overall progress bar */}
           <div className="w-full h-2.5 bg-[#1e1e1e] rounded-full overflow-hidden border border-[#2e2e2e]">
             <div
-              className={`h-full transition-all duration-500 rounded-full ${
+              className={`h-full transition-[width] duration-500 rounded-full ${
                 hasError ? 'bg-[#ef4444]'
                 : isCompleted ? 'bg-gradient-to-r from-[#22c55e] to-[#22c55e]'
                 : 'bg-gradient-to-r from-[#0369a1] via-[#0369a1] to-[#0369a1]'
@@ -238,12 +238,12 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-1 bg-[#1e1e1e] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-[#0369a1] to-[#0369a1] rounded-full transition-all duration-700"
+                      className="h-full bg-gradient-to-r from-[#0369a1] to-[#0369a1] rounded-full transition-[width] duration-700"
                       style={{ width: `${Math.min(100, progress.stagePercent)}%` }}
                     />
                   </div>
-                  <span className="text-caption font-mono text-[#666666] flex-shrink-0 w-8 text-right">
-                    {progress.stagePercent}%
+                  <span className="text-caption font-mono text-[#666666] flex-shrink-0 w-10 text-right tabular-nums">
+                    {fmtNum(progress.stagePercent, language)}%
                   </span>
                 </div>
               )}
@@ -259,14 +259,14 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
         {/* Row 5: stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-1 border-t border-[#2e2e2e]">
           {[
-            { label: ui.files, value: `${progress.processedItems} / ${progress.totalItems}`, color: 'text-white' },
+            { label: ui.files, value: `${fmtNum(progress.processedItems, language)} / ${fmtNum(progress.totalItems, language)}`, color: 'text-white' },
             { label: ui.data, value: `${formatBytes(progress.processedBytes)} / ${formatBytes(progress.totalBytes)}`, color: 'text-[#38bdf8]' },
             { label: t.progress.speed, value: progress.speedBytesPerSec > 0 ? `${fmtNum(progress.speedBytesPerSec / (1024 * 1024), language, 1)} ${mbps}` : `-- ${mbps}`, color: 'text-[#4ade80]' },
             { label: t.progress.eta, value: formatSeconds(progress.etaSeconds), color: 'text-[#fbbf24]' },
           ].map((s) => (
-            <div key={s.label} className="bg-[#181818] px-2.5 py-2 rounded-lg border border-[#2e2e2e]">
-              <span className="text-caption text-[#666666] uppercase font-bold block">{s.label}</span>
-              <span className={`text-body font-mono font-bold ${s.color} block mt-0.5`}>{s.value}</span>
+            <div key={s.label} className="bg-[#181818] px-2.5 py-2 rounded-lg border border-[#2e2e2e] min-w-0">
+              <span className="text-caption text-[#666666] uppercase font-bold block truncate" title={s.label}>{s.label}</span>
+              <span className={`text-body font-mono font-bold ${s.color} block mt-0.5 truncate tabular-nums`} title={s.value}>{s.value}</span>
             </div>
           ))}
         </div>
@@ -283,11 +283,11 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
       <div className="flex-1 bg-[#181818] border border-[#2e2e2e] rounded-xl overflow-hidden flex flex-col shadow-inner min-h-[320px]">
 
         {/* Terminal toolbar */}
-        <div className="h-9 px-3 bg-[#181818] border-b border-[#2e2e2e] flex items-center justify-between gap-3 flex-shrink-0">
-          <div className="flex items-center gap-2 text-[#666666] text-meta">
+        <div className="min-h-9 px-3 py-1 bg-[#181818] border-b border-[#2e2e2e] flex flex-wrap items-center justify-between gap-x-3 gap-y-1 flex-shrink-0">
+          <div className="flex items-center gap-2 text-[#666666] text-meta min-w-0">
             <span>💻</span>
-            <span className="font-medium text-[#aaaaaa]">{t.progress.terminalLogs}</span>
-            <span className="px-1.5 py-0.5 rounded bg-[#222222] text-caption">{logs.length}</span>
+            <span className="font-medium text-[#aaaaaa] truncate">{t.progress.terminalLogs}</span>
+            <span className="px-1.5 py-0.5 rounded bg-[#222222] text-caption tabular-nums">{fmtNum(logs.length, language)}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -334,8 +334,13 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
         {/* Terminal body */}
         <div ref={terminalRef} className="flex-1 p-3 overflow-y-auto font-mono text-body space-y-0.5 bg-[#181818]">
           {filteredLogs.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-[#666666] text-body">
-              {ui.waitingOps}
+            <div className="h-full flex flex-col items-center justify-center gap-2 text-[#666666] text-body text-center">
+              {logs.length === 0 ? ui.waitingOps : (
+                <>
+                  <span>{ui.noLogs}</span>
+                  <button type="button" onClick={() => setLogFilter('all')} className="text-[#38bdf8] hover:text-white cursor-pointer">{ui.all}</button>
+                </>
+              )}
             </div>
           ) : (
             [...filteredLogs].reverse().map((log) => {
@@ -348,10 +353,10 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
               };
               const s = style[log.level] || { line: 'text-[#dddddd]', tag: 'text-[#666666]' };
               return (
-                <div key={log.id} className="flex items-start gap-2 hover:bg-[#181818] px-1 py-px rounded leading-relaxed">
+                <div key={log.id} className="flex items-start gap-2 px-1 py-px rounded leading-relaxed">
                   <span className="text-[#1e1e1e] select-none whitespace-nowrap text-caption flex-shrink-0">{log.timestamp}</span>
                   <span className={`text-caption uppercase select-none w-[52px] flex-shrink-0 ${s.tag}`}>[{log.level}]</span>
-                  <span className={`flex-1 break-all whitespace-pre-wrap ${s.line}`}>{tr(log.message)}</span>
+                  <span className={`flex-1 min-w-0 [overflow-wrap:anywhere] whitespace-pre-wrap ${s.line}`}>{tr(log.message)}</span>
                 </div>
               );
             })

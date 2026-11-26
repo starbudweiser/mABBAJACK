@@ -16,7 +16,7 @@ export interface InstallerUi {
 
 export interface ManualUi {
   title: string; missingCount: string; subtitle: string; search: string; scanning: string; verify: string;
-  copyPath: string; pathCopied: string; allReady: string; noMatch: string; author: string; googleSearch: string;
+  copyPath: string; pathCopied: string; allReady: string; noMatch: string; showAll: string; author: string; googleSearch: string;
   footer: string; close: string; gameFile: string; gameFileHint: string; expectedAt: string;
   nxmHint: string; nxmDownloading: string; nxmDone: string; nxmError: string; nxmOther: string; nxmClaim: string;
 }
@@ -33,7 +33,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     previewOpenBtn: '📁 Parcourir un fichier… de l\'Inspecteur.',
     downloadsTitle: '1. Dossier DOWNLOADS', downloadsHint: 'Stockage des archives .7z/.zip/.rar téléchargées (mods bruts).',
     downloadsSelect: 'Sélectionnez le dossier DOWNLOADS',
-    cache: 'Cache :', archivesReady: 'archives prêtes', missing: 'manquantes →', allPresent: '✓ Toutes présentes',
+    cache: 'Cache :', archivesReady: 'archive(s) prête(s)', missing: 'manquante(s) →', allPresent: '✓ Toutes présentes',
     destTitle: '2. Dossier READY TO PLAY', destBadge: 'Destination finale',
     destHint: 'Les fichiers seront extraits ici selon les directives Wabbajack. Copiez ensuite dans votre Skyrim/Data.',
     destSelect: 'Sélectionnez le dossier READY TO PLAY',
@@ -41,7 +41,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     pasteKeyPrompt: 'Collez votre clé API Nexus Mods :', keyPasted: '✓ Clé collée', keyInvalid: '✕ Clé invalide', keyError: '✕ Erreur de validation', keyOffline: '⚠ Nexus injoignable : clé non vérifiée', keyRateLimited: '⚠ Limite de requêtes Nexus atteinte : réessayez dans une heure', keyNexusError: '⚠ Nexus a répondu HTTP {n} : incident côté Nexus, la clé n\'est pas en cause',
     premiumAuto: 'Premium ⭐ (téléchargements automatiques)', standardManual: 'Standard (URLs manuelles générées)',
     blockedTitle: '⛔ Installation bloquée',
-    blockedBody: 'Aucun fichier .wabbajack réel chargé. Chargez d\'abord le vrai fichier pour débloquer l\'installation.', archivesN: '{n} archives',
+    blockedBody: 'Aucun fichier .wabbajack réel chargé. Chargez d\'abord le vrai fichier pour débloquer l\'installation.', archivesN: '{n} archive(s)',
     launch: 'Lancer le Déploiement Ready to Play',
     footer: 'Extraction sélective selon les directives Wabbajack · plugins.txt & loadorder.txt générés',
     pathPrompt: 'Chemin pour :', pastePrompt: 'Chemin (collez avec Cmd+V) :',
@@ -57,7 +57,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     previewOpenBtn: '📁 Browse for a file… in the Inspector.',
     downloadsTitle: '1. DOWNLOADS folder', downloadsHint: 'Storage for downloaded .7z/.zip/.rar archives (raw mods).',
     downloadsSelect: 'Select the DOWNLOADS folder',
-    cache: 'Cache:', archivesReady: 'archives ready', missing: 'missing →', allPresent: '✓ All present',
+    cache: 'Cache:', archivesReady: 'archive(s) ready', missing: 'missing →', allPresent: '✓ All present',
     destTitle: '2. READY TO PLAY folder', destBadge: 'Final destination',
     destHint: 'Files are extracted here following Wabbajack directives. Then copy them into your Skyrim/Data.',
     destSelect: 'Select the READY TO PLAY folder',
@@ -65,7 +65,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     pasteKeyPrompt: 'Paste your Nexus Mods API key:', keyPasted: '✓ Key pasted', keyInvalid: '✕ Invalid key', keyError: '✕ Validation error', keyOffline: '⚠ Nexus unreachable: key not verified', keyRateLimited: '⚠ Nexus request limit reached: try again in an hour', keyNexusError: '⚠ Nexus answered HTTP {n}: a Nexus-side problem, your key is not the cause',
     premiumAuto: 'Premium ⭐ (automatic downloads)', standardManual: 'Standard (manual URLs generated)',
     blockedTitle: '⛔ Installation blocked',
-    blockedBody: 'No real .wabbajack file loaded. Load the actual file first to unlock the installation.', archivesN: '{n} archives',
+    blockedBody: 'No real .wabbajack file loaded. Load the actual file first to unlock the installation.', archivesN: '{n} archive(s)',
     launch: 'Start Ready to Play Deployment',
     footer: 'Selective extraction following Wabbajack directives · plugins.txt & loadorder.txt generated',
     pathPrompt: 'Path for:', pastePrompt: 'Path (paste with Cmd+V):',
@@ -81,7 +81,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     previewOpenBtn: '📁 Examinar un archivo… del Inspector.',
     downloadsTitle: '1. Carpeta DOWNLOADS', downloadsHint: 'Almacenamiento de los archivos .7z/.zip/.rar descargados (mods en bruto).',
     downloadsSelect: 'Seleccione la carpeta DOWNLOADS',
-    cache: 'Caché:', archivesReady: 'archivos listos', missing: 'faltantes →', allPresent: '✓ Todos presentes',
+    cache: 'Caché:', archivesReady: 'archivo(s) listo(s)', missing: 'faltante(s) →', allPresent: '✓ Todos presentes',
     destTitle: '2. Carpeta READY TO PLAY', destBadge: 'Destino final',
     destHint: 'Los archivos se extraen aquí según las directivas de Wabbajack. Luego cópielos en su Skyrim/Data.',
     destSelect: 'Seleccione la carpeta READY TO PLAY',
@@ -89,7 +89,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     pasteKeyPrompt: 'Pegue su clave API de Nexus Mods:', keyPasted: '✓ Clave pegada', keyInvalid: '✕ Clave no válida', keyError: '✕ Error de validación', keyOffline: '⚠ Nexus inaccesible: clave no verificada', keyRateLimited: '⚠ Límite de solicitudes de Nexus alcanzado: inténtelo de nuevo en una hora', keyNexusError: '⚠ Nexus respondió HTTP {n}: problema de Nexus, la clave no es la causa',
     premiumAuto: 'Premium ⭐ (descargas automáticas)', standardManual: 'Standard (URL manuales generadas)',
     blockedTitle: '⛔ Instalación bloqueada',
-    blockedBody: 'No se ha cargado ningún archivo .wabbajack real. Cargue primero el archivo real para desbloquear la instalación.', archivesN: '{n} archivos',
+    blockedBody: 'No se ha cargado ningún archivo .wabbajack real. Cargue primero el archivo real para desbloquear la instalación.', archivesN: '{n} archivo(s)',
     launch: 'Iniciar el despliegue Ready to Play',
     footer: 'Extracción selectiva según las directivas de Wabbajack · plugins.txt y loadorder.txt generados',
     pathPrompt: 'Ruta para:', pastePrompt: 'Ruta (pegue con Cmd+V):',
@@ -105,7 +105,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     previewOpenBtn: '📁 Sfoglia un file… dell\'Ispettore.',
     downloadsTitle: '1. Cartella DOWNLOADS', downloadsHint: 'Archivio dei file .7z/.zip/.rar scaricati (mod grezze).',
     downloadsSelect: 'Seleziona la cartella DOWNLOADS',
-    cache: 'Cache:', archivesReady: 'archivi pronti', missing: 'mancanti →', allPresent: '✓ Tutti presenti',
+    cache: 'Cache:', archivesReady: 'archivio/i pronto/i', missing: 'mancante/i →', allPresent: '✓ Tutti presenti',
     destTitle: '2. Cartella READY TO PLAY', destBadge: 'Destinazione finale',
     destHint: 'I file vengono estratti qui secondo le direttive Wabbajack. Copiarli poi in Skyrim/Data.',
     destSelect: 'Seleziona la cartella READY TO PLAY',
@@ -113,7 +113,7 @@ export const INSTALLER_UI: Record<Language, InstallerUi> = {
     pasteKeyPrompt: 'Incollare la chiave API di Nexus Mods:', keyPasted: '✓ Chiave incollata', keyInvalid: '✕ Chiave non valida', keyError: '✕ Errore di convalida', keyOffline: '⚠ Nexus irraggiungibile: chiave non verificata', keyRateLimited: '⚠ Limite di richieste Nexus raggiunto: riprovare tra un\'ora', keyNexusError: '⚠ Nexus ha risposto HTTP {n}: problema di Nexus, la chiave non è la causa',
     premiumAuto: 'Premium ⭐ (download automatici)', standardManual: 'Standard (URL manuali generati)',
     blockedTitle: '⛔ Installazione bloccata',
-    blockedBody: 'Nessun vero file .wabbajack caricato. Caricare prima il file reale per sbloccare l\'installazione.', archivesN: '{n} archivi',
+    blockedBody: 'Nessun vero file .wabbajack caricato. Caricare prima il file reale per sbloccare l\'installazione.', archivesN: '{n} archivio/i',
     launch: 'Avvia il deployment Ready to Play',
     footer: 'Estrazione selettiva secondo le direttive Wabbajack · plugins.txt e loadorder.txt generati',
     pathPrompt: 'Percorso per:', pastePrompt: 'Percorso (incolla con Cmd+V):',
@@ -124,11 +124,11 @@ export const MANUAL_UI: Record<Language, ManualUi> = {
   fr: {
     nxmHint: 'Compte gratuit : sur la page Nexus, cliquez sur « Mod Manager Download » puis « Slow download ». mABBAJACK reçoit le fichier et le range tout seul dans DOWNLOADS.', nxmDownloading: 'Réception de {name}…', nxmDone: '{name} reçu.', nxmError: 'Échec du lien Nexus : {error}',
     nxmOther: 'Les liens Nexus s\'ouvrent pour l\'instant dans {app} : mABBAJACK ne recevra pas les fichiers.', nxmClaim: 'Utiliser mABBAJACK pour les liens Nexus',
-    title: 'Téléchargement manuel d\'archives', missingCount: '{n} manquantes ({size})',
+    title: 'Téléchargement manuel d\'archives', missingCount: '{n} manquante(s) ({size})',
     subtitle: 'Téléchargez les archives de mods et déposez-les dans votre dossier DOWNLOADS. Les fichiers du jeu, eux, sont lus dans le dossier du jeu.',
     search: 'Rechercher une archive manquante…', scanning: 'Scan en cours…', verify: 'Vérifier les fichiers',
     copyPath: 'Copier le chemin du dossier', pathCopied: 'Chemin copié dans le presse-papier :',
-    allReady: 'Toutes les archives sont prêtes !', noMatch: 'Aucune archive manquante ne correspond à votre recherche.',
+    allReady: 'Toutes les archives sont prêtes !', noMatch: 'Aucune archive manquante ne correspond à votre recherche.', showAll: 'Tout afficher',
     author: 'Auteur', googleSearch: 'Recherche Google',
     footer: 'Après avoir déposé les fichiers, cliquez sur « Vérifier les fichiers ».', close: 'Fermer',
     gameFile: 'Fichier du jeu', gameFileHint: 'Non téléchargeable : renseignez « Dossier du jeu Skyrim ».', expectedAt: 'Attendu :',
@@ -140,7 +140,7 @@ export const MANUAL_UI: Record<Language, ManualUi> = {
     subtitle: 'Download the mod archives and drop them into your DOWNLOADS folder. Game files are read from the game folder instead.',
     search: 'Search a missing archive…', scanning: 'Scanning…', verify: 'Verify files',
     copyPath: 'Copy folder path', pathCopied: 'Path copied to clipboard:',
-    allReady: 'All archives are ready!', noMatch: 'No missing archive matches your search.',
+    allReady: 'All archives are ready!', noMatch: 'No missing archive matches your search.', showAll: 'Show all',
     author: 'Author', googleSearch: 'Google search',
     footer: 'Once the files are in place, click "Verify files".', close: 'Close',
     gameFile: 'Game file', gameFileHint: 'Not downloadable: fill in "Skyrim game folder".', expectedAt: 'Expected at:',
@@ -148,11 +148,11 @@ export const MANUAL_UI: Record<Language, ManualUi> = {
   es: {
     nxmHint: 'Cuenta gratuita: en la página de Nexus, pulsa «Mod Manager Download» y luego «Slow download». mABBAJACK recibe el archivo y lo guarda solo en DOWNLOADS.', nxmDownloading: 'Recibiendo {name}…', nxmDone: '{name} recibido.', nxmError: 'Fallo del enlace de Nexus: {error}',
     nxmOther: 'Los enlaces de Nexus se abren ahora en {app}: mABBAJACK no recibirá los archivos.', nxmClaim: 'Usar mABBAJACK para los enlaces de Nexus',
-    title: 'Descarga manual de archivos', missingCount: '{n} faltantes ({size})',
+    title: 'Descarga manual de archivos', missingCount: '{n} faltante(s) ({size})',
     subtitle: 'Descargue los archivos de mods y colóquelos en su carpeta DOWNLOADS. Los archivos del juego se leen desde la carpeta del juego.',
     search: 'Buscar un archivo faltante…', scanning: 'Escaneando…', verify: 'Verificar archivos',
     copyPath: 'Copiar la ruta de la carpeta', pathCopied: 'Ruta copiada al portapapeles:',
-    allReady: '¡Todos los archivos están listos!', noMatch: 'Ningún archivo faltante coincide con su búsqueda.',
+    allReady: '¡Todos los archivos están listos!', noMatch: 'Ningún archivo faltante coincide con su búsqueda.', showAll: 'Mostrar todo',
     author: 'Autor', googleSearch: 'Búsqueda en Google',
     footer: 'Cuando los archivos estén en su sitio, pulse «Verificar archivos».', close: 'Cerrar',
     gameFile: 'Archivo del juego', gameFileHint: 'No descargable: indique «Carpeta del juego Skyrim».', expectedAt: 'Esperado en:',
@@ -160,11 +160,11 @@ export const MANUAL_UI: Record<Language, ManualUi> = {
   it: {
     nxmHint: 'Account gratuito: nella pagina Nexus, fai clic su «Mod Manager Download» e poi su «Slow download». mABBAJACK riceve il file e lo mette da solo in DOWNLOADS.', nxmDownloading: 'Ricezione di {name}…', nxmDone: '{name} ricevuto.', nxmError: 'Link Nexus non riuscito: {error}',
     nxmOther: 'Al momento i link Nexus si aprono in {app}: mABBAJACK non riceverà i file.', nxmClaim: 'Usa mABBAJACK per i link Nexus',
-    title: 'Download manuale degli archivi', missingCount: '{n} mancanti ({size})',
+    title: 'Download manuale degli archivi', missingCount: '{n} mancante/i ({size})',
     subtitle: 'Scaricare gli archivi delle mod e metterli nella cartella DOWNLOADS. I file del gioco vengono invece letti dalla cartella del gioco.',
     search: 'Cerca un archivio mancante…', scanning: 'Scansione in corso…', verify: 'Verifica file',
     copyPath: 'Copia il percorso della cartella', pathCopied: 'Percorso copiato negli appunti:',
-    allReady: 'Tutti gli archivi sono pronti!', noMatch: 'Nessun archivio mancante corrisponde alla ricerca.',
+    allReady: 'Tutti gli archivi sono pronti!', noMatch: 'Nessun archivio mancante corrisponde alla ricerca.', showAll: 'Mostra tutto',
     author: 'Autore', googleSearch: 'Ricerca Google',
     footer: 'Dopo aver inserito i file, fare clic su «Verifica file».', close: 'Chiudi',
     gameFile: 'File del gioco', gameFileHint: 'Non scaricabile: compilare «Cartella del gioco Skyrim».', expectedAt: 'Atteso in:',
@@ -186,7 +186,7 @@ export const OPTIONS_UI: Record<Language, OptionsUi> = {
     profilesHint: 'Un seul profil peut être installé.', choicesTitle: 'Choix exclusifs', format: "Format d'écran", formatDetected: 'détecté : {ratio}', family: 'Interface {tag}', variant: '{label}',
     title: 'Mods optionnels', hint: 'Désactivés par défaut dans la modlist (ex. ultra-wide, manette, ENB, contenus NSFW). Seuls les mods cochés seront installés.',
     loading: 'Analyse des options…', error: 'Options indisponibles pour ce fichier.', profile: 'Profil',
-    selected: '{n} / {total} sélectionné(s) · {size}', checkAll: 'Tout cocher', uncheckAll: 'Tout décocher',
+    selected: '{n} sélectionné(s) sur {total} · {size}', checkAll: 'Tout cocher', uncheckAll: 'Tout décocher',
     note: 'Les mods non cochés ne sont ni téléchargés ni installés.',
     restoredSaved: '✓ Sélections reprises de l\'installation existante.', restoredDisk: '✓ Sélections déduites de l\'installation existante (fichiers présents) : vérifiez-les avant la mise à jour.',
   },
@@ -206,7 +206,7 @@ export const OPTIONS_UI: Record<Language, OptionsUi> = {
     profilesHint: 'Solo se puede instalar un perfil.', choicesTitle: 'Opciones exclusivas', format: 'Formato de pantalla', formatDetected: 'detectado: {ratio}', family: 'Interfaz {tag}', variant: '{label}',
     title: 'Mods opcionales', hint: 'Desactivados por defecto en la modlist (p. ej. ultra-wide, mando, ENB, contenido NSFW). Solo se instalarán los mods marcados.',
     loading: 'Analizando opciones…', error: 'Opciones no disponibles para este archivo.', profile: 'Perfil',
-    selected: '{n} / {total} seleccionado(s) · {size}', checkAll: 'Marcar todo', uncheckAll: 'Desmarcar todo',
+    selected: '{n} seleccionado(s) de {total} · {size}', checkAll: 'Marcar todo', uncheckAll: 'Desmarcar todo',
     note: 'Los mods sin marcar no se descargan ni se instalan.',
     restoredSaved: '✓ Selecciones recuperadas de la instalación existente.', restoredDisk: '✓ Selecciones deducidas de la instalación existente (archivos presentes): revíselas antes de actualizar.',
   },
@@ -216,7 +216,7 @@ export const OPTIONS_UI: Record<Language, OptionsUi> = {
     profilesHint: 'È possibile installare un solo profilo.', choicesTitle: 'Scelte esclusive', format: 'Formato schermo', formatDetected: 'rilevato: {ratio}', family: 'Interfaccia {tag}', variant: '{label}',
     title: 'Mod opzionali', hint: 'Disattivate per impostazione predefinita nella modlist (es. ultra-wide, controller, ENB, contenuti NSFW). Verranno installate solo le mod selezionate.',
     loading: 'Analisi delle opzioni…', error: 'Opzioni non disponibili per questo file.', profile: 'Profilo',
-    selected: '{n} / {total} selezionata/e · {size}', checkAll: 'Seleziona tutto', uncheckAll: 'Deseleziona tutto',
+    selected: '{n} selezionata/e su {total} · {size}', checkAll: 'Seleziona tutto', uncheckAll: 'Deseleziona tutto',
     note: 'Le mod non selezionate non vengono né scaricate né installate.',
     restoredSaved: '✓ Selezioni riprese dall\'installazione esistente.', restoredDisk: '✓ Selezioni dedotte dall\'installazione esistente (file presenti): verificale prima dell\'aggiornamento.',
   },
@@ -252,6 +252,7 @@ export const IMPORT_UI: Record<Language, ImportUi> = {
 export interface ScanUi {
   listing: string; matching: string; hint: string; availability: string; noFolder: string;
   missingN: string; scanning: string; showMore: string; showLess: string;
+  noArchives: string; noDirectives: string; showAll: string;
 }
 
 export const SCAN_UI: Record<Language, ScanUi> = {
@@ -260,24 +261,28 @@ export const SCAN_UI: Record<Language, ScanUi> = {
     hint: 'Peut durer une à deux minutes sur un grand dossier : l\'application n\'a pas planté.',
     availability: 'Archives locales', noFolder: 'Dossier de téléchargement non défini (Installation).',
     missingN: '{n} manquante(s)', scanning: 'Scan en cours…', showMore: 'Voir plus', showLess: 'Réduire',
+    noArchives: 'Aucune archive ne correspond à ce filtre.', noDirectives: 'Aucune instruction à afficher.', showAll: 'Tout afficher',
   },
   en: {
     listing: 'Reading the download folder…', matching: 'Matching the modlist archives…',
     hint: 'This can take a minute or two on a large folder: the app has not crashed.',
     availability: 'Local archives', noFolder: 'Download folder not set (Install tab).',
     missingN: '{n} missing', scanning: 'Scanning…', showMore: 'Show more', showLess: 'Show less',
+    noArchives: 'No archive matches this filter.', noDirectives: 'No instruction to show.', showAll: 'Show all',
   },
   es: {
     listing: 'Leyendo la carpeta de descargas…', matching: 'Buscando los archivos de la modlist…',
     hint: 'Puede tardar uno o dos minutos en una carpeta grande: la aplicación no se ha bloqueado.',
     availability: 'Archivos locales', noFolder: 'Carpeta de descargas no definida (pestaña Instalación).',
     missingN: '{n} faltante(s)', scanning: 'Escaneando…', showMore: 'Ver más', showLess: 'Reducir',
+    noArchives: 'Ningún archivo coincide con este filtro.', noDirectives: 'Ninguna instrucción que mostrar.', showAll: 'Mostrar todo',
   },
   it: {
     listing: 'Lettura della cartella dei download…', matching: 'Ricerca degli archivi della modlist…',
     hint: 'Può richiedere uno o due minuti su una cartella grande: l\'applicazione non si è bloccata.',
     availability: 'Archivi locali', noFolder: 'Cartella dei download non definita (scheda Installazione).',
     missingN: '{n} mancante/i', scanning: 'Scansione in corso…', showMore: 'Mostra altro', showLess: 'Riduci',
+    noArchives: 'Nessun archivio corrisponde a questo filtro.', noDirectives: 'Nessuna istruzione da mostrare.', showAll: 'Mostra tutto',
   },
 };
 

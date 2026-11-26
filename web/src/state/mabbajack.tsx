@@ -179,7 +179,7 @@ function useMabbajackState() {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 20) {
           setGalleryModlists(data);
-          addLog('success', `${data.length} modlists chargées depuis le serveur local.`);
+          addLog('success', `${data.length} modlist(s) chargée(s) depuis le serveur local.`);
           setIsLoadingModlists(false);
           return;
         }
@@ -210,7 +210,7 @@ function useMabbajackState() {
       const enriched = deduped.map((m) => ({ ...m, skyrimVersion: classifyVersion(m) }));
       if (enriched.length > 0) {
         setGalleryModlists(enriched);
-        addLog('success', `${enriched.length} modlists agrégées depuis GitHub (${repoUrls.length} dépôts).`);
+        addLog('success', `${enriched.length} modlist(s) agrégée(s) depuis GitHub (${repoUrls.length} dépôt(s)).`);
         setIsLoadingModlists(false);
         return;
       }
@@ -224,7 +224,7 @@ function useMabbajackState() {
       if (featRes.ok) {
         const featured = await featRes.json();
         setGalleryModlists(featured.map((m: any) => ({ ...m, skyrimVersion: classifyVersion(m) })));
-        addLog('warn', `Catalogue partiel : ${featured.length} modlists officielles seulement.`);
+        addLog('warn', `Catalogue partiel : ${featured.length} modlist(s) officielle(s) seulement.`);
         setIsLoadingModlists(false);
         return;
       }
@@ -465,7 +465,7 @@ function useMabbajackState() {
       const modArchives = data.archives.filter((a: ModlistArchive) => a.sourceKind !== 'game');
       const ready = modArchives.filter((a: ModlistArchive) => a.status === 'ready').length;
       if (ready > 0) {
-        addLog('success', `✓ ${ready}/${modArchives.length} archives détectées dans DOWNLOADS.`);
+        addLog('success', `✓ ${ready}/${modArchives.length} archive(s) détectée(s) dans DOWNLOADS.`);
       } else if (modArchives.length > 0) {
         addLog('warn', `⚠ Aucune archive trouvée dans ${downloadsPath}. Vérifiez le chemin.`);
       }

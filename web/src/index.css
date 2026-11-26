@@ -96,3 +96,25 @@ input[type='radio'], input[type='checkbox'] {
   accent-color: var(--accent);
   cursor: pointer;
 }
+
+/* Survol et sélection sans encadré (Socle, « États ») : seul le fond change ; le contour reste réservé au focus clavier */
+.sc-selectable { transition: background-color 150ms ease-out; cursor: pointer; outline: none; }
+.sc-selectable:hover { background: var(--surface-hover); }
+.sc-selectable.is-selected { background: var(--surface-selected); color: var(--text-strong); }
+.sc-selectable:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+/* Encart de résumé (état + action) : contenu centré */
+.sc-summary { display: flex; flex-direction: column; align-items: center; gap: var(--space-1\.5); text-align: center; padding: var(--space-3); border-radius: var(--radius-lg); background: var(--surface-raised); }
+
+/* Chiffres qui changent : largeur constante, pas de saut */
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Barre indéterminée (durée inconnue) : va-et-vient lent, immobile en mouvement réduit */
+.sc-indeterminate { animation: importSlide 1.2s ease-in-out infinite alternate; }
+@keyframes importSlide { from { margin-left: 0; } to { margin-left: 66%; } }
+
+/* Mouvement réduit : plus de transitions ni d'animations décoratives (les roues de chargement restent) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .animate-ping, .animate-pulse, .animate-pulse-subtle, .animate-fadeIn, .sc-indeterminate { animation: none !important; }
+}

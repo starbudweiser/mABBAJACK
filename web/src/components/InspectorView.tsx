@@ -3,7 +3,8 @@ import { useI18n } from '../locales';
 import { btn, badge, Divider } from '../design';
 import { ParsedWabbajackFile, ModlistArchive } from '../types/wabbajack';
 import { useTranslated } from '../hooks/useTranslated';
-import { INSPECTOR_UI, fmtBytes, colon } from '../locales/uiScreens';
+import { INSPECTOR_UI, fmtBytes, fmtNum, colon } from '../locales/uiScreens';
+import { fillText } from '../locales/plural.ts';
 import { SCAN_UI } from '../locales/uiExtra';
 import type { ScanProgress } from '../services/api';
 import UpdateCard from './UpdateCard';
@@ -145,24 +146,18 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
           </div>
 
           <h2 className="text-heading font-bold text-white mb-1">{t.inspector.title}</h2>
-          <p className="text-body text-[#8f8f8f] max-w-md mb-6 leading-relaxed">
+          <p className="text-body text-[#8f8f8f] max-w-md mb-6 leading-relaxed [overflow-wrap:anywhere]">
             {t.inspector.subtitle}
           </p>
 
           {/* Drag & Drop Zone */}
           <div
             onClick={() => fileInputRef.current?.click()}
-            className={`w-full border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-200 group ${
-              isDragActive
-                ? 'border-[#0ea5e9] bg-[#0369a1]/10 shadow-[0_0_20px_rgba(14,165,233,0.3)]'
-                : 'border-[#333333] hover:border-[#0ea5e9] bg-[#181818] hover:bg-[#181818]'
-            }`}
+            className={`sc-selectable w-full border-2 border-dashed border-[#333333] rounded-xl p-8 flex flex-col items-center justify-center gap-3 bg-[#181818] ${isDragActive ? 'is-selected' : ''}`}
           >
-            <span className={`text-4xl transition-transform ${isDragActive ? 'scale-125 text-[#38bdf8]' : 'group-hover:scale-110'}`}>
-              📂
-            </span>
+            <span className="text-4xl">📂</span>
             <div className="space-y-1">
-              <span className="text-body-lg font-semibold text-white block group-hover:text-[#38bdf8]">
+              <span className="text-body-lg font-semibold text-white block">
                 {isDragActive ? ui.dropRelease : t.inspector.dropModlist}
               </span>
               <span className="text-meta text-[#666666] block font-mono">
@@ -228,17 +223,19 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-heading font-bold text-white leading-tight">{parsedFile.name}</h2>
-              <span className="px-2 py-0.5 rounded text-caption font-mono font-bold bg-[#0369a1]/20 text-[#38bdf8] border border-[#0ea5e9]/30">
+              <h2 className="text-heading font-bold text-white leading-tight [overflow-wrap:anywhere] min-w-0">{parsedFile.name}</h2>
+              <span className="px-2 py-0.5 rounded text-caption font-mono font-bold bg-[#0369a1]/20 text-[#38bdf8] border border-[#0ea5e9]/30 max-w-[12rem] truncate" title={`v${parsedFile.version || '1.0'}`}>
                 v{parsedFile.version || '1.0'}
               </span>
-              <span className="px-2 py-0.5 rounded text-caption font-mono font-medium bg-[#1e1e1e] text-[#aaaaaa] border border-[#2e2e2e]">
+              <span className="px-2 py-0.5 rounded text-caption font-mono font-medium bg-[#1e1e1e] text-[#aaaaaa] border border-[#2e2e2e] max-w-[14rem] truncate" title={parsedFile.gameType || 'Skyrim SE'}>
                 {parsedFile.gameType || 'Skyrim SE'}
               </span>
             </div>
-            <p className="text-body text-[#8f8f8f] mt-1">
-              {ui.createdBy} <strong className="text-[#dddddd]">{parsedFile.author}</strong>
-            </p>
+            {parsedFile.author && (
+              <p className="text-body text-[#8f8f8f] mt-1 [overflow-wrap:anywhere]">
+                {ui.createdBy} <strong className="text-[#dddddd]">{parsedFile.author}</strong>
+              </p>
+            )}
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
@@ -291,69 +288,69 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
       {isScanning && (
         <div className="px-5 py-2.5 bg-[#181818] border-b border-[#0369a1] flex-shrink-0" role="status" aria-live="polite" id="scan-progress-banner">
           <div className="flex items-center justify-between gap-3 text-body">
-            <span className="text-[#bae6fd] flex items-center gap-2">
+            <span className="text-[#bae6fd] flex items-center gap-2 min-w-0 flex-wrap">
               <span style={{ display: 'inline-block', width: 10, height: 10, borderRadius: '50%', border: '2px solid #38bdf8', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
               {scanPhase === 'match' ? scanUi.matching : scanUi.listing}
               {scanPhase === 'match' && scanTotal > 0 && (
-                <span className="font-mono text-[#38bdf8]">{scanProgress?.done.toLocaleString(language)} / {scanTotal.toLocaleString(language)}</span>
+                <span className="font-mono text-[#38bdf8] tabular-nums">{fmtNum(scanProgress?.done ?? 0, language)} / {fmtNum(scanTotal, language)}</span>
               )}
             </span>
-            <span className="font-mono font-bold text-[#38bdf8]">{scanPct !== null ? `${scanPct} %` : '…'}</span>
+            <span className="font-mono font-bold text-[#38bdf8] tabular-nums shrink-0">{scanPct !== null ? `${scanPct} %` : '…'}</span>
           </div>
           <div className="mt-1.5 h-1.5 rounded-full bg-[#181818] border border-[#0369a1] overflow-hidden" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={scanPct ?? undefined}>
             {scanPct !== null ? (
               <div className="h-full rounded-full bg-gradient-to-r from-[#0369a1] to-[#0369a1] transition-[width] duration-200" style={{ width: `${scanPct}%` }} />
             ) : (
-              <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-[#0369a1] to-[#0369a1]" style={{ animation: 'importSlide 1.2s ease-in-out infinite alternate' }} />
+              <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-[#0369a1] to-[#0369a1] sc-indeterminate" />
             )}
           </div>
           <p className="mt-1 text-caption text-[#38bdf8]">{scanUi.hint}</p>
-          <style>{'@keyframes importSlide { from { margin-left: 0 } to { margin-left: 66% } }'}</style>
+          
         </div>
       )}
 
       {/* ── Métriques ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 px-5 py-3.5 bg-[#181818] border-b border-[#2e2e2e] flex-shrink-0">
-        <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e]">
+        <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e] min-w-0">
           <span className="text-caption text-[#666666] uppercase font-mono block">{ui.requiredArchives}</span>
-          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.numberOfArchives.toLocaleString(language)}</span>
+          <span className="text-heading font-bold text-white font-mono mt-0.5 block tabular-nums">{fmtNum(parsedFile.numberOfArchives, language)}</span>
           <span className="text-caption text-[#38bdf8]">{ui.totalSize} {formatBytes(parsedFile.totalArchiveSize)}</span>
         </div>
 
-        <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e]">
+        <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e] min-w-0">
           <span className="text-caption text-[#666666] uppercase font-mono block">{ui.directives}</span>
-          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.numberOfDirectives.toLocaleString(language)}</span>
+          <span className="text-heading font-bold text-white font-mono mt-0.5 block tabular-nums">{fmtNum(parsedFile.numberOfDirectives, language)}</span>
           <span className="text-caption text-[#38bdf8]">{ui.installedSize} {formatBytes(parsedFile.totalInstalledSize)}</span>
         </div>
 
-        <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e]">
+        <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e] min-w-0">
           <span className="text-caption text-[#666666] uppercase font-mono block">{ui.inlined}</span>
-          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.inlinedFilesCount.toLocaleString(language)}</span>
+          <span className="text-heading font-bold text-white font-mono mt-0.5 block tabular-nums">{fmtNum(parsedFile.inlinedFilesCount, language)}</span>
           <span className="text-caption text-[#4ade80]">{ui.inlinedDesc}</span>
         </div>
 
-        <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e]">
+        <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e] min-w-0">
           <span className="text-caption text-[#666666] uppercase font-mono block">{ui.patches}</span>
-          <span className="text-heading font-bold text-white font-mono mt-0.5 block">{parsedFile.patchesCount.toLocaleString(language)}</span>
+          <span className="text-heading font-bold text-white font-mono mt-0.5 block tabular-nums">{fmtNum(parsedFile.patchesCount, language)}</span>
           <span className="text-caption text-[#fbbf24]">{ui.patchesDesc}</span>
         </div>
 
         {/* Disponibilité locale des archives (résultat du scan) */}
-        <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e] col-span-2 lg:col-span-1">
+        <div className="bg-[#181818] p-3 rounded-lg border border-[#2e2e2e] min-w-0 col-span-2 lg:col-span-1">
           <span className="text-caption text-[#666666] uppercase font-mono block">{scanUi.availability}</span>
           {!downloadsPath ? (
             <span className="text-body text-[#aaaaaa] mt-1 block leading-snug">{scanUi.noFolder}</span>
           ) : (
             <>
-              <span className="text-heading font-bold font-mono mt-0.5 block text-white">
-                {isScanning ? '…' : `${readyCount.toLocaleString(language)} / ${parsedFile.archives.length.toLocaleString(language)}`}
+              <span className="text-heading font-bold font-mono mt-0.5 block text-white tabular-nums">
+                {isScanning ? '…' : `${fmtNum(readyCount, language)} / ${fmtNum(parsedFile.archives.length, language)}`}
               </span>
               <div className="h-1.5 mt-1 rounded-full bg-[#181818] overflow-hidden">
                 <div className="h-full rounded-full bg-[#22c55e] transition-[width] duration-300"
                   style={{ width: `${parsedFile.archives.length ? Math.round((readyCount / parsedFile.archives.length) * 100) : 0}%` }} />
               </div>
               <span className={`text-caption mt-1 block ${missingCount > 0 ? 'text-[#f87171]' : 'text-[#4ade80]'}`}>
-                {isScanning ? scanUi.scanning : scanUi.missingN.replace('{n}', missingCount.toLocaleString(language))}
+                {isScanning ? scanUi.scanning : fillText(scanUi.missingN, { n: missingCount }, language)}
               </span>
             </>
           )}
@@ -364,16 +361,16 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
       <div className="px-4 py-2.5 bg-[#181818] border-b border-[#2e2e2e] flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
         <div className="flex items-center gap-0.5 bg-[#1a1a1a] border border-[#2e2e2e] p-1 rounded-lg">
           {([
-            ['archives', `${ui.tabArchives} (${parsedFile.archives.length})`],
-            ['directives', `${ui.tabDirectives} (${parsedFile.numberOfDirectives ?? parsedFile.directives.length})`],
-            ['plugins', `${ui.tabPlugins} (${parsedFile.loadOrder?.length || 7})`],
+            ['archives', `${ui.tabArchives} (${fmtNum(parsedFile.archives.length, language)})`],
+            ['directives', `${ui.tabDirectives} (${fmtNum(parsedFile.numberOfDirectives ?? parsedFile.directives.length, language)})`],
+            ['plugins', `${ui.tabPlugins} (${fmtNum(parsedFile.loadOrder?.length || 7, language)})`],
           ] as const).map(([id, label]) => (
             <button
               key={id}
               type="button"
               onClick={() => setActiveSubTab(id)}
-              className={`px-3 py-1 rounded text-body font-semibold cursor-pointer transition-all ${
-                activeSubTab === id ? 'bg-[#0369a1] text-white shadow-sm' : 'text-[#aaaaaa] hover:text-white hover:bg-[#262626]'
+              className={`px-3 py-1 rounded text-body font-semibold whitespace-nowrap tabular-nums transition-colors ${
+                activeSubTab === id ? 'bg-[#35353a] text-white' : 'text-[#aaaaaa] hover:text-white hover:bg-[#2c2c31] cursor-pointer'
               }`}
             >
               {label}
@@ -382,15 +379,15 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
         </div>
 
         {activeSubTab === 'archives' && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center bg-[#1a1a1a] border border-[#2e2e2e] p-0.5 rounded-lg text-body">
               {([
-                ['all', `${ui.all} (${parsedFile.archives.length})`, 'text-white', 'bg-[#2c2c2c]'],
-                ['ready', `${ui.ready} (${readyCount})`,          'text-[#4ade80]', 'bg-[#262626]'],
-                ['missing', `${ui.missing} (${missingCount})`,  'text-[#f87171]', 'bg-[#1e1e1e]'],
+                ['all', `${ui.all} (${fmtNum(parsedFile.archives.length, language)})`, 'text-white', 'bg-[#35353a]'],
+                ['ready', `${ui.ready} (${fmtNum(readyCount, language)})`,          'text-[#4ade80]', 'bg-[#35353a]'],
+                ['missing', `${ui.missing} (${fmtNum(missingCount, language)})`,  'text-[#f87171]', 'bg-[#35353a]'],
               ] as const).map(([k, label, activeC, activeBg]) => (
                 <button key={k} type="button" onClick={() => setArchiveFilter(k)}
-                  className={`px-2 py-0.5 rounded cursor-pointer font-medium transition-colors ${
+                  className={`px-2 py-0.5 rounded cursor-pointer font-medium whitespace-nowrap tabular-nums transition-colors ${
                     archiveFilter === k ? `${activeC} ${activeBg} font-bold` : 'text-[#666666] hover:text-[#aaaaaa]'
                   }`}
                 >
@@ -410,21 +407,29 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
       <div className="flex-1 overflow-y-auto p-4 select-text">
         {activeSubTab === 'archives' && (
           <div className="space-y-2">
+            {filteredArchives.length === 0 && (
+              <div className="flex flex-col items-center gap-3 py-12 text-center">
+                <p className="text-body text-[#aaaaaa] [overflow-wrap:anywhere]">{scanUi.noArchives}</p>
+                {(archiveFilter !== 'all' || archiveSearch.trim() !== '') && parsedFile.archives.length > 0 && (
+                  <button type="button" className={btn.secondary} onClick={() => { setArchiveFilter('all'); setArchiveSearch(''); }}>{scanUi.showAll}</button>
+                )}
+              </div>
+            )}
             {filteredArchives.map((archive) => (
               <div
                 key={archive.Hash + archive.Name}
-                className="bg-[#181818] border border-[#2e2e2e] hover:border-[#333333] rounded-xl p-3 flex items-center justify-between gap-4 transition-colors"
+                className="sc-selectable !cursor-default bg-[#181818] border border-[#2e2e2e] rounded-xl p-3 flex items-center justify-between gap-4 [content-visibility:auto] [contain-intrinsic-size:auto_64px]"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-body font-semibold text-white truncate">
+                    <span className="text-body font-semibold text-white truncate min-w-0" title={archive.Name}>
                       {archive.Name}
                     </span>
-                    <span className="text-caption font-mono px-2 py-0.5 rounded bg-[#222222] text-[#aaaaaa]">
+                    <span className="text-caption font-mono px-2 py-0.5 rounded bg-[#222222] text-[#aaaaaa] shrink-0 whitespace-nowrap tabular-nums">
                       {formatBytes(archive.Size)}
                     </span>
                     <span
-                      className={`text-caption font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                      className={`text-caption font-bold uppercase tracking-wider px-2 py-0.5 rounded shrink-0 whitespace-nowrap ${
                         archive.status === 'ready'
                           ? 'bg-[#262626] text-[#4ade80] border border-[#22c55e]'
                           : 'bg-[#1e1e1e] text-[#f87171] border border-[#ef4444]'
@@ -434,7 +439,7 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
                     </span>
                   </div>
 
-                  <div className="text-caption text-[#666666] font-mono mt-1 flex items-center gap-3">
+                  <div className="text-caption text-[#666666] font-mono mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 [overflow-wrap:anywhere]">
                     {archive.Hash && <span>Hash{colon(language)} {archive.Hash.slice(0, 16)}…</span>}
                     {archive.State?.ModID && <span>Mod ID{colon(language)} {archive.State.ModID}</span>}
                     {archive.State?.FileID && <span>File ID{colon(language)} {archive.State.FileID}</span>}
@@ -458,23 +463,26 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
 
         {activeSubTab === 'directives' && (
           <div className="space-y-1.5 font-mono text-body">
+            {parsedFile.directives.length === 0 && (
+              <p className="text-body text-[#aaaaaa] font-sans text-center py-12">{scanUi.noDirectives}</p>
+            )}
             {parsedFile.directivesTruncated && (
               <div className="text-body text-[#aaaaaa] font-sans px-1 pb-1">
-                {parsedFile.directives.length.toLocaleString(language)} / {(parsedFile.numberOfDirectives ?? 0).toLocaleString(language)}
+                <span className="tabular-nums">{fmtNum(parsedFile.directives.length, language)} / {fmtNum(parsedFile.numberOfDirectives ?? 0, language)}</span>
               </div>
             )}
             {parsedFile.directives.map((dir, idx) => (
               <div
                 key={idx}
-                className="bg-[#181818] border border-[#2e2e2e] p-2 rounded-lg flex items-center justify-between text-body"
+                className="sc-selectable !cursor-default bg-[#181818] border border-[#2e2e2e] p-2 rounded-lg flex items-center justify-between gap-3 text-body [content-visibility:auto] [contain-intrinsic-size:auto_40px]"
               >
-                <div className="flex items-center gap-2 truncate">
-                  <span className="text-caption px-1.5 py-0.5 rounded bg-[#262626] text-[#38bdf8] font-bold">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-caption px-1.5 py-0.5 rounded bg-[#262626] text-[#38bdf8] font-bold shrink-0 whitespace-nowrap">
                     {dir.$type}
                   </span>
-                  <span className="text-white truncate">{dir.To}</span>
+                  <span className="text-white truncate min-w-0" title={dir.To}>{dir.To}</span>
                 </div>
-                <div className="text-[#666666] text-caption flex items-center gap-3 flex-shrink-0">
+                <div className="text-[#666666] text-caption flex items-center gap-3 flex-shrink-0 tabular-nums whitespace-nowrap">
                   <span>{formatBytes(dir.Size)}</span>
                   {dir.ArchiveHash && (
                     <span className="text-[#aaaaaa]">Src: {dir.ArchiveHash.slice(0, 8)}...</span>
@@ -487,8 +495,8 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
 
         {activeSubTab === 'plugins' && (
           <div className="bg-[#181818] border border-[#2e2e2e] rounded-xl p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
                 <h3 className="text-title font-bold text-white flex items-center gap-2">
                   <span>📄</span>
                   <span>{ui.pluginsTitle}</span>
@@ -499,7 +507,7 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
               </div>
 
               {onOpenPluginsTxt && (
-                <button type="button" onClick={onOpenPluginsTxt} className={btn.primary}>
+                <button type="button" onClick={onOpenPluginsTxt} className={`${btn.primary} shrink-0`}>
                   <span>📄</span><span>{ui.fullViewer}</span>
                 </button>
               )}
@@ -507,9 +515,9 @@ export const InspectorView: React.FC<InspectorViewProps> = ({
 
             <div className="bg-[#181818] border border-[#2e2e2e] rounded-lg p-3 font-mono text-body text-[#dddddd] max-h-96 overflow-y-auto space-y-1">
               {(parsedFile.pluginsTxt || `*Skyrim.esm\n*Update.esm\n*Dawnguard.esm\n*HearthFires.esm\n*Dragonborn.esm\n*Unofficial Skyrim Special Edition Patch.esp\n*SkyUI_SE.esp`).split('\n').map((line, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="text-[#666666] w-6 text-right select-none">{i + 1}</span>
-                  <span className={line.endsWith('.esm') ? 'text-[#38bdf8] font-bold' : 'text-[#dddddd]'}>
+                <div key={i} className="flex items-start gap-2">
+                  <span className="text-[#666666] min-w-6 shrink-0 text-right select-none tabular-nums">{i + 1}</span>
+                  <span className={`min-w-0 [overflow-wrap:anywhere] ${line.endsWith('.esm') ? 'text-[#38bdf8] font-bold' : 'text-[#dddddd]'}`}>
                     {line}
                   </span>
                 </div>

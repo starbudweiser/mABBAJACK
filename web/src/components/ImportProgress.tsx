@@ -40,8 +40,8 @@ export const ImportProgress: React.FC<{ state: ImportProgressState }> = ({ state
         <p className="text-meta text-[#8f8f8f] font-mono truncate mb-4" title={state.fileName}>{state.fileName}</p>
 
         <div className="flex items-center justify-between text-body text-[#dddddd] mb-1.5">
-          <span>{uploading ? ui.uploading : ui.analyzing}</span>
-          <span className="font-mono font-bold text-[#38bdf8]">{pct !== null ? `${pct} %` : '…'}</span>
+          <span className="min-w-0 truncate">{uploading ? ui.uploading : ui.analyzing}</span>
+          <span className="font-mono font-bold text-[#38bdf8] tabular-nums shrink-0">{pct !== null ? `${pct} %` : '…'}</span>
         </div>
 
         <div
@@ -57,18 +57,18 @@ export const ImportProgress: React.FC<{ state: ImportProgressState }> = ({ state
               style={{ width: `${pct}%` }}
             />
           ) : (
-            <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-[#0369a1] to-[#0369a1]" style={{ animation: 'importSlide 1.2s ease-in-out infinite alternate' }} />
+            <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-[#0369a1] to-[#0369a1] sc-indeterminate" />
           )}
         </div>
 
-        <div className="flex items-center justify-between text-caption text-[#666666] font-mono mt-2">
+        <div className="flex items-center justify-between gap-2 text-caption text-[#666666] font-mono mt-2 tabular-nums">
           <span>{uploading && state.total > 0 ? `${fmtBytes(state.sent, language)} / ${fmtBytes(state.total, language)}` : ''}</span>
           <span>{ui.elapsed.replace('{s}', String(seconds))}</span>
         </div>
 
         {!uploading && <p className="text-body text-[#aaaaaa] mt-3 leading-relaxed">{ui.analyzingHint}</p>}
       </div>
-      <style>{'@keyframes importSlide { from { margin-left: 0 } to { margin-left: 66% } }'}</style>
+      
     </div>
   );
 };

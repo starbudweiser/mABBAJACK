@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useI18n } from '../locales';
-import { fmtBytes } from '../locales/uiScreens';
+import { fmtBytes, fmtNum } from '../locales/uiScreens';
+import { fillText } from '../locales/plural.ts';
 import { INSTALLER_UI, keyRefusalMessage } from '../locales/uiExtra';
 import { ParsedWabbajackFile, NexusAccount, InstallOptions, UpdateRequest } from '../types/wabbajack';
 import OptionalModsCard from './OptionalModsCard';
@@ -152,8 +153,8 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
       <div className="max-w-2xl w-full flex flex-col gap-4">
 
         {/* ── PAGE HEADER ─────────────────────────────────────────── */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#2e2e2e]">
-          <div>
+        <div className="flex items-center justify-between gap-3 pb-3 border-b border-[#2e2e2e]">
+          <div className="min-w-0">
             <h2 className="text-heading font-bold text-white flex items-center gap-2">
               <span>⚡</span>
               <span>{ui.title}</span>
@@ -161,7 +162,7 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             <p className="text-meta text-[#666666] mt-0.5">{ui.subtitle}</p>
           </div>
           {parsedFile && (
-            <button type="button" onClick={onOpenPluginsTxt} className={btn.secondary}>
+            <button type="button" onClick={onOpenPluginsTxt} className={`${btn.secondary} shrink-0`}>
               <span>📄</span><span>{t.installer.exportPluginsTxt}</span>
             </button>
           )}
@@ -169,9 +170,9 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
 
         {/* ── CARD 1: Modlist ──────────────────────────────────────── */}
         <div className={card}>
-          <div className="flex items-center justify-between">
-            <span className={sectionLabel}><span>📋</span><span>{ui.modlistLoaded}</span></span>
-            {parsedFile && <span className={badge.blue}>{ui.archivesN.replace('{n}', parsedFile.numberOfArchives.toLocaleString(language))} · {fmtBytes(parsedFile.totalArchiveSize, language)}</span>}
+          <div className="flex items-center justify-between gap-x-2 gap-y-1 flex-wrap">
+            <span className={`${sectionLabel} min-w-0`}><span>📋</span><span>{ui.modlistLoaded}</span></span>
+            {parsedFile && <span className={`${badge.blue} shrink-0 tabular-nums`}>{fillText(ui.archivesN, { n: parsedFile.numberOfArchives ?? 0 }, language)} · {fmtBytes(parsedFile.totalArchiveSize, language)}</span>}
           </div>
 
           {/* ── Demo mode warning ─────────────────────────────────────── */}
@@ -205,22 +206,22 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
             <>
               <div className="bg-[#1a1a1a] px-3 py-2.5 rounded-lg border border-[#2e2e2e] flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <span className="text-title font-bold text-white block truncate">{parsedFile.name}</span>
-                  <span className="text-meta text-[#666666]">{ui.by} {parsedFile.author} · v{parsedFile.version || '1.0'}</span>
+                  <span className="text-title font-bold text-white block truncate" title={parsedFile.name}>{parsedFile.name}</span>
+                  <span className="text-meta text-[#666666] block truncate" title={`${parsedFile.author} · v${parsedFile.version || '1.0'}`}>{parsedFile.author ? `${ui.by} ${parsedFile.author} · ` : ''}v{parsedFile.version || '1.0'}</span>
                 </div>
-                <span className={badge.green}>{ui.loaded}</span>
+                <span className={`${badge.green} shrink-0`}>{ui.loaded}</span>
               </div>
 
               {/* Edition badge */}
               {editionInfo && (
                 <div style={{ padding: '8px 12px', background: editionInfo.bg, border: `1px solid ${editionInfo.border}`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                  <div>
+                  <div style={{ minWidth: 0 }}>
                     <span style={{ fontSize: 'calc(12px * var(--text-scale))', fontWeight: 700, color: editionInfo.color }}>🎮 {editionInfo.label}</span>
                     <span style={{ display: 'block', fontSize: 'calc(11px * var(--text-scale))', color: '#707070', marginTop: 2 }}>
                       {ui.requiredVersion} <strong style={{ color: editionInfo.color }}>{editionInfo.version}</strong>
                     </span>
                   </div>
-                  <code style={{ fontSize: 'calc(10px * var(--text-scale))', fontFamily: 'monospace', padding: '2px 8px', borderRadius: 5, background: `${editionInfo.color}18`, color: editionInfo.color, border: `1px solid ${editionInfo.color}33` }}>
+                  <code style={{ flexShrink: 1, minWidth: 0, maxWidth: '45%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 'calc(10px * var(--text-scale))', fontFamily: 'monospace', padding: '2px 8px', borderRadius: 5, background: `${editionInfo.color}18`, color: editionInfo.color, border: `1px solid ${editionInfo.color}33` }}>
                     {parsedFile.gameType}
                   </code>
                 </div>
@@ -241,10 +242,10 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
 
         {/* ── CARD 3: DOWNLOADS ───────────────────────────────────── */}
         <div className={card}>
-          <div className="flex items-center justify-between">
-            <span className={sectionLabel}><span>📥</span><span>{ui.downloadsTitle}</span></span>
+          <div className="flex items-center justify-between gap-2">
+            <span className={`${sectionLabel} min-w-0`}><span>📥</span><span>{ui.downloadsTitle}</span></span>
             {parsedFile && (
-              <button type="button" onClick={onScanDownloads} disabled={isScanning} className={btn.ghost}>
+              <button type="button" onClick={onScanDownloads} disabled={isScanning} className={`${btn.ghost} shrink-0`}>
                 <span>{isScanning ? '⏳' : '🔄'}</span>
                 <span>{t.installer.scanDownloads}</span>
               </button>
@@ -263,16 +264,16 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
           />
 
           {parsedFile && (
-            <div className="flex items-center justify-between bg-[#1a1a1a] border border-[#2e2e2e] px-3 py-2 rounded-lg text-body">
-              <span className="text-[#666666]">
-                {ui.cache} <strong className="text-white">{readyArchives}</strong> / {totalArchives} {ui.archivesReady}
+            <div className="flex items-center justify-between gap-x-3 gap-y-2 flex-wrap bg-[#1a1a1a] border border-[#2e2e2e] px-3 py-2 rounded-lg text-body">
+              <span className="text-[#666666] min-w-0 tabular-nums">
+                {ui.cache} <strong className="text-white">{fmtNum(readyArchives, language)}</strong> / {fillText(`{n} ${ui.archivesReady}`, { n: totalArchives }, language)}
               </span>
               {missingArchives > 0 ? (
-                <button type="button" onClick={onOpenManualDownloads} className={btn.warning}>
-                  {missingArchives} {ui.missing}
+                <button type="button" onClick={onOpenManualDownloads} className={`${btn.warning} shrink-0 tabular-nums`}>
+                  {fillText(`{n} ${ui.missing}`, { n: missingArchives }, language)}
                 </button>
               ) : (
-                <span className={badge.green}>{ui.allPresent}</span>
+                <span className={`${badge.green} shrink-0`}>{ui.allPresent}</span>
               )}
             </div>
           )}
@@ -280,9 +281,9 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
 
         {/* ── CARD 4: READY TO PLAY ────────────────────────────────── */}
         <div className={card}>
-          <div className="flex items-center justify-between">
-            <span className={sectionLabel}><span>🚀</span><span>{ui.destTitle}</span></span>
-            <span className={badge.blue}>{ui.destBadge}</span>
+          <div className="flex items-center justify-between gap-2">
+            <span className={`${sectionLabel} min-w-0`}><span>🚀</span><span>{ui.destTitle}</span></span>
+            <span className={`${badge.blue} shrink-0`}>{ui.destBadge}</span>
           </div>
           <p className="text-meta text-[#666666] -mt-1">{ui.destHint}</p>
           <FieldRow
@@ -314,13 +315,15 @@ export const InstallerView: React.FC<InstallerViewProps> = ({
           {gameArchives.length > 0 && (
             missingGameArchives.length > 0 ? (
               <div className="bg-[#181818] border border-[#f59e0b] px-3 py-2.5 rounded-lg text-body text-[#fbbf24] flex flex-col gap-1">
-                <span className="font-semibold">⚠ {t.installer.gameFilesMissing.replace('{n}', String(missingGameArchives.length))}</span>
-                {missingGameArchives.map((a) => (
-                  <code key={a.Hash || a.Name} className="font-mono text-caption text-[#fbbf24] break-all">{a.expectedPath || a.Name}</code>
-                ))}
+                <span className="font-semibold tabular-nums">⚠ {fillText(t.installer.gameFilesMissing, { n: missingGameArchives.length }, language)}</span>
+                <div className="flex flex-col gap-1 max-h-48 overflow-y-auto">
+                  {missingGameArchives.map((a) => (
+                    <code key={a.Hash || a.Name} className="font-mono text-caption text-[#fbbf24] [overflow-wrap:anywhere]">{a.expectedPath || a.Name}</code>
+                  ))}
+                </div>
               </div>
             ) : (
-              <span className={badge.green}>{t.installer.gameFilesFound} ({gameArchives.length})</span>
+              <span className={`${badge.green} tabular-nums`}>{t.installer.gameFilesFound} ({fmtNum(gameArchives.length, language)})</span>
             )
           )}
         </div>

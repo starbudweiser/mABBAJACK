@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useI18n } from '../locales';
 import { useEscapeKey } from '../design';
 import { PLUGINS_UI } from '../locales/uiScreens';
+import { fillText } from '../locales/plural.ts';
 
 interface PluginsTxtModalProps {
   isOpen: boolean;
@@ -55,20 +56,20 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-[#181818] border border-[#2e2e2e] rounded-2xl max-w-3xl w-full h-[80vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
         {/* Header */}
-        <div className="p-4 bg-[#181818] border-b border-[#2e2e2e] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#0369a1]/20 border border-[#0ea5e9]/40 flex items-center justify-center text-[#38bdf8] text-lg">
+        <div className="p-4 bg-[#181818] border-b border-[#2e2e2e] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 shrink-0 rounded-xl bg-[#0369a1]/20 border border-[#0ea5e9]/40 flex items-center justify-center text-[#38bdf8] text-lg">
               📄
             </div>
-            <div>
-              <h2 className="text-title font-bold text-white flex items-center gap-2">
+            <div className="min-w-0">
+              <h2 className="text-title font-bold text-white flex items-center gap-2 flex-wrap">
                 <span>{ui.title}</span>
-                <span className="text-caption font-mono px-2 py-0.5 rounded-full bg-[#0369a1]/20 text-[#38bdf8] border border-[#0ea5e9]/30">
-                  {lines.length} plugins
+                <span className="text-caption font-mono px-2 py-0.5 rounded-full bg-[#0369a1]/20 text-[#38bdf8] border border-[#0ea5e9]/30 whitespace-nowrap tabular-nums">
+                  {fillText(ui.count, { n: lines.length }, language)}
                 </span>
               </h2>
-              <p className="text-meta text-[#8f8f8f]">
-                {ui.subtitle.replace('{name}', modlistName)}
+              <p className="text-meta text-[#8f8f8f] [overflow-wrap:anywhere]">
+                {fillText(ui.subtitle, { name: modlistName }, language)}
               </p>
             </div>
           </div>
@@ -76,7 +77,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-[#222222] hover:bg-[#303030] text-[#8f8f8f] hover:text-white flex items-center justify-center text-body-lg transition-colors cursor-pointer"
+            className="w-8 h-8 shrink-0 rounded-lg bg-[#222222] hover:bg-[#303030] text-[#8f8f8f] hover:text-white flex items-center justify-center text-body-lg transition-colors cursor-pointer"
           >
             ✕
           </button>
@@ -94,7 +95,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               type="button"
               onClick={handleCopy}
@@ -118,8 +119,11 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
         {/* Plugins List View */}
         <div className="flex-1 overflow-y-auto p-4 font-mono text-body bg-[#181818] select-text">
           {filteredLines.length === 0 ? (
-            <div className="text-[#666666] text-center py-12">
-              {ui.noMatch}
+            <div className="text-[#aaaaaa] text-center py-12 flex flex-col items-center gap-3 font-sans">
+              <span className="[overflow-wrap:anywhere]">{lines.length === 0 ? ui.empty : ui.noMatch}</span>
+              {lines.length > 0 && filter !== '' && (
+                <button type="button" onClick={() => setFilter('')} className="h-8 px-3 bg-[#262626] hover:bg-[#333333] border border-[#444444] text-[#dddddd] hover:text-white rounded-lg text-body font-semibold cursor-pointer transition-colors">{ui.showAll}</button>
+              )}
             </div>
           ) : (
             <div className="space-y-1">
@@ -129,13 +133,13 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
                 return (
                   <div
                     key={idx}
-                    className="flex items-center gap-3 px-2 py-1 rounded hover:bg-[#181818] text-[#dddddd] transition-colors"
+                    className="sc-selectable !cursor-default flex items-start gap-3 px-2 py-1 rounded text-[#dddddd] [content-visibility:auto] [contain-intrinsic-size:auto_28px]"
                   >
-                    <span className="text-[#666666] w-8 text-right select-none text-caption">
+                    <span className="text-[#666666] min-w-8 shrink-0 text-right select-none text-caption tabular-nums">
                       {idx + 1}
                     </span>
                     <span
-                      className={`truncate ${
+                      className={`min-w-0 [overflow-wrap:anywhere] ${
                         isComment
                           ? 'text-[#666666] italic'
                           : isMaster
@@ -153,10 +157,10 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
         </div>
 
         {/* Footer info */}
-        <div className="p-3 bg-[#181818] border-t border-[#2e2e2e] flex items-center justify-between text-meta text-[#666666]">
-          <div className="flex items-center gap-2">
-            <span>💡</span>
-            <span>
+        <div className="p-3 bg-[#181818] border-t border-[#2e2e2e] flex items-center justify-between gap-3 text-meta text-[#666666]">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="shrink-0">💡</span>
+            <span className="min-w-0 [overflow-wrap:anywhere]">
               {ui.footerHint}{' '}
               <code className="text-[#aaaaaa] bg-[#1a1a1a] px-1 py-0.5 rounded">
                 drive_c/users/&lt;user&gt;/AppData/Local/Skyrim Special Edition/plugins.txt
@@ -167,7 +171,7 @@ export const PluginsTxtModal: React.FC<PluginsTxtModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-[#222222] hover:bg-[#303030] text-white rounded-lg text-body font-semibold transition-colors cursor-pointer"
+            className="px-4 py-1.5 shrink-0 bg-[#222222] hover:bg-[#303030] text-white rounded-lg text-body font-semibold transition-colors cursor-pointer"
           >
             {ui.close}
           </button>

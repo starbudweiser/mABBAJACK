@@ -61,7 +61,7 @@ export const BottledBlock: React.FC<{ bottled: MacBottled }> = ({ bottled }) => 
 
   const errorText = (j: Extract<BottledJob, { status: 'error' }>) => ({
     noKey: ui.bottledNoKey, noFolder: ui.bottledNoFolder, noFile: ui.bottledNoFile,
-    tooOld: fillMac(ui.bottledTooOld, { version: j.version ?? '?' }), noLink: ui.bottledNoLink, failed: ui.bottledFailed,
+    tooOld: fillMac(ui.bottledTooOld, { version: j.version ?? '?' }, language), noLink: ui.bottledNoLink, failed: ui.bottledFailed,
   })[j.code];
 
   return (
@@ -72,21 +72,21 @@ export const BottledBlock: React.FC<{ bottled: MacBottled }> = ({ bottled }) => 
           <span className={bottled.state === 'ok' ? 'text-[#4ade80]' : needsFix ? 'text-[#fbbf24]' : 'text-[#8f8f8f]'}>{bottled.state === 'ok' ? '✓' : needsFix ? '⚠' : '•'}</span>
           <span className="text-body font-semibold text-white">{ui.bottled}</span>
         </span>
-        <p className="text-body text-[#aaaaaa]">{macText(bottled.text, language)}</p>
+        <p className="text-body text-[#aaaaaa] [overflow-wrap:anywhere]">{macText(bottled.text, language)}</p>
       </div>
       {needsFix && (
         <div className="flex flex-col items-center text-center gap-2">
           {job.status === 'idle' || job.status === 'error' ? (
             <>
-              <div><button type="button" className={btn.secondary} onClick={start}>⬇ {fillMac(ui.bottledGet, { version: bottled.minimum })}</button></div>
+              <div><button type="button" className={btn.secondary} onClick={start}>⬇ {fillMac(ui.bottledGet, { version: bottled.minimum }, language)}</button></div>
               {job.status === 'error' && <p className="text-meta text-[#f87171]">{errorText(job)}</p>}
             </>
           ) : job.status === 'looking' ? (
             <p className="text-meta text-[#aaaaaa]">{ui.bottledLooking}</p>
           ) : job.status === 'downloading' ? (
             <div className="flex flex-col gap-1 w-full">
-              <p className="text-meta text-[#aaaaaa]">{fillMac(ui.bottledProgress, { name: job.name, percent: job.percent })}</p>
-              <div className="h-1.5 rounded-full bg-[#262626] overflow-hidden"><div className="h-full rounded-full bg-[#0ea5e9] transition-all" style={{ width: `${job.percent}%` }} /></div>
+              <p className="text-meta text-[#aaaaaa] tabular-nums [overflow-wrap:anywhere]">{fillMac(ui.bottledProgress, { name: job.name, percent: job.percent }, language)}</p>
+              <div className="h-1.5 rounded-full bg-[#262626] overflow-hidden"><div className="h-full rounded-full bg-[#0ea5e9] transition-[width]" style={{ width: `${Math.min(100, Math.max(0, job.percent))}%` }} /></div>
             </div>
           ) : job.status === 'manual' ? (
             <div className="flex flex-col gap-1.5">
@@ -95,7 +95,7 @@ export const BottledBlock: React.FC<{ bottled: MacBottled }> = ({ bottled }) => 
             </div>
           ) : (
             <div className="flex flex-col gap-1.5">
-              <p className="text-meta text-[#4ade80]">✓ {fillMac(ui.bottledDone, { name: job.name })}</p>
+              <p className="text-meta text-[#4ade80]">✓ {fillMac(ui.bottledDone, { name: job.name }, language)}</p>
               <p className="text-meta text-[#8f8f8f]">{ui.bottledHint}</p>
               <div><button type="button" className={btn.ghost} onClick={() => openFolderInFinder(job.path.replace(/\/[^/]*$/, ''))}>📂 {ui.bottledShow}</button></div>
             </div>
@@ -117,26 +117,26 @@ const ModeOption: React.FC<{
     tabIndex={disabled ? -1 : 0}
     onClick={() => { if (!disabled) onSelect(); }}
     onKeyDown={(e) => { if (!disabled && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); onSelect(); } }}
-    className={`rounded-lg border p-3 flex flex-col gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#0ea5e9] ${selected ? 'border-[#0ea5e9] bg-[#0ea5e9]/10' : 'border-[#2e2e2e] bg-[#1a1a1a]'} ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:border-[#3d3d3d]'}`}
+    className={`rounded-lg border border-[#2e2e2e] bg-[#1a1a1a] p-3 flex flex-col gap-2 min-w-0 ${disabled ? 'opacity-60 cursor-not-allowed outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]' : `sc-selectable ${selected ? 'is-selected' : ''}`}`}
   >
     <div className="flex items-start gap-2.5">
       <span className={`mt-0.5 w-4 h-4 rounded-full border flex-shrink-0 flex items-center justify-center ${selected ? 'border-[#0ea5e9]' : 'border-[#555555]'}`}>
         {selected && <span className="w-2 h-2 rounded-full bg-[#0ea5e9]" />}
       </span>
       <div className="min-w-0 flex flex-col gap-0.5">
-        <span className="text-body font-semibold text-white">{title}</span>
-        <p className="text-body text-[#aaaaaa]">{lead}</p>
+        <span className="text-body font-semibold text-white [overflow-wrap:anywhere]">{title}</span>
+        <p className="text-body text-[#aaaaaa] [overflow-wrap:anywhere]">{lead}</p>
       </div>
     </div>
-    <dl className="grid grid-cols-[9.5rem_1fr] gap-x-3 gap-y-1.5 pl-[26px]">
+    <dl className="grid grid-cols-[minmax(0,9.5rem)_minmax(0,1fr)] gap-x-3 gap-y-1.5 pl-[26px]">
       {rows.map(([label, value]) => (
         <React.Fragment key={label}>
-          <dt className="text-caption uppercase font-bold text-[#707070] pt-0.5">{label}</dt>
-          <dd className="text-meta text-[#aaaaaa]">{value}</dd>
+          <dt className="text-caption uppercase font-bold text-[#707070] pt-0.5 [overflow-wrap:anywhere]">{label}</dt>
+          <dd className="text-meta text-[#aaaaaa] [overflow-wrap:anywhere]">{value}</dd>
         </React.Fragment>
       ))}
     </dl>
-    {notice && <p className="text-meta text-[#fbbf24] pl-[26px]">⚠ {notice}</p>}
+    {notice && <p className="text-meta text-[#fbbf24] pl-[26px] [overflow-wrap:anywhere]">⚠ {notice}</p>}
   </div>
 );
 
@@ -184,8 +184,8 @@ export const MacCard: React.FC = () => {
   return (
     <div className={card}>
       <div className="flex items-center justify-between gap-3">
-        <span className={sectionLabel}><span>🍎</span><span>{ui.title}</span></span>
-        {kit && preview?.target && <span className={badge.blue}>{preview.target.kind === 'install' ? ui.targetInstall : ui.targetGame}</span>}
+        <span className={`${sectionLabel} min-w-0`}><span>🍎</span><span>{ui.title}</span></span>
+        {kit && preview?.target && <span className={`${badge.blue} shrink-0`}>{preview.target.kind === 'install' ? ui.targetInstall : ui.targetGame}</span>}
       </div>
 
       <p className="text-meta text-[#8f8f8f] -mt-1">{ui.modeChoose}</p>
@@ -219,12 +219,12 @@ export const MacCard: React.FC = () => {
               {preview.bottles && preview.bottles.length > 1 ? (
                 <label className="flex items-center gap-2">
                   <span>{ui.bottleLabel} :</span>
-                  <select className="h-7 px-2 bg-[#1a1a1a] border border-[#2e2e2e] rounded-md text-body text-white" value={preview.bottle?.name || ''} onChange={(e) => setMacBottle(e.target.value)}>
+                  <select className="h-7 px-2 min-w-0 max-w-full bg-[#1a1a1a] border border-[#2e2e2e] rounded-md text-body text-white" value={preview.bottle?.name || ''} onChange={(e) => setMacBottle(e.target.value)}>
                     {preview.bottles.map((b) => <option key={b.path} value={b.name}>{b.name}</option>)}
                   </select>
                 </label>
               ) : (
-                <span>{ui.bottle} : {preview.bottle ? <code className="font-mono text-[#aaaaaa]">{preview.bottle.name}</code> : ui.noBottle}</span>
+                <span>{ui.bottle} : {preview.bottle ? <code className="font-mono text-[#aaaaaa] break-all">{preview.bottle.name}</code> : ui.noBottle}</span>
               )}
             </div>
           )}
@@ -237,8 +237,8 @@ export const MacCard: React.FC = () => {
               <span className="text-caption uppercase font-bold text-[#707070]">{ui.willDo}</span>
               {plan.fixes.map((f) => (
                 <div key={f.id} className="rounded-lg border border-[#2e2e2e] bg-[#1a1a1a] p-3 flex flex-col gap-1">
-                  <span className="text-body font-semibold text-white">{macText(f.title, language)}</span>
-                  <p className="text-body text-[#aaaaaa]">{macText(f.detail, language)}</p>
+                  <span className="text-body font-semibold text-white [overflow-wrap:anywhere]">{macText(f.title, language)}</span>
+                  <p className="text-body text-[#aaaaaa] [overflow-wrap:anywhere]">{macText(f.detail, language)}</p>
                   <FixDetails files={f.files} changes={f.changes} />
                 </div>
               ))}
@@ -249,7 +249,7 @@ export const MacCard: React.FC = () => {
             <div className="flex flex-col gap-1">
               <span className="text-caption uppercase font-bold text-[#707070]">{ui.skippedTitle}</span>
               {plan.skipped.map((s) => (
-                <p key={s.id} className="text-meta text-[#8f8f8f]"><span className="text-[#aaaaaa]">{macText(titleOf(s.id), language)}</span> — {macText(s.reason, language)}</p>
+                <p key={s.id} className="text-meta text-[#8f8f8f] [overflow-wrap:anywhere]"><span className="text-[#aaaaaa]">{macText(titleOf(s.id), language)}</span> — {macText(s.reason, language)}</p>
               ))}
             </div>
           )}
@@ -258,7 +258,7 @@ export const MacCard: React.FC = () => {
             <div className="flex flex-col gap-1">
               <span className="text-caption uppercase font-bold text-[#707070]">{ui.discardedTitle}</span>
               {plan.discarded.map((d) => (
-                <p key={d.file} className="text-meta text-[#8f8f8f]"><code className="font-mono text-[#aaaaaa]">{d.file.split('/').pop()}</code> — {macText(d.reason, language)}</p>
+                <p key={d.file} className="text-meta text-[#8f8f8f] [overflow-wrap:anywhere]"><code className="font-mono text-[#aaaaaa] break-all">{d.file.split('/').pop()}</code> — {macText(d.reason, language)}</p>
               ))}
             </div>
           )}
@@ -345,7 +345,7 @@ export const MacReportCard: React.FC<{ report: MacReport; children?: React.React
       {!report.error && report.noBottle && <p className="text-body text-[#fbbf24]">⚠ {ui.reportNoBottle}</p>}
       {!report.error && report.target && !report.noBottle && items.length === 0 && !undoneCount && <p className="text-body text-[#4ade80]">✓ {ui.reportNothing}</p>}
       {allUndone && <p className="text-body text-[#4ade80]">✓ {ui.allUndone}</p>}
-      {undoneCount !== 0 && !allUndone && <p className="text-meta text-[#4ade80]">✓ {fillMac(ui.undone, { n: undoneCount })}</p>}
+      {undoneCount !== 0 && !allUndone && <p className="text-meta text-[#4ade80]">✓ {fillMac(ui.undone, { n: undoneCount }, language)}</p>}
 
       {report.target && (
         <p className="text-meta text-[#8f8f8f]">
@@ -365,10 +365,10 @@ export const MacReportCard: React.FC<{ report: MacReport; children?: React.React
                 <span className={`${st.color} font-bold w-4 text-center flex-shrink-0`}>{st.icon}</span>
                 <div className="min-w-0 flex-1 flex flex-col gap-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-body font-semibold text-white">{macText(it.title ?? titleOf(it.id), language)}</span>
+                    <span className="text-body font-semibold text-white [overflow-wrap:anywhere]">{macText(it.title ?? titleOf(it.id), language)}</span>
                     <span className={badge[st.badge]}>{label}</span>
                   </div>
-                  {why && <p className="text-body text-[#aaaaaa]">{macText(why, language)}</p>}
+                  {why && <p className="text-body text-[#aaaaaa] [overflow-wrap:anywhere]">{macText(why, language)}</p>}
                   {refusals[it.id] && <p className="text-meta text-[#fbbf24]">⚠ {ui.refused} — {macText(refusals[it.id], language)}</p>}
                   <FixDetails files={it.files} changes={it.changes} />
                 </div>
@@ -385,7 +385,7 @@ export const MacReportCard: React.FC<{ report: MacReport; children?: React.React
         <div className="flex flex-col gap-1">
           <span className="text-caption uppercase font-bold text-[#707070]">{ui.discardedTitle}</span>
           {discarded.map((d) => (
-            <p key={d.file} className="text-meta text-[#8f8f8f]"><code className="font-mono text-[#aaaaaa]">{d.file.split('/').pop()}</code> — {macText(d.reason, language)}</p>
+            <p key={d.file} className="text-meta text-[#8f8f8f] [overflow-wrap:anywhere]"><code className="font-mono text-[#aaaaaa] break-all">{d.file.split('/').pop()}</code> — {macText(d.reason, language)}</p>
           ))}
         </div>
       )}
