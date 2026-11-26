@@ -2,6 +2,24 @@
 
 Notes de version / release notes (EN + FR). Translations in IT and ES: see the Nexus Mods page.
 
+## 2.0.4
+
+**English**
+
+- Modlist cards, rows and Mac options: hover and selection now change the background only, with no border or glow.
+- Singular and plural forms agree with the number in all four languages, and numbers and sizes follow your language.
+- Long modlist, archive and folder names no longer overflow, and very long archive lists scroll smoothly.
+- Empty lists show a message, with a "Show all" button when a filter or search is active.
+- The macOS "Reduce motion" setting is respected.
+
+**Français**
+
+- Cartes des modlists, lignes et options Mac : le survol et la sélection changent seulement le fond, sans bordure ni halo.
+- Le singulier et le pluriel s'accordent avec le nombre dans les quatre langues, et les nombres et tailles suivent votre langue.
+- Les noms longs de modlists, d'archives et de dossiers ne débordent plus, et les très longues listes d'archives défilent sans à-coups.
+- Les listes vides affichent un message, avec un bouton « Tout afficher » quand un filtre ou une recherche est actif.
+- Le réglage « Réduire les animations » de macOS est respecté.
+
 ## 2.0.3
 
 **English**
